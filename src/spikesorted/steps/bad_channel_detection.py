@@ -24,20 +24,50 @@ from .estimate_bad_channel_detection_memory_usage import (
 
 @dataclass(frozen=True)
 class BadChannelDetectionStep(BasePipelineStep):
-    """Detect bad channels. Inherits from BasePipelineStep
-    including  all standard attributes (recordings, pipeline config, etc).
+    """Detect bad channels for each recording session and shank.
 
-    The step wraps SpikeInterface's `bad_channel_detection` in it's `run()`
-    function. It stores to disk for each session / shank in `recordings`:
+    The ``run()`` method wraps SpikeInterface's ``detect_bad_channels()``.
 
-    "bad_channel_ids.csv"
-        The SpikeInterface channel_id of every bad channel in the recording.
-        A single column containing channel ID.
+    Parameters
+    ----------
+    recordings : RecordingInput or list of RecordingInput
+        A recording, a dictionary mapping shank IDs to recordings, or a
+        tuple of (recording or shank dictionary, session name). Supply a
+        list of these objects to process multiple sessions.
 
-    "bad_channel_labels.csv"
-        A label indicating whether the channel is good, bad noise etc.
-        See SpikeInterface detect_bad_channels() documentation for details
-        on labels. Two columns, the first is channel ID and the second the label.
+    config_path : str or pathlib.Path
+        Path to the YAML pipeline configuration file containing the
+        ``bad_channel_detection`` settings.
+
+    output_path : str or pathlib.Path
+        Root output directory under which the step saves outputs for
+        each session and shank.
+
+    overwrite : bool, optional
+        Whether to overwrite existing output CSV files. Default is False.
+
+    num_cores : int, optional
+        Number of CPU cores allocated to the step. Default is 1.
+
+    See Also
+    --------
+    BasePipelineStep
+    spikeinterface.preprocessing.detect_bad_channels
+
+    Notes
+    -----
+    The following CSV files are saved for each session and shank:
+
+    ``bad_channel_ids.csv``
+        One row per detected bad channel, with a single ``channel_id``
+        column containing its SpikeInterface channel identifier.
+
+    ``bad_channel_labels.csv``
+        One row per recording channel, including good channels, with
+        columns ``channel_id`` and ``label``. Labels are supplied by
+        SpikeInterface's ``detect_bad_channels()``.
+
+    Both files include column headers and omit the DataFrame index.
     """
     def run(self, verbose: bool = True) -> None:
         """Check inputs, high-pass at 300 Hz, and run IBL bad-channel detection.
@@ -48,9 +78,13 @@ class BadChannelDetectionStep(BasePipelineStep):
 
         kwargs = self.config["bad_channel_detection"]
 
-        for shank_recording, shank_path in self._get_recordings_and_paths(
+        for session_name, shank_id, shank_recording, shank_path in self._get_recordings_and_paths(
             "bad_channel_detection"
         ):
+            if verbose:
+                shank_id_message = f", shank {shank_id}" if shank_id else ""
+                print(f"Running bad channel detection for session {session_name}" + shank_id_message)
+
             bad_ids_path = self.get_bad_channel_ids_filepath(shank_path)
             labels_path = self.get_bad_channel_labels_filepath(shank_path)
 
@@ -71,6 +105,9 @@ class BadChannelDetectionStep(BasePipelineStep):
             )
             bad_ids_df.to_csv(bad_ids_path, index=False)
             labels_df.to_csv(labels_path, index=False)
+
+            if verbose:
+                print(f"Bad channel IDS and labels saved to: {bad_ids_path.parent}")
 
         if "combine_sessions" in self.config and get_num_sessions(self.recordings) > 1:
             create_bad_channel_labels_union(self.recordings, self.output_path)
@@ -121,56 +158,6 @@ class BadChannelDetectionStep(BasePipelineStep):
     def get_bad_channel_labels_filepath(self, shank_path: Path) -> Path:
         """Return the all-channel labels CSV path for a shank output directory."""
         return shank_path / "bad_channel_labels.csv"
-
-    def mem_required_per_core(self) -> int:
-        """Estimate the memory usage for applying bad channel to a single recording.
-
-        Bad channels are detected by first generating random chunks of data
-        from the recording before estimating channel data quality from the chunks.
-        When n_jobs>1 each chunk is handled in a separate core. This function estimates
-        the memory requirement for each function.
-
-        This is very much a conservative estimate. The key features for the memory used
-        is chunk size in bytes (affected by chunk length in seconds and datatype)
-        as well as the number of copies made internally. For each step, the number
-        of copies is estimated from the implementation.
-
-        This estimate is *very* rough. In reality, these scalars are largely determined
-        by our benchmark tests, choosing values that work as close to, but within, all
-        measured memory limits across systems.
-        """
-        config = self.config["bad_channel_detection"]
-
-        recording = self.get_first_recording()
-
-        chunk_duration_s = _parameter(config.get("chunk_duration_s"), "chunk_duration_s")
-
-        num_samples_per_chunk = int(
-            recording.get_sampling_frequency() * chunk_duration_s
-        )
-
-        float64_bytes = 8
-
-        chunk_bytes = num_samples_per_chunk * recording.get_num_channels() * float64_bytes
-
-        filter_factor = estimate_filter_memory_usage(
-            recording, chunk_duration_s=config.get("chunk_duration_s"),
-            freq_min=self._highpass_freq_min,
-            method=config.get("method"),
-            num_random_chunks=config.get("num_random_chunks"),
-        )
-
-        detection_factor = estimate_bad_channel_detection_memory_usage(
-            recording,
-            chunk_duration_s=config.get("chunk_duration_s"),
-            method=config.get("method"),
-            num_random_chunks=config.get("num_random_chunks"),
-        )
-
-        # Add 10% headroom for small allocations beyond the estimated arrays.
-        headroom_multiplier = 1.1
-
-        return ceil(headroom_multiplier * chunk_bytes * max(filter_factor, detection_factor))
 
     def needs_gpu(self) -> bool:
         """Report whether the configured detection method requires a GPU."""
