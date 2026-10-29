@@ -1,25 +1,17 @@
-API
-===
+API reference
+=============
 
-math
-----
+Pipeline
+--------
 
-.. currentmodule:: spikesorted.math
+.. autoclass:: spikesorted.Pipeline
+   :members: run
+   :member-order: bysource
 
-.. autosummary::
-    :toctree: api_generated
-    :template: function.rst
+Steps
+-----
 
-    add_two_integers
-    subtract_two_integers
-
-greetings
----------
-
-.. currentmodule:: spikesorted.greetings
-
-.. autosummary::
-    :toctree: api_generated
-    :template: class.rst
-
-    Greetings
+.. autoclass:: spikesorted.steps.bad_channel_detection_step.BadChannelDetectionStep
+   :members: run, perform_checks, get_bad_channel_ids_filepath, get_bad_channel_labels_filepath, mem_required_per_core, mem_required_total, needs_gpu
+   :inherited-members:
+   :member-order: bysource

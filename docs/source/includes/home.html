@@ -1,15 +1,161 @@
 <div class="spikesorted-home">
-  <section class="signal-hero" aria-labelledby="hero-title">
-    <canvas id="spike-field" aria-hidden="true"></canvas>
-    <div class="hero-content">
-      <div class="eyebrow"><span class="status-dot"></span> EXTRACELLULAR ELECTROPHYSIOLOGY</div>
-      <h1 id="hero-title">From raw recordings<br><span>to sorted spikes.</span></h1>
-      <p class="hero-description">spikesorted is an end-to-end pipeline for spike sorting<br>extracellular electrophysiology recordings.</p>
-      <div class="hero-actions">
-        <a class="signal-button primary" href="getting_started.html">Get started <span aria-hidden="true">→</span></a>
+
+  <nav class="ss-doc-nav" aria-label="Explore the documentation">
+    <a class="ss-doc-card" href="getting_started.html"><span class="ss-doc-card-title">Get started</span><span class="ss-doc-card-description">Install <code>spikesorted</code>.</span></a>
+    <a class="ss-doc-card" href="tutorials/index.html"><span class="ss-doc-card-title">Tutorials</span><span class="ss-doc-card-description">Walk through common uses of <code>spikesorted</code>.</span></a>
+    <a class="ss-doc-card" href="steps/index.html"><span class="ss-doc-card-title">Pipeline Steps</span><span class="ss-doc-card-description">Read more on each step</span></a>
+  </nav>
+
+
+  <section aria-labelledby="pipeline-title">
+    <h2 id="pipeline-title">Pipeline overview</h2>
+    <p>Apply a configured sequence of steps to your recordings. <a href="tutorials/pipeline-overview.html">Read the pipeline overview</a>.</p>
+    <figure class="ss-pipeline">
+      <div class="ss-flowchart" role="group" aria-label="Pipeline flow. Main sequence: bad-channel detection, raw data quality metrics, artifact detection, preprocessing, spike sorting, postprocessing, curation. Side routes: artifact detection through artifact curation to preprocessing; preprocessing through combining multiple sessions to spike sorting; postprocessing through optional unit matching to curation.">
+        <svg class="ss-connectors" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <marker id="ss-main-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M1 2L10 5L1 8Z" fill="var(--ss-flow-green)"/></marker>
+            <marker id="ss-side-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M1 2L10 5L1 8Z" fill="var(--pst-color-text-muted)"/></marker>
+          </defs>
+          <g class="ss-main-paths" marker-end="url(#ss-main-arrow)">
+            <path d="M75 9V15"/>
+            <path d="M75 23V29"/>
+            <path d="M75 37V43"/>
+            <path d="M75 51V57"/>
+            <path d="M75 65V71"/>
+            <path d="M75 79V85"/>
+          </g>
+          <g class="ss-side-paths" marker-end="url(#ss-side-arrow)">
+            <path d="M52 33H46Q43 33 43 36Q43 38.5 40 38.5H36"/>
+            <path d="M36 41.5H39Q41 41.5 41 43.5Q41 45.5 44 45.5H52"/>
+            <path d="M52 48.5H46Q43 48.5 43 50.5Q43 52.5 40 52.5H36"/>
+            <path d="M36 55.5H39Q41 55.5 41 58Q41 61 44 61H52"/>
+            <path d="M52 75H46Q43 75 43 78Q43 80.5 40 80.5H36"/>
+            <path d="M36 83.5H39Q41 83.5 41 86Q41 89 44 89H52"/>
+          </g>
+        </svg>
+        <a class="ss-flow-node" style="--row:1%" href="steps/pipeline-steps.html">Bad-channel detection<svg class="ss-step-link-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M8 4h4v4"/></svg></a>
+        <a class="ss-flow-node" style="--row:15%" href="steps/raw-data-quality-metrics.html">Raw data quality metrics<svg class="ss-step-link-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M8 4h4v4"/></svg></a>
+        <a class="ss-flow-node" style="--row:29%" href="steps/artifact-detection.html">Artifact detection<svg class="ss-step-link-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M8 4h4v4"/></svg></a>
+        <a class="ss-flow-node" style="--row:43%" href="steps/preprocessing.html">Preprocessing<svg class="ss-step-link-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M8 4h4v4"/></svg></a>
+        <a class="ss-flow-node" style="--row:57%" href="steps/sorting.html">Spike sorting<svg class="ss-step-link-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M8 4h4v4"/></svg></a>
+        <a class="ss-flow-node" style="--row:71%" href="steps/postprocessing.html">Postprocessing<svg class="ss-step-link-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M8 4h4v4"/></svg></a>
+        <a class="ss-flow-node" style="--row:85%" href="steps/curation.html">Curation<svg class="ss-step-link-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M8 4h4v4"/></svg></a>
+        <a class="ss-flow-node ss-flow-side" style="--row:36%" href="steps/artifact-curation.html">Artifact curation<svg class="ss-step-link-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M8 4h4v4"/></svg></a>
+        <a class="ss-flow-node ss-flow-side" style="--row:50%" href="steps/combine-sessions.html">Combine multiple sessions<svg class="ss-step-link-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M8 4h4v4"/></svg></a>
+        <a class="ss-flow-node ss-flow-side" style="--row:78%" href="specification/implementation.html#unit-matching">Unit matching (optional)<svg class="ss-step-link-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M8 4h4v4"/></svg></a>
       </div>
-      <div class="hero-meta"><span>OPEN SOURCE</span><span>PYTHON</span><span>IN DEVELOPMENT</span></div>
+      <figcaption>Select a step to explore it. Side routes show artifact curation, multi-session processing and optional unit matching.</figcaption>
+    </figure>
+  </section>
+
+  <section aria-labelledby="quality-title">
+    <h2 id="quality-title">Assess quality</h2>
+    <div class="ss-quality-overview">
+      <figure class="ss-rms-figure">
+        <a href="_static/images/raw-data-quality-source.png" aria-label="View the original quality plots at full size">
+          <svg viewBox="10 52 500 350" role="img" aria-label="Raw AP RMS amplitude by channel over time"><title>Raw AP RMS amplitude by channel over time</title><image href="_static/images/raw-data-quality-source.png" width="1539" height="891"/><rect x="10" y="88" width="79" height="273" fill="white"/></svg>
+        </a>
+        <figcaption class="ss-rms-caption">RMS plot over time, used for raw data quality assessment, similar to the <a href="https://docs.internationalbrainlab.org/_autosummary/ibllib.ephys.ephysqc.html">IBL pipeline</a>.</figcaption>
+      </figure>
+      <div class="ss-quality-description">
+        <p>Inspect RMS amplitude across channels and time to assess recording quality.</p>
+        <p>Native SpikeInterface sorting outputs can be opened in <a href="https://spikeinterface-gui.readthedocs.io/en/latest/">spikeinterface-gui</a> for inspection and manual curation.</p>
+      </div>
     </div>
-    <div class="signal-caption"><button id="motion-toggle" type="button" aria-pressed="false" hidden>Pause animation</button></div>
+  </section>
+
+  <section aria-labelledby="configuration-title">
+    <h2 id="configuration-title">Encode and share</h2>
+    <p>Define your pipeline in a YAML configuration file. For example:</p>
+    <p><a href="configs/index.html">Configs</a></p>
+    <div class="ss-config-example">
+      <div class="ss-config-filename">np-standard-kilosort4.yaml</div>
+    <pre aria-label="Example YAML configuration"><code class="ss-yaml"><span class="nt">raw_data_quality_metrics</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">chunk_size_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="w">  </span><span class="nt">num_chunks</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
+<span class="w">  </span><span class="nt">rolling_rms_window_size_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3.0</span>
+<span class="w">  </span><span class="nt">quick_metrics_only</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+
+<span class="nt">bad_channel_detection</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="s">'coherence+psd'</span>
+
+<span class="nt">preprocessing</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">remove_bad_channels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w">  </span><span class="c1"># detected bad channels are removed, not interpolated</span>
+<span class="w">  </span><span class="nt">phase_shift</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w">  </span><span class="c1"># Neuropixels only</span>
+<span class="w">  </span><span class="nt">bandpass_filter</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">freq_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">300.0</span>
+<span class="w">    </span><span class="nt">freq_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6000.0</span>
+<span class="w">  </span><span class="nt">common_reference</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">reference</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">global</span>
+<span class="w">    </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">median</span>
+
+<span class="nt">sorting</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">sorter</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kilosort4</span>
+<span class="w">  </span><span class="nt">params</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">do_CAR</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">highpass_cutoff</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w">  </span><span class="c1"># Low cutoff; Kilosort still applies a high-pass filter</span>
+
+<span class="nt">postprocessing</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">random_spikes</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">max_spikes_per_unit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2500</span>
+<span class="w">  </span><span class="nt">waveforms</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">ms_before</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="w">    </span><span class="nt">ms_after</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span>
+<span class="w">  </span><span class="nt">templates</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
+<span class="w">  </span><span class="nt">quality_metrics</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">metric_names</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span>
+<span class="w">  </span><span class="nt">compute_sparsity</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">radius</span>
+<span class="w">    </span><span class="nt">radius_um</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span></code></pre>
+    </div>
+  </section>
+
+  <section class="ss-output-selector" aria-labelledby="outputs-title">
+    <h2 id="outputs-title">Standardised outputs</h2>
+    <p>Explore the single-session and concatenated multi-session output layouts below.</p>
+    <svg class="ss-file-symbols" aria-hidden="true"><defs>
+  <symbol id="ss-folder-symbol" viewBox="0 0 365 350"><image href="_static/images/blueprint-project-tree.png" width="7049" height="5858"/></symbol>
+  <symbol id="ss-data-folder-symbol" viewBox="0 0 365 350"><image href="_static/images/blueprint-project-tree.png" width="7049" height="5858"/><svg x="100" y="8" width="165" height="215" viewBox="550 430 300 350"><image href="_static/images/blueprint-project-tree.png" width="7049" height="5858"/></svg><defs><clipPath id="output-folder-front"><polygon points="58,350 298,178 365,33 228,95 209,154 97,211"/></clipPath></defs><g clip-path="url(#output-folder-front)"><image href="_static/images/blueprint-project-tree.png" width="7049" height="5858"/></g></symbol>
+  <symbol id="ss-file-symbol" viewBox="550 430 300 350"><image href="_static/images/blueprint-project-tree.png" width="7049" height="5858"/></symbol>
+</defs></svg>
+    <div class="sd-tab-set docutils">
+    <input checked="checked" id="output-tab-single" name="output-tabs" type="radio">
+    <label class="sd-tab-label" for="output-tab-single">Single session</label>
+    <div class="sd-tab-content docutils"><figure class="ss-folder-schematic ss-output-single"><ul class="ss-folder-tree"><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">session-001/</span></div><ul><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">shank_0/</span></div><ul><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-data-folder-symbol"/></svg><span class="ss-folder-name">bad_channel_detection/</span></div><ul><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-file-symbol"/></svg><span class="ss-folder-name">bad_channel_ids.csv</span></div></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-file-symbol"/></svg><span class="ss-folder-name">bad_channel_labels.csv</span></div></li></ul></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">raw_data_metrics/</span></div><ul><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-file-symbol"/></svg><span class="ss-folder-name">raw_data_quality_metrics.csv</span></div></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-data-folder-symbol"/></svg><span class="ss-folder-name">raw_data_quality_plots/</span></div></li></ul></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">artifact_detection/</span></div><ul><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-data-folder-symbol"/></svg><span class="ss-folder-name">artifact_detection_plots/</span></div></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-file-symbol"/></svg><span class="ss-folder-name">event_periods.csv</span></div></li></ul></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">preprocessing/</span></div><ul><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-data-folder-symbol"/></svg><span class="ss-folder-name">preprocessing_plots/</span></div></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-data-folder-symbol"/></svg><span class="ss-folder-name">recording/</span></div></li></ul></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">sorting/</span></div><ul><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-data-folder-symbol"/></svg><span class="ss-folder-name">sorting/</span></div></li></ul></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">postprocessing/</span></div><ul><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-data-folder-symbol"/></svg><span class="ss-folder-name">sorting_analyzer/</span></div></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-file-symbol"/></svg><span class="ss-folder-name">quality_metrics.csv</span></div></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-data-folder-symbol"/></svg><span class="ss-folder-name">postprocessing_plots/</span></div></li></ul></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">curation/</span></div><ul><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-data-folder-symbol"/></svg><span class="ss-folder-name">sorting_analyzer/</span></div></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-file-symbol"/></svg><span class="ss-folder-name">curation.json</span></div></li></ul></li></ul></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-data-folder-symbol"/></svg><span class="ss-folder-name">shank_1/</span></div><ul><li><div class="ss-folder-row"><span class="ss-folder-name">...</span></div></li></ul></li></ul></li></ul><figcaption>Single-session output layout.</figcaption></figure></div>
+    <input id="output-tab-multiple" name="output-tabs" type="radio">
+    <label class="sd-tab-label" for="output-tab-multiple">Multiple sessions</label>
+    <div class="sd-tab-content docutils"><figure class="ss-folder-schematic ss-output-multiple"><ul class="ss-folder-tree"><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">sub-001/</span></div><ul><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">ses-001/</span></div><ul><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">bad_channel_detection/</span></div></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">raw_data_metrics/</span></div></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">artifact_detection/</span></div></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">preprocessing/</span></div></li></ul></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">ses-002/</span></div><ul><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">bad_channel_detection/</span></div></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">raw_data_metrics/</span></div></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">artifact_detection/</span></div></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">preprocessing/</span></div></li></ul></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">bad_channel_unions/</span></div></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">sessions_concat/</span></div><ul><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">sorting/</span></div></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">postprocessing/</span></div></li><li><div class="ss-folder-row"><svg aria-hidden="true"><use href="#ss-folder-symbol"/></svg><span class="ss-folder-name">curation/</span></div></li></ul></li></ul></li></ul><figcaption>Proposed multi-session layout: each session runs through preprocessing, with shared bad-channel unions and concatenated sorting, postprocessing and curation.</figcaption></figure></div>
+    </div>
+  </section>
+
+  <section id="python-input" aria-labelledby="python-title">
+    <h2 id="python-title">Flexible data loading</h2>
+    <p>Load recordings with SpikeInterface, then pass them into the Python API. Use a single recording, named sessions, or recordings already split by shank.</p>
+    <p>This example runs bad-channel detection using your own YAML configuration.</p>
+    <pre><code><span class="ss-code-flag">import</span> spikeinterface <span class="ss-code-flag">as</span> si
+<span class="ss-code-flag">from</span> spikesorted <span class="ss-code-flag">import</span> Pipeline
+
+recording = si.load(<span class="ss-code-string">"/data/saved_recording"</span>)
+
+Pipeline(
+    recordings=recording,
+    config_path=<span class="ss-code-string">"my_pipeline.yaml"</span>,
+    output_path=<span class="ss-code-string">"/results/subject_01"</span>,
+    stop_after_step=<span class="ss-code-string">"bad_channel_detection"</span>,
+).run()</code></pre>
+  </section>
+
+  <section aria-labelledby="try-title">
+    <h2 id="try-title">Try <code>spikesorted</code></h2>
+    <p>Running a standard pipeline on an existing recording session is as simple as:</p>
+    <p>installing it:</p>
+    <pre><code>pip install spikesorted</code></pre>
+    <p>and running:</p>
+    <pre><code>spikesorted \
+    --sessions /rawdata/sub-001/ses-001 \
+    --output_path /my_awesome_project/sub-001 \
+    --config /my_awesome_project/pipeline_config.yaml</code></pre>
+    <p>We'd love to hear your <a href="https://github.com/neuroinformatics-unit/spikesorted/issues">feedback</a> and welcome <a href="https://github.com/neuroinformatics-unit/spikesorted">community contributions</a>. <a href="configs/index.html">Edit and share your configuration</a> to help other researchers build on your workflow.</p>
   </section>
 </div>
