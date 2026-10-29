@@ -1,0 +1,46 @@
+raw_data_quality_metrics:
+  chunk_size_s: 1.0
+  num_chunks: 30
+  rolling_rms_window_size_s: 3.0
+  quick_metrics_only: false
+
+bad_channel_detection:
+  method: 'coherence+psd'
+
+artifact_detection:
+  detect_saturation_periods:
+    saturation_threshold_uV: from_metadata  # Saturation voltage from recording metadata
+    diff_threshold_uV: null  # Disabled pending NP2 validation
+    proportion: 0.2
+
+preprocessing:
+  highpass_filter:
+    freq_min: 300.0
+  phase_shift: {}
+  interpolate_bad_channels: {}
+  highpass_spatial_filter: {}
+  silence_periods:
+    mode: zeros
+
+combine_sessions:
+  method: concatenate
+
+sorting:
+  sorter: kilosort2_5
+  params:
+    car: false
+    freq_min: 0.1
+    do_correction: true
+
+postprocessing:
+  random_spikes:
+    max_spikes_per_unit: 2500
+  waveforms:
+    ms_before: 1.0
+    ms_after: 2.0
+  templates: {}
+  quality_metrics:
+    metric_names: all
+  compute_sparsity:
+    method: radius
+    radius_um: 100

@@ -18,7 +18,7 @@ autodoc_mock_imports = []
 # Add the module path to sys.path here.
 # If the directory is relative to the documentation root,
 # use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath("../../src"))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../src")))
 
 project = "spikesorted"
 copyright = "2022, Joe Ziminski"
@@ -44,6 +44,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
     "sphinx_sitemap",
+    "sphinx_design",
     "myst_parser",
     "nbsphinx",
 ]
@@ -66,7 +67,7 @@ myst_enable_extensions = [
     "tasklist",
 ]
 # Automatically add anchors to markdown headings
-myst_heading_anchors = 3
+myst_heading_anchors = 4
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -74,25 +75,40 @@ templates_path = ["_templates"]
 # Automatically generate stub pages for API
 autosummary_generate = True
 autodoc_default_flags = ["members", "inherited-members"]
+typehints_use_signature = True
+typehints_use_signature_return = True
+autodoc_type_aliases = {
+    "RecordingInput": "spikesorted.utils.recordings_structure.RecordingInput",
+}
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = [
     "**.ipynb_checkpoints",
+    "steps/scope.md",
     # to ensure that include files (partial pages) aren't built, exclude them
     # https://github.com/sphinx-doc/sphinx/issues/1965#issuecomment-124732907
     "**/includes/**",
+    "api_generated/**",  # Obsolete template API pages for removed example modules.
 ]
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 html_theme = "pydata_sphinx_theme"
 html_title = "spikesorted"
+html_show_sourcelink = False
+html_show_copyright = False
+html_show_sphinx = False
 
 # Customize the theme
 html_theme_options = {
-    "navbar_align": "left",
+    "footer_start": [],
+    "footer_center": [],
+    "footer_end": [],
+    "navbar_end": ["theme-switcher", "navbar-icon-links"],
+    "show_prev_next": False,
+    "show_toc_level": 2,
     "icon_links": [
         {
             # Label for this link
@@ -128,8 +144,8 @@ sitemap_url_scheme = "{link}"
 # Shared assets and page-specific layout for the landing page.
 html_static_path = ["_static"]
 html_css_files = ["css/landing.css", "css/docs.css"]
-html_js_files = ["js/landing.js"]
+html_js_files = ["js/step-outputs-nav.js"]
 html_sidebars = {"index": [], "**": ["sidebar-nav-bs"]}
 
-# Use the site palette by default; the theme switcher retains user preferences.
-html_context = {"default_mode": "dark"}
+# Start in light mode; the theme switcher retains user preferences.
+html_context = {"default_mode": "light"}

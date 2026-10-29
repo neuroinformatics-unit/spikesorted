@@ -9,6 +9,7 @@ dynamic = ["version"]
 dependencies = [
     "PyYAML",
     "pydantic",
+    "typing_extensions",
     "spikeinterface==0.105.3",
     "scipy",
     "pandas",
@@ -54,6 +55,7 @@ docs = [
   "setuptools-scm",
   "sphinx",
   "sphinx-autodoc-typehints",
+  "sphinx-design",
   "sphinx-sitemap",
 ]
 
