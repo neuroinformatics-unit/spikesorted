@@ -9,7 +9,7 @@ bad_channel_detection:
 
 artifact_detection:
   detect_saturation_periods:
-    saturation_threshold_uV: from_metadata  # Saturation voltage from recording metadata
+    saturation_threshold_uV: from_metadata  # NP2 saturation depends on probe
     diff_threshold_uV: null  # Disabled pending NP2 validation
     proportion: 0.2
 
@@ -21,9 +21,6 @@ preprocessing:
   highpass_spatial_filter: {}
   silence_periods:
     mode: zeros
-
-combine_sessions:
-  method: concatenate
 
 sorting:
   sorter: kilosort2_5
@@ -39,8 +36,18 @@ postprocessing:
     ms_before: 1.0
     ms_after: 2.0
   templates: {}
+  template_metrics: {}
   quality_metrics:
     metric_names: all
   compute_sparsity:
     method: radius
     radius_um: 100
+
+unitmatching:
+  method: unitmatch
+  params:
+    channel_radius: 150
+    max_dist: 100
+    neighbour_dist: 50
+    match_threshold: 0.5
+    units_per_shank_thrs: 15

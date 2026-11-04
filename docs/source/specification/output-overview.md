@@ -1,4 +1,4 @@
-# Step Outputs
+# Pipeline Outputs
 
 ```{toctree}
 :maxdepth: 1

@@ -90,6 +90,8 @@ exclude_patterns = [
     # to ensure that include files (partial pages) aren't built, exclude them
     # https://github.com/sphinx-doc/sphinx/issues/1965#issuecomment-124732907
     "**/includes/**",
+    "configs/selector.md",
+    "configs/config-notes-*.md",
     "api_generated/**",  # Obsolete template API pages for removed example modules.
 ]
 

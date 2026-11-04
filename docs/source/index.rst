@@ -21,7 +21,7 @@ spikesorted
 
    Get started <getting_started>
    Tutorials <tutorials/index>
-   Configs <configs/index>
+   Config <configs/index>
    Pipeline Steps <steps/index>
    Spec <specification/index>
    Community <community/index>

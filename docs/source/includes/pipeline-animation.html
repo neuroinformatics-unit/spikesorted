@@ -216,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function type() {
       renderCommand(animation, text.slice(0, ++position));
       if (position < text.length) {
-        const pause = text[position - 1] === "\\" ? 250 : 26;
+        const pause = text[position - 1] === "\\" ? 187.5 : 26;
         timer = window.setTimeout(type, pause);
       } else {
         timer = window.setTimeout(run, 525);

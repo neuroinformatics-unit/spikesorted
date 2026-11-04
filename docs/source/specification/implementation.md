@@ -251,7 +251,7 @@ and uses UnitMatchPy to compare units across sessions. Preserve the original
 session and unit IDs alongside match probabilities and cross-session identities.
 Prepare the waveforms and channel positions using the
 [UnitMatchPy SpikeInterface integration](https://github.com/EnnyvanBeest/UnitMatch/blob/main/UnitMatchPy/Demo%20Notebooks/UMPy_spike_interface_demo.ipynb).
-See [session handling configuration](config.md#session-handling).
+See the [Config specification](config.md).
 
 ## Curation
 
