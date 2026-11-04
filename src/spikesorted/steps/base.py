@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, ClassVar
 
 from spikeinterface.core import BaseRecording
 
-from ..utils.recordings_structure import get_recordings_and_paths
+from ..utils.recordings_structure import get_path, get_recordings_and_paths
 from ..utils.utils import load_pipeline_config
 from ..validation.steps_validation import _BaseStepArguments
 
@@ -74,8 +74,14 @@ class BasePipelineStep:
         return self._config
 
     def perform_checks(self) -> None:
-        """Check inputs, configuration, and scientific assumptions before running."""
-        raise NotImplementedError
+        """Check that every recording contains exactly one segment."""
+        for session_name, shank_id, recording, _ in self._get_recordings_and_paths(""):
+            if recording.get_num_segments() != 1:
+                raise ValueError(
+                    f"Only single-segment recordings are supported; "
+                    f"session {session_name}, shank {shank_id} has "
+                    f"{recording.get_num_segments()} segments."
+                )
 
     def run(self, verbose: bool = True) -> None:
         """Perform checks, execute the step, and save its outputs."""
@@ -111,9 +117,17 @@ class BasePipelineStep:
 
         return recording
 
+    def get_path(
+        self, step_name: str, session_name: str | None = None, shank_id: str | int | None = None
+    ) -> Path:
+        """Return the output directory for a step, session and shank."""
+        return get_path(
+            self.output_path, step_name, session_name, shank_id
+        )
+
     def _get_recordings_and_paths(
         self, step_name: str
-    ) -> list[tuple[str, str, RecordingInput, Path]]:
+    ) -> list[tuple[str | None, str | int | None, RecordingInput, Path]]:
         """Convenience function for get_recordings_and_paths."""
         return get_recordings_and_paths(
             self.recordings, self.output_path, step_name

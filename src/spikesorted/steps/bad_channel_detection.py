@@ -2,7 +2,6 @@
 
 import warnings
 from dataclasses import dataclass
-from math import ceil
 from pathlib import Path
 
 import pandas as pd
@@ -12,14 +11,10 @@ import pandas as pd
 import scipy.signal  # noqa: F401
 import spikeinterface.preprocessing as spre
 
-from ...utils.recordings_structure import get_num_sessions
-from ..base import BasePipelineStep
+from ..utils.recordings_structure import get_num_sessions
+from .base import BasePipelineStep
 from .bad_channel_union import create_bad_channel_labels_union
-from .estimate_bad_channel_detection_memory_usage import (
-    estimate_bad_channel_detection_memory_usage,
-    estimate_filter_memory_usage,
-    _parameter,
-)
+from ..utils.recordings_structure import get_path
 
 
 @dataclass(frozen=True)
@@ -59,12 +54,12 @@ class BadChannelDetectionStep(BasePipelineStep):
     The following CSV files are saved for each session and shank:
 
     ``bad_channel_ids.csv``
-        One row per detected bad channel, with a single ``channel_id``
-        column containing its SpikeInterface channel identifier.
+        One row per detected bad channel, with ``channel_id``
+        and ``channel_id_dtype`` columns storing the identifier and NumPy dtype.
 
     ``bad_channel_labels.csv``
         One row per recording channel, including good channels, with
-        columns ``channel_id`` and ``label``. Labels are supplied by
+        columns ``channel_id``, ``label`` and ``channel_id_dtype``. Labels are supplied by
         SpikeInterface's ``detect_bad_channels()``.
 
     Both files include column headers and omit the DataFrame index.
@@ -96,11 +91,18 @@ class BadChannelDetectionStep(BasePipelineStep):
                 filtered_recording, **kwargs
             )
 
-            bad_ids_df = pd.DataFrame({"channel_id": bad_channel_ids})
+            channel_id_dtype = shank_recording.get_channel_ids().dtype.str
+            bad_ids_df = pd.DataFrame(
+                {
+                    "channel_id": bad_channel_ids,
+                    "channel_id_dtype": channel_id_dtype,
+                }
+            )
             labels_df = pd.DataFrame(
                 {
                     "channel_id": shank_recording.get_channel_ids(),
                     "label": channel_labels,
+                    "channel_id_dtype": channel_id_dtype,
                 }
             )
             bad_ids_df.to_csv(bad_ids_path, index=False)
@@ -119,11 +121,13 @@ class BadChannelDetectionStep(BasePipelineStep):
         - throw a warning for low-coutn channels
         - raise if `overwrite=False` and output already exists.
         """
+        super().perform_checks()
+
         method = self.config["bad_channel_detection"].get("method")
         if method is None:
             raise ValueError("bad_channel_detection.method must be explicitly provided")
 
-        for recording, shank_path in self._get_recordings_and_paths(
+        for _, _, recording, shank_path in self._get_recordings_and_paths(
             "bad_channel_detection"
         ):
 
@@ -138,18 +142,40 @@ class BadChannelDetectionStep(BasePipelineStep):
                     stacklevel=2,
                 )
 
-            bad_ids_path = self.get_bad_channel_ids_filepath(shank_path)
-            labels_path = self.get_bad_channel_labels_filepath(shank_path)
-
             if not self.overwrite:
-                for output_path in (bad_ids_path, labels_path):
-                    if output_path.exists():
-                        raise FileExistsError(
-                            "Bad-channel detection output already exists: "
-                            f"{output_path}. "
-                            "Set overwrite=True to replace existing outputs, "
-                            "or choose a different output_path."
-                        )
+                if shank_path.exists():
+                    raise FileExistsError(
+                        "Bad-channel detection output folder already exists: "
+                        f"{shank_path}. "
+                        "Set overwrite=True to replace existing outputs, "
+                        "or choose a different output_path."
+                    )
+
+    @classmethod
+    def load_bad_channels(cls, output_path, session_name=None, shank_id=None):
+        """Load bad-channel IDs for a session and shank in their original dtype."""
+        channel_ids_path = get_path(
+            output_path, "bad_channel_detection", session_name, shank_id
+        ) / "bad_channel_ids.csv"
+
+        if not channel_ids_path.exists():
+            return None
+
+        bad_channels = pd.read_csv(
+            channel_ids_path, dtype={"channel_id": str}
+        )
+
+        bad_channel_ids = bad_channels["channel_id"].to_numpy()
+
+        # Bad channels can be str or int dtype
+        bad_channels_type = bad_channels["channel_id_dtype"].iloc[0]
+
+        if not bad_channels.empty:
+            bad_channel_ids = bad_channel_ids.astype(
+                bad_channels_type
+            )
+
+        return bad_channel_ids
 
     def get_bad_channel_ids_filepath(self, shank_path: Path) -> Path:
         """Return the bad-channel IDs CSV path for a shank output directory."""

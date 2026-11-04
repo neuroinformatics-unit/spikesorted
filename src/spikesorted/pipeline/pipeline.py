@@ -5,7 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from ..steps.bad_channel_detection.bad_channel_detection import BadChannelDetectionStep
+from ..steps.bad_channel_detection import BadChannelDetectionStep
+from ..steps.artifact_detection import ArtifactDetectionStep
 from ..utils.utils import load_pipeline_config
 
 if TYPE_CHECKING:
@@ -41,7 +42,9 @@ class Pipeline:
 
         configs = load_pipeline_config(self.config_path)
 
-        if "bad_channel_detection" in configs and self.start_at_step in [None, "bad_channel_detection"]:
+        if "bad_channel_detection" in configs and self.start_at_step in [
+            None, "bad_channel_detection"
+        ]:
 
             bad_channel_detection = BadChannelDetectionStep(
                 recordings=self.recordings,
@@ -55,3 +58,18 @@ class Pipeline:
         if self.stop_after_step == "bad_channel_detection":
             return
 
+        if "artifact_detection" in configs and self.start_at_step in [
+            None, "bad_channel_detection", "artifact_detection"
+        ]:
+
+            artifact_detection = ArtifactDetectionStep(
+                recordings=self.recordings,
+                config_path=self.config_path,
+                output_path=self.output_path,
+                overwrite=self.overwrite,
+                num_cores=self.num_cores,
+            )
+            artifact_detection.run(self.verbose)
+
+        if self.stop_after_step == "artifact_detection":
+            return

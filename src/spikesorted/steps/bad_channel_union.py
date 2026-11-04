@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
-from ...utils.recordings_structure import get_recordings_and_paths_by_shank
+from ..utils.recordings_structure import get_recordings_and_paths_by_shank
 
 
 def create_bad_channel_labels_union(recordings, output_path):
@@ -37,7 +37,7 @@ def create_bad_channel_labels_union(recordings, output_path):
 
     for shank_id, recordings_and_paths in recordings_by_shank.items():
 
-        bad_channel_ids = set()
+        bad_channel_ids = {}
         session_names = []
 
         for session_name, _, path in recordings_and_paths:
@@ -46,7 +46,9 @@ def create_bad_channel_labels_union(recordings, output_path):
                 path / "bad_channel_ids.csv",
                 dtype={"channel_id": str}, keep_default_na=False,
             )
-            bad_channel_ids.update(labels["channel_id"])
+            bad_channel_ids.update(
+                zip(labels["channel_id"], labels["channel_id_dtype"])
+            )
 
         if shank_id is None:
             output_path = union_path
@@ -55,7 +57,10 @@ def create_bad_channel_labels_union(recordings, output_path):
 
         output_path.mkdir(parents=True, exist_ok=True)
 
-        pd.DataFrame({"channel_id": sorted(bad_channel_ids)}).to_csv(
+        pd.DataFrame(
+            sorted(bad_channel_ids.items()),
+            columns=["channel_id", "channel_id_dtype"],
+        ).to_csv(
             output_path / "bad_channel_ids.csv", index=False
         )
         with (output_path / "sessions.yaml").open("w", encoding="utf-8") as file:
