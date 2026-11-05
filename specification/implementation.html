@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Step Inputs and Outputs &#8212; spikesorted</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_autodoc_typehints.css?v=057ac668" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/landing.css?v=e0f94530" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/docs.css?v=53dc9d5a" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
+
+    <script src="../_static/documentation_options.js?v=ebec096d"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'specification/implementation';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/step-outputs-nav.js?v=28bee415"></script>
+    <link rel="canonical" href="https://neuroinformatics.dev/spikesorted/specification/implementation.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Definitions" href="definitions.html" />
+    <link rel="prev" title="Developers" href="developer.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="light">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">spikesorted.</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Get started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../configs/index.html">
+    Config
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../steps/index.html">
+    Pipeline Steps
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Spec
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../community/index.html">
+    Community
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../api_index.html">
+    API
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neuroinformatics-unit/spikesorted" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page" aria-expanded="false" aria-controls="pst-secondary-sidebar-modal">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Get started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../configs/index.html">
+    Config
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../steps/index.html">
+    Pipeline Steps
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Spec
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../community/index.html">
+    Community
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api_index.html">
+    API
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neuroinformatics-unit/spikesorted" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="output-overview.html">Pipeline Outputs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="steps/bad-channel-detection.html">Bad-channel detection</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Config specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="on-disk-structure.html">Structure on disk</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="developer.html">Developers</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a aria-current="page" class="current reference internal" href="#">Step Inputs and Outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="definitions.html">Definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-loader.html">Data Loader</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-house"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Specification</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="developer.html" class="nav-link">Developers</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Step Inputs and Outputs</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="step-inputs-and-outputs">
+<h1>Step Inputs and Outputs<a class="headerlink" href="#step-inputs-and-outputs" title="Link to this heading">#</a></h1>
+<p>The <a class="reference internal" href="data-loader.html"><span class="std std-doc">Data loader</span></a> is separate from the pipeline steps and returns a <a class="reference internal" href="definitions.html#definitions-data-loader-output-recordings"><span class="std std-ref">DATA_LOADER_OUTPUT_RECORDINGS</span></a> that can be passed to this pipeline.</p>
+<section id="raw-data-quality-metrics">
+<h2>Raw data quality metrics<a class="headerlink" href="#raw-data-quality-metrics" title="Link to this heading">#</a></h2>
+<p>This step computes IBL’s quality metrics on raw recordings.</p>
+<p>The metrics and detect-bad-channels results are written to the <code class="docutils literal notranslate"><span class="pre">RAW_DATA_METRICS_DIR</span></code> in the <a class="reference internal" href="definitions.html#outputs-output-path"><span class="std std-ref">OUTPUT_PATH</span></a>.</p>
+<p><strong>Inputs</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="definitions.html#definitions-data-loader-output-recordings"><span class="std std-ref">DATA_LOADER_OUTPUT_RECORDINGS</span></a></p></li>
+<li><p>a <a class="reference internal" href="definitions.html#outputs-pipeline-config"><span class="std std-ref">PIPELINE_CONFIG</span></a></p></li>
+<li><p>a <a class="reference internal" href="definitions.html#outputs-output-path"><span class="std std-ref">OUTPUT_PATH</span></a></p></li>
+</ul>
+<p><strong>Outputs</strong></p>
+<p>Outputs are saved to <code class="docutils literal notranslate"><span class="pre">RAW_DATA_METRICS_DIR</span></code></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="definitions.html#outputs-raw-data-quality-metrics"><span class="std std-ref">RAW_DATA_QUALITY_METRICS</span></a> and <a class="reference internal" href="definitions.html#outputs-raw-data-quality-plots"><span class="std std-ref">RAW_DATA_QUALITY_PLOTS</span></a></p></li>
+<li><p>TODO: discuss <code class="docutils literal notranslate"><span class="pre">CONCAT_POINTS_QUALITY_METRICS</span></code> and <code class="docutils literal notranslate"><span class="pre">CONCAT_POINTS_QUALITY_METRICS_PLOTS</span></code>.</p></li>
+<li><p><a class="reference internal" href="definitions.html#outputs-concat-rec-times"><span class="std std-ref">CONCAT_REC_TIMES</span></a> if concatenated recordings are detected.</p></li>
+</ul>
+<p><strong>OPERATIONS</strong>:</p>
+<ul class="simple">
+<li><p>Compute raw-data quality metrics using the configured settings.</p></li>
+<li><p>Generate quality-assessment plots from the computed metrics.</p></li>
+<li><p>Save the metrics and plots to <code class="docutils literal notranslate"><span class="pre">RAW_DATA_METRICS_DIR</span></code>.</p></li>
+<li><p>Determine if recordings are concatenated. TODO: discuss quality metrics across concatenation points.</p></li>
+</ul>
+<p><strong>CHECKS</strong>:</p>
+<ul class="simple">
+<li><p>Confirm that the input data can be resolved to an AP recording suitable for metric computation.</p></li>
+<li><p>Warn when probe-specific metric settings are used on recordings with substantially different channel counts or geometry.</p></li>
+</ul>
+</section>
+<section id="detect-bad-channels">
+<span id="implementation-detect-bad-channels"></span><h2>Detect bad channels<a class="headerlink" href="#detect-bad-channels" title="Link to this heading">#</a></h2>
+<p>This (optional) step uses IBL’s bad-channel detection algorithm to detect bad channels. The bad-channel information is used to
+remove bad channels before artefact detection, and remove or interpolate bad channels during preprocessing.</p>
+<p>Detect bad channels after high-pass filtering at 300 Hz. This is because bandpass filtering removes the high frequencies used for noisy-channel detection.</p>
+<p><strong>Inputs</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="definitions.html#definitions-data-loader-output-recordings"><span class="std std-ref">DATA_LOADER_OUTPUT_RECORDINGS</span></a></p></li>
+<li><p>a <a class="reference internal" href="definitions.html#outputs-pipeline-config"><span class="std std-ref">PIPELINE_CONFIG</span></a></p></li>
+<li><p>a <a class="reference internal" href="definitions.html#outputs-output-path"><span class="std std-ref">OUTPUT_PATH</span></a></p></li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="definitions.html#outputs-bad-channel-detection-outputs"><span class="std std-ref">BAD_CHANNEL_DETECTION_OUTPUTS</span></a>, containing channel IDs and labels.</p></li>
+<li><p>TODO: discuss <code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_DETECTION_METRICS</span></code> and <code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_DETECTION_PLOTS</span></code>.</p></li>
+</ul>
+<p><strong>OPERATIONS</strong>:</p>
+<ul class="simple">
+<li><p>High-pass filter the data, as required by the detect-bad-channels method.</p></li>
+<li><p>Detect bad channels and assign labels using the configured thresholds.</p></li>
+<li><p>Save the channel IDs and labels to the bad-channel output directory.</p></li>
+<li><p>TODO: discuss saving quality metrics and associated plots.</p></li>
+</ul>
+<p><strong>CHECKS</strong>:</p>
+<ul class="simple">
+<li><p>This algorithm was developed for Neuropixels probes. Different settings should be recommended for probes with lower channel counts.</p></li>
+<li><p>No preprocessing should have been applied to the recording so far.</p></li>
+<li><p>If too many are out mention adjusting threshold as this is a known issue. Or maybe we bandpass but with a very high cutoff. Ask Alessio for a few examples of this issue.</p></li>
+</ul>
+</section>
+<section id="artifact-detection">
+<h2>Artifact detection<a class="headerlink" href="#artifact-detection" title="Link to this heading">#</a></h2>
+<p>This (optional) step can detect two types of artifact:</p>
+<ul class="simple">
+<li><p>saturation artifacts, detected before preprocessing</p></li>
+<li><p>other artifacts detected after high-pass filtering (e.g. envelope).</p></li>
+</ul>
+<p>see <a class="reference external" href="https://spikeinterface.readthedocs.io/en/latest/api.html#spikeinterface.preprocessing.detect_and_remove_artifacts"><code class="docutils literal notranslate"><span class="pre">detect_and_remove_artifacts()</span></code></a> for details.</p>
+<p>These detected periods are used in <a class="reference internal" href="#preprocessing"><span class="std std-ref">Preprocessing</span></a> to zero or otherwise remove the periods.</p>
+<p><strong>Inputs</strong></p>
+<ul class="simple">
+<li><p>a <a class="reference internal" href="definitions.html#definitions-data-loader-output-recordings"><span class="std std-ref">DATA_LOADER_OUTPUT_RECORDINGS</span></a></p></li>
+<li><p>a <a class="reference internal" href="definitions.html#outputs-pipeline-config"><span class="std std-ref">PIPELINE_CONFIG</span></a></p></li>
+<li><p>a <a class="reference internal" href="definitions.html#outputs-output-path"><span class="std std-ref">OUTPUT_PATH</span></a></p></li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul class="simple">
+<li><p>an <a class="reference internal" href="definitions.html#outputs-artefact-periods-csv"><span class="std std-ref">ARTEFACT_PERIODS_CSV</span></a>, saved to <code class="docutils literal notranslate"><span class="pre">ARTIFACT_DETECTION_DIR</span></code></p></li>
+<li><p><a class="reference internal" href="definitions.html#outputs-artefact-detection-plots"><span class="std std-ref">ARTEFACT_DETECTION_PLOTS</span></a></p></li>
+</ul>
+<p><strong>OPERATIONS</strong>:</p>
+<ul class="simple">
+<li><p>Load the recording from the passed <a class="reference internal" href="definitions.html#definitions-data-loader-output-recordings"><span class="std std-ref">DATA_LOADER_OUTPUT_RECORDINGS</span></a>.</p></li>
+<li><p>Detect saturation artifacts before preprocessing.</p></li>
+<li><p>Detect other configured artifact classes after the required filtering steps. Use the filtering step from the passed <code class="docutils literal notranslate"><span class="pre">PIPELINE_CONFIG</span></code>.</p></li>
+<li><p>Save detected periods to <code class="docutils literal notranslate"><span class="pre">ARTIFACT_DETECTION_DIR</span></code> as <a class="reference internal" href="definitions.html#outputs-artefact-periods-csv"><span class="std std-ref">ARTEFACT_PERIODS_CSV</span></a>.</p></li>
+</ul>
+<p><strong>CHECKS</strong>:</p>
+<ul class="simple">
+<li><p>Confirm that artifact detection settings match the recording type and sampling rate.</p></li>
+<li><p>Warn when no artifact class can be evaluated because the required filtered view of the recording is unavailable.</p></li>
+</ul>
+</section>
+<section id="artifact-curation">
+<h2>Artifact curation<a class="headerlink" href="#artifact-curation" title="Link to this heading">#</a></h2>
+<p>This (optional) stepprovides the user with the option to curate the automatically detected artifacts. This step is not automated, and typically more hands-on and requires a dedicated walkthrough in the documentation. It will entail the user loading their data into viewephys (applying the preprocessing beforehand as desired).</p>
+<p><strong>Inputs</strong></p>
+<ul class="simple">
+<li><p>a <a class="reference internal" href="definitions.html#definitions-raw-data-path"><span class="std std-ref">RAW_DATA_PATH</span></a> or <a class="reference internal" href="definitions.html#definitions-spikeinterface-rec"><span class="std std-ref">SPIKEINTERFACE_REC</span></a></p></li>
+<li><p>an <a class="reference internal" href="definitions.html#outputs-artefact-periods-csv"><span class="std std-ref">ARTEFACT_PERIODS_CSV</span></a></p></li>
+<li><p>a <a class="reference internal" href="definitions.html#outputs-output-path"><span class="std std-ref">OUTPUT_PATH</span></a></p></li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul class="simple">
+<li><p>an <a class="reference internal" href="definitions.html#outputs-artefact-periods-curated-csv"><span class="std std-ref">ARTEFACT_PERIODS_CURATED_CSV</span></a>, saved to <code class="docutils literal notranslate"><span class="pre">ARTIFACT_DETECTION_DIR</span></code></p></li>
+</ul>
+<p><strong>OPERATIONS</strong>:</p>
+<ul class="simple">
+<li><p>Load the automatically detected artifact periods alongside the recording in a manual curation tool.</p></li>
+<li><p>Review, add, remove, or adjust artifact intervals.</p></li>
+<li><p>Save the curated artifact intervals back to <code class="docutils literal notranslate"><span class="pre">ARTIFACT_DETECTION_DIR</span></code>.</p></li>
+</ul>
+<p><strong>CHECKS</strong>:</p>
+<ul class="simple">
+<li><p>Confirm that the curated intervals refer to the same recording and time base as the detected intervals.</p></li>
+<li><p>Preserve the original automatically detected artifact file so manual curation remains auditable.</p></li>
+</ul>
+</section>
+<section id="preprocessing">
+<h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Link to this heading">#</a></h2>
+<p>Preprocesses recordings, supporting:</p>
+<ul class="simple">
+<li><p>Bad channel removal or interpolation (interpolation after filtering).</p></li>
+<li><p>Phase shift correction.</p></li>
+<li><p>TEMPORAL_FILTER steps</p></li>
+<li><p>Artifact period filling with zeros, noise, or another configured strategy.</p></li>
+<li><ul>
+<li><p>COMMON_REFERENCE steps</p></li>
+</ul>
+</li>
+<li><p>Motion correction.</p></li>
+<li><p>Inter-session alignment</p></li>
+<li><p>Session concatenation</p></li>
+<li><p>Whitening.</p></li>
+</ul>
+<p>This can get quite complicated if we have both multiple shanks and sessions, when
+this step concatenates across sessions. It should check that all passed shanks are available for all sessions (should they be concatenated). It will also need to handle taking the intersection of good channels, in this case.</p>
+<p><strong>Inputs</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="definitions.html#definitions-data-loader-output-recordings"><span class="std std-ref">DATA_LOADER_OUTPUT_RECORDINGS</span></a></p></li>
+<li><p>a <a class="reference internal" href="definitions.html#outputs-pipeline-config"><span class="std std-ref">PIPELINE_CONFIG</span></a></p></li>
+<li><p>a <a class="reference internal" href="definitions.html#outputs-output-path"><span class="std std-ref">OUTPUT_PATH</span></a></p></li>
+<li><p>a <code class="docutils literal notranslate"><span class="pre">concatenate_sessions</span></code> flag. If <code class="docutils literal notranslate"><span class="pre">True</span></code>, sessions will be concatenated after preprocessing.</p></li>
+</ul>
+<p><em>Loaded from disk:</em></p>
+<ul class="simple">
+<li><p>(optional) <a class="reference internal" href="definitions.html#outputs-artefact-periods-csv"><span class="std std-ref">ARTEFACT_PERIODS_CSV</span></a> or <a class="reference internal" href="definitions.html#outputs-artefact-periods-curated-csv"><span class="std std-ref">ARTEFACT_PERIODS_CURATED_CSV</span></a></p></li>
+<li><p>(optional) <a class="reference internal" href="definitions.html#outputs-bad-channel-detection-outputs"><span class="std std-ref">BAD_CHANNEL_DETECTION_OUTPUTS</span></a></p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Event periods and bad channel labels must match the organization of the passed recordings, which may be organized on disk <a class="reference internal" href="on-disk-structure.html"><span class="std std-doc">per shank and per session</span></a> when required.</p>
+</div>
+<p><strong>Outputs</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="definitions.html#definitions-preprocessed-output-recordings"><span class="std std-ref">PREPROCESSED_OUTPUT_RECORDINGS</span></a>.</p></li>
+<li><p><a class="reference internal" href="definitions.html#outputs-preprocess-step-plots"><span class="std std-ref">PREPROCESS_STEP_PLOTS</span></a></p></li>
+<li><p><a class="reference internal" href="definitions.html#outputs-motion-correction-plots"><span class="std std-ref">MOTION_CORRECTION_PLOTS</span></a></p></li>
+<li><p><a class="reference internal" href="definitions.html#outputs-session-concatenation-plots"><span class="std std-ref">INTER_SESSION_ALIGNMENT_PLOTS</span></a></p></li>
+<li><p><a class="reference internal" href="definitions.html#outputs-session-concatenation-plots"><span class="std std-ref">SESSION_CONCATENATION_PLOTS</span></a></p></li>
+</ul>
+<p><strong>OPERATIONS</strong>:</p>
+<ul class="simple">
+<li><p>Load the recording from the passed <a class="reference internal" href="definitions.html#definitions-data-loader-output-recordings"><span class="std std-ref">DATA_LOADER_OUTPUT_RECORDINGS</span></a>.</p></li>
+<li><p>Apply the configured preprocessing steps in sequence.</p></li>
+<li><p>for artefact removal, bad channel removal / interpolation the user can input where to do this on the config file. However, we should warn or error if is not done in the correct place (e.g. bad channel interpolate before filtering).</p></li>
+<li><p>Return or save the preprocessed recording in <code class="docutils literal notranslate"><span class="pre">PREPROCESSING_DIR</span></code>, depending on configuration.</p></li>
+<li><p>If the user requests, perform inter-session alignment on multiple sessions before (optionally) concatenating. If sessions are concatenated, update the recording attribute to indicate this and write appropriate metadata. Ensure the same set of channels across sessions when concatenating (detect bad channels). Use the intersection of available channels.</p></li>
+<li><p>Need to remove bad channels at the start, but interpolate after filtering.</p></li>
+</ul>
+<p><strong>CHECKS</strong>:</p>
+<ul class="simple">
+<li><p>Warn when recordings intended for multi-session processing do not share compatible channel sets or sampling rates.</p></li>
+<li><p>per-shank and per-session organisation must be consistent on disk and match passed recordings.</p></li>
+<li><p>Apply phase-shift correction only when the probe supports it.</p></li>
+<li><p>Do not re-run whitening or motion correction in the sorter if already run through SpikeInterface preprocessing.</p></li>
+<li><p>Warn when high-density-specific methods, such as motion correction or detect-bad-channels methods, are used on 32- or 64-channel recordings.</p></li>
+</ul>
+</section>
+<section id="spike-sorting">
+<h2>Spike sorting<a class="headerlink" href="#spike-sorting" title="Link to this heading">#</a></h2>
+<p>The spike sorting step, made very simple thanks to SpikeInterface:</p>
+<p><strong>Inputs</strong></p>
+<ul class="simple">
+<li><p>a <a class="reference internal" href="definitions.html#definitions-spikeinterface-rec"><span class="std std-ref">SPIKEINTERFACE_REC</span></a> or <a class="reference internal" href="definitions.html#definitions-spikeinterface-rec-session-list"><span class="std std-ref">SPIKEINTERFACE_REC_SESSION_LIST</span></a>,
+OR a <a class="reference internal" href="definitions.html#outputs-output-path"><span class="std std-ref">OUTPUT_PATH</span></a> containing a <code class="docutils literal notranslate"><span class="pre">PREPROCESSING_DIR</span></code> with saved recording.</p></li>
+<li><p>a <a class="reference internal" href="definitions.html#outputs-pipeline-config"><span class="std std-ref">PIPELINE_CONFIG</span></a></p></li>
+<li><p>a <a class="reference internal" href="definitions.html#outputs-output-path"><span class="std std-ref">OUTPUT_PATH</span></a> containing a <code class="docutils literal notranslate"><span class="pre">PREPROCESSING_DIR</span></code>. This is used to store outputs and cross-check the metadata of the passed recording to the on-disk project.</p></li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul class="simple">
+<li><p>a <a class="reference internal" href="definitions.html#definitions-sorting"><span class="std std-ref">SORTING</span></a> and other sorting metadata.</p></li>
+<li><p><a class="reference internal" href="definitions.html#definitions-sorter-report"><span class="std std-ref">SORTER_REPORT</span></a>, corresponding to the SpikeInterface sorting report.</p></li>
+</ul>
+<p><strong>OPERATIONS</strong>:</p>
+<ul class="simple">
+<li><p>Load the preprocessed recording from memory or from the preprocessing output directory.</p></li>
+<li><p>Run the configured sorter on the prepared recording.</p></li>
+<li><p>Save the resulting sorting and associated metadata to <code class="docutils literal notranslate"><span class="pre">SORTING_DIR</span></code>.</p></li>
+</ul>
+<p><strong>CHECKS</strong>:</p>
+<ul class="simple">
+<li><p>Confirm that the passed recording matches any saved preprocessing metadata in the project.</p></li>
+<li><p>Avoid rerunning preprocessing-dependent steps in the sorter when they were already applied upstream.</p></li>
+</ul>
+</section>
+<section id="postprocessing">
+<h2>Postprocessing<a class="headerlink" href="#postprocessing" title="Link to this heading">#</a></h2>
+<p>Postprocessing computes unit quality metrics used for curation.</p>
+<p><strong>Inputs</strong></p>
+<ul class="simple">
+<li><p>a <a class="reference internal" href="definitions.html#definitions-spikeinterface-rec"><span class="std std-ref">SPIKEINTERFACE_REC</span></a> or <a class="reference internal" href="definitions.html#definitions-spikeinterface-rec-session-list"><span class="std std-ref">SPIKEINTERFACE_REC_SESSION_LIST</span></a>,
+OR a <a class="reference internal" href="definitions.html#outputs-output-path"><span class="std std-ref">OUTPUT_PATH</span></a> containing a <code class="docutils literal notranslate"><span class="pre">PREPROCESSING_DIR</span></code> with saved recording.</p></li>
+<li><p>a <a class="reference internal" href="definitions.html#outputs-pipeline-config"><span class="std std-ref">PIPELINE_CONFIG</span></a></p></li>
+<li><p>a <a class="reference internal" href="definitions.html#outputs-output-path"><span class="std std-ref">OUTPUT_PATH</span></a></p></li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul class="simple">
+<li><p>a <a class="reference internal" href="definitions.html#definitions-sorting-analyzer"><span class="std std-ref">SORTING_ANALYZER</span></a> saved to disk as well as:</p>
+<ul>
+<li><p><a class="reference internal" href="definitions.html#definitions-postprocessing-plots"><span class="std std-ref">POSTPROCESSING_PLOTS</span></a></p></li>
+<li><p><a class="reference internal" href="definitions.html#outputs-quality-metrics-csv"><span class="std std-ref">QUALITY_METRICS_CSV</span></a> and other metadata.</p></li>
+</ul>
+</li>
+</ul>
+<p><strong>OPERATIONS</strong>:</p>
+<ul class="simple">
+<li><p>Load the sorting output together with the matching recording.</p></li>
+<li><p>Compute the configured postprocessing extensions and quality metrics.</p></li>
+<li><p>Save the resulting analyzer, plots, metrics, and metadata to <code class="docutils literal notranslate"><span class="pre">POSTPROCESSING_DIR</span></code>.</p></li>
+</ul>
+<p><strong>CHECKS</strong>:</p>
+<ul class="simple">
+<li><p>Must ensure the passed recording is the same recording used for sorting.</p></li>
+<li><p>Confirm that all required postprocessing extensions are computed before downstream curation methods rely on them.</p></li>
+</ul>
+</section>
+<section id="unit-matching">
+<h2>Unit matching<a class="headerlink" href="#unit-matching" title="Link to this heading">#</a></h2>
+<p>TODO: add an optional <code class="docutils literal notranslate"><span class="pre">unitmatching</span></code> step after per-session postprocessing and
+before curation. It consumes the separately sorted sessions’ SortingAnalyzers
+and uses UnitMatchPy to compare units across sessions. Preserve the original
+session and unit IDs alongside match probabilities and cross-session identities.
+Prepare the waveforms and channel positions using the
+<a class="reference external" href="https://github.com/EnnyvanBeest/UnitMatch/blob/main/UnitMatchPy/Demo%20Notebooks/UMPy_spike_interface_demo.ipynb">UnitMatchPy SpikeInterface integration</a>.
+See the <a class="reference internal" href="config.html"><span class="std std-doc">Config specification</span></a>.</p>
+</section>
+<section id="curation">
+<h2>Curation<a class="headerlink" href="#curation" title="Link to this heading">#</a></h2>
+<p>The curation step computes labels and merges automatically (e.g. with Bombcell, UnitRefine, SlaY) and applies them to the sorting analyzer, creating a new final sorting analyzer which services as the output of the pipeline.</p>
+<p><strong>Inputs</strong></p>
+<ul class="simple">
+<li><p>a <a class="reference internal" href="definitions.html#outputs-output-path"><span class="std std-ref">OUTPUT_PATH</span></a> containing a <code class="docutils literal notranslate"><span class="pre">POSTPROCESSING_DIR</span></code> with a saved <a class="reference internal" href="definitions.html#definitions-sorting-analyzer"><span class="std std-ref">SORTING_ANALYZER</span></a></p></li>
+<li><p>a <a class="reference internal" href="definitions.html#outputs-pipeline-config"><span class="std std-ref">PIPELINE_CONFIG</span></a></p></li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul class="simple">
+<li><p>a <a class="reference internal" href="definitions.html#definitions-sorting-analyzer"><span class="std std-ref">SORTING_ANALYZER</span></a> and associated metadata.</p></li>
+</ul>
+<p><strong>OPERATIONS</strong>:</p>
+<ul class="simple">
+<li><p>Load the postprocessing analyzer from the project.</p></li>
+<li><p>Apply configured automatic labeling, merge, and removal rules.</p></li>
+<li><p>Recompute any dependent analyzer extensions required after accepted merges.</p></li>
+<li><p>Save the final curated analyzer and metadata to <code class="docutils literal notranslate"><span class="pre">CURATION_DIR</span></code>.</p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal" tabindex="-1"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#raw-data-quality-metrics">Raw data quality metrics</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#detect-bad-channels">Detect bad channels</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#artifact-detection">Artifact detection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#artifact-curation">Artifact curation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preprocessing">Preprocessing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spike-sorting">Spike sorting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#postprocessing">Postprocessing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#unit-matching">Unit matching</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curation">Curation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
