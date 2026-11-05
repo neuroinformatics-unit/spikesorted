@@ -5,11 +5,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from ..steps.bad_channel_detection.bad_channel_detection import BadChannelDetectionStep
-from ..utils.utils import load_pipeline_config
+from spikesorted.steps.bad_channel_detection import BadChannelDetectionStep
+from spikesorted.utils.utils import load_pipeline_config
 
 if TYPE_CHECKING:
-    from ..utils.recordings_structure import RecordingInput
+    from spikesorted.utils.recordings_structure import RecordingInput
 
 
 class Pipeline:

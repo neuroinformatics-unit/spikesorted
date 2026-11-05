@@ -5,14 +5,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from ..pipeline.pipeline import Pipeline
-from ..steps.bad_channel_detection.bad_channel_union import create_bad_channel_labels_union
-from ..utils.utils import load_pipeline_config
-from .slurm_runners import run_slurm_batch, submit_slurm
-from .slurm_utils import split_recordings_by_shank
+from spikesorted.pipeline.pipeline import Pipeline
+from spikesorted.steps.bad_channel_union import create_bad_channel_labels_union
+from spikesorted.utils.utils import load_pipeline_config
+from spikesorted.slurm.slurm_runners import run_slurm_batch, submit_slurm
+from spikesorted.slurm.slurm_utils import split_recordings_by_shank
 
 if TYPE_CHECKING:
-    from ..steps.base import RecordingInput
+    from spikesorted.steps.base import RecordingInput
 
 # TODO: we need a unitmatching option here in which we will need to
 # take the union of bad channels even if we are not concatenating

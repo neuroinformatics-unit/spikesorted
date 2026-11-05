@@ -6,13 +6,13 @@ from typing import TYPE_CHECKING, ClassVar
 
 from spikeinterface.core import BaseRecording
 
-from ..utils.recordings_structure import get_recordings_and_paths
-from ..utils.utils import load_pipeline_config
-from ..validation.steps_validation import _BaseStepArguments
+from spikesorted.utils.recordings_structure import get_recordings_and_paths
+from spikesorted.utils.utils import load_pipeline_config
+from spikesorted.validation.steps_validation import _BaseStepArguments
 
 if TYPE_CHECKING:
-    from ..utils.recordings_structure import RecordingInput
-    from ..validation.config_validation import PipelineConfig
+    from spikesorted.utils.recordings_structure import RecordingInput
+    from spikesorted.validation.config_validation import PipelineConfig
 
 
 @dataclass(frozen=True)

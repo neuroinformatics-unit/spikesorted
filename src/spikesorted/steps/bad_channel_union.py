@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
-from ...utils.recordings_structure import get_recordings_and_paths_by_shank
+from spikesorted.utils.recordings_structure import get_recordings_and_paths_by_shank
 
 
 def create_bad_channel_labels_union(recordings, output_path):

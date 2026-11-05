@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..utils.recordings_structure import iter_over_shanks
+from spikesorted.utils.recordings_structure import iter_over_shanks
 
 if TYPE_CHECKING:
-    from ..utils.recordings_structure import RecordingInput
+    from spikesorted.utils.recordings_structure import RecordingInput
 
 
 def split_recordings_by_shank(
