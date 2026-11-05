@@ -1,18 +1,20 @@
-# Structure On-disk
+# Structure on disk
 
-The pipeline stores outputs in a project directory so that each step can be run independently and downstream steps can discover and validate earlier outputs.
+This page will contain details on the output folder structure.
 
-The planned output directory has the following structure:
+Currently the provisional output folder structure is:
 
-:::{note}
-## Output layout
+::::{tab-set}
+
+:::{tab-item} Single session, single shank
 
 ```text
 output/
 ├── raw_data_metrics/
 │   ├── raw_data_quality_metrics.csv
-│   ├── raw_data_quality_plots/
-│   │   └── ...
+│   └── raw_data_quality_plots/
+│       └── ...
+├── bad_channel_detection/
 │   ├── bad_channel_ids.csv
 │   └── bad_channel_labels.csv
 ├── artifact_detection/
@@ -36,51 +38,218 @@ output/
     └── metadata.*
 ```
 
-`*`
-: Storage format has not yet been specified.
-
-**Optional outputs**
-: Created only when enabled in the [`PIPELINE_CONFIG`](config.md). Artifact detection may pause for manual curation and produce `event_periods_curated.csv`.
 :::
 
-## Raw data metrics with sessions and shanks
-
-For two sessions with four shanks each, the raw data metrics directory is organized as follows:
+:::{tab-item} Multiple sessions, single shank
 
 ```text
-raw_data_metrics/
-├── session_1/
-│   ├── shank_1/
+# Sorting and downstream folders shown for separately sorted sessions.
+output/
+├── raw_data_metrics/
+│   ├── session_0/
 │   │   ├── raw_data_quality_metrics.csv
 │   │   └── raw_data_quality_plots/
 │   │       └── ...
-│   ├── shank_2/
-│   │   ├── raw_data_quality_metrics.csv
-│   │   └── raw_data_quality_plots/
-│   │       └── ...
-│   ├── shank_3/
-│   │   ├── raw_data_quality_metrics.csv
-│   │   └── raw_data_quality_plots/
-│   │       └── ...
-│   └── shank_4/
+│   └── session_1/
 │       ├── raw_data_quality_metrics.csv
 │       └── raw_data_quality_plots/
 │           └── ...
-└── session_2/
-    ├── shank_1/
-    │   ├── raw_data_quality_metrics.csv
-    │   └── raw_data_quality_plots/
-    │       └── ...
-    ├── shank_2/
-    │   ├── raw_data_quality_metrics.csv
-    │   └── raw_data_quality_plots/
-    │       └── ...
-    ├── shank_3/
-    │   ├── raw_data_quality_metrics.csv
-    │   └── raw_data_quality_plots/
-    │       └── ...
-    └── shank_4/
-        ├── raw_data_quality_metrics.csv
-        └── raw_data_quality_plots/
-            └── ...
+├── bad_channel_detection/
+│   ├── session_0/
+│   │   ├── bad_channel_ids.csv
+│   │   └── bad_channel_labels.csv
+│   ├── session_1/
+│   │   ├── bad_channel_ids.csv
+│   │   └── bad_channel_labels.csv
+│   └── session_unions/               # only when combine_sessions is configured
+│       ├── bad_channel_ids.csv
+│       └── sessions.yaml
+├── artifact_detection/
+│   ├── session_0/
+│   │   └── event_periods.csv              # or event_periods_curated.csv
+│   └── session_1/
+│       └── event_periods.csv              # or event_periods_curated.csv
+├── preprocessing/
+│   ├── session_0/
+│   │   ├── metadata.*
+│   │   ├── preprocessing_plots/
+│   │   └── recording/                     # optional, depending on PIPELINE_CONFIG
+│   └── session_1/
+│       ├── metadata.*
+│       ├── preprocessing_plots/
+│       └── recording/                     # optional, depending on PIPELINE_CONFIG
+├── sorting/
+│   ├── session_0/
+│   │   ├── sorting/
+│   │   └── metadata.*
+│   └── session_1/
+│       ├── sorting/
+│       └── metadata.*
+├── postprocessing/
+│   ├── session_0/
+│   │   ├── sorting_analyzer/
+│   │   ├── quality_metrics.csv
+│   │   ├── postprocessing_plots/
+│   │   │   └── *.png
+│   │   └── metadata.*
+│   └── session_1/
+│       ├── sorting_analyzer/
+│       ├── quality_metrics.csv
+│       ├── postprocessing_plots/
+│       │   └── *.png
+│       └── metadata.*
+└── curation/
+    ├── session_0/
+    │   ├── sorting_analyzer/
+    │   ├── curation_decisions.*
+    │   └── metadata.*
+    └── session_1/
+        ├── sorting_analyzer/
+        ├── curation_decisions.*
+        └── metadata.*
 ```
+
+:::
+
+:::{tab-item} Multiple sessions, multiple shanks
+
+```text
+# Sorting and downstream folders shown for separately sorted sessions.
+output/
+├── raw_data_metrics/
+│   ├── session_0/
+│   │   ├── shank_0/
+│   │   │   ├── raw_data_quality_metrics.csv
+│   │   │   └── raw_data_quality_plots/
+│   │   │       └── ...
+│   │   └── shank_1/
+│   │       ├── raw_data_quality_metrics.csv
+│   │       └── raw_data_quality_plots/
+│   │           └── ...
+│   └── session_1/
+│       ├── shank_0/
+│       │   ├── raw_data_quality_metrics.csv
+│       │   └── raw_data_quality_plots/
+│       │       └── ...
+│       └── shank_1/
+│           ├── raw_data_quality_metrics.csv
+│           └── raw_data_quality_plots/
+│               └── ...
+├── bad_channel_detection/
+│   ├── session_0/
+│   │   ├── shank_0/
+│   │   │   ├── bad_channel_ids.csv
+│   │   │   └── bad_channel_labels.csv
+│   │   └── shank_1/
+│   │       ├── bad_channel_ids.csv
+│   │       └── bad_channel_labels.csv
+│   ├── session_1/
+│   │   ├── shank_0/
+│   │   │   ├── bad_channel_ids.csv
+│   │   │   └── bad_channel_labels.csv
+│   │   └── shank_1/
+│   │       ├── bad_channel_ids.csv
+│   │       └── bad_channel_labels.csv
+│   └── session_unions/               # only when combine_sessions is configured
+│       ├── shank_0/
+│       │   ├── bad_channel_ids.csv
+│       │   └── sessions.yaml
+│       └── shank_1/
+│           ├── bad_channel_ids.csv
+│           └── sessions.yaml
+├── artifact_detection/
+│   ├── session_0/
+│   │   ├── shank_0/
+│   │   │   └── event_periods.csv              # or event_periods_curated.csv
+│   │   └── shank_1/
+│   │       └── event_periods.csv              # or event_periods_curated.csv
+│   └── session_1/
+│       ├── shank_0/
+│       │   └── event_periods.csv              # or event_periods_curated.csv
+│       └── shank_1/
+│           └── event_periods.csv              # or event_periods_curated.csv
+├── preprocessing/
+│   ├── session_0/
+│   │   ├── shank_0/
+│   │   │   ├── metadata.*
+│   │   │   ├── preprocessing_plots/
+│   │   │   └── recording/                     # optional, depending on PIPELINE_CONFIG
+│   │   └── shank_1/
+│   │       ├── metadata.*
+│   │       ├── preprocessing_plots/
+│   │       └── recording/                     # optional, depending on PIPELINE_CONFIG
+│   └── session_1/
+│       ├── shank_0/
+│       │   ├── metadata.*
+│       │   ├── preprocessing_plots/
+│       │   └── recording/                     # optional, depending on PIPELINE_CONFIG
+│       └── shank_1/
+│           ├── metadata.*
+│           ├── preprocessing_plots/
+│           └── recording/                     # optional, depending on PIPELINE_CONFIG
+├── sorting/
+│   ├── session_0/
+│   │   ├── shank_0/
+│   │   │   ├── sorting/
+│   │   │   └── metadata.*
+│   │   └── shank_1/
+│   │       ├── sorting/
+│   │       └── metadata.*
+│   └── session_1/
+│       ├── shank_0/
+│       │   ├── sorting/
+│       │   └── metadata.*
+│       └── shank_1/
+│           ├── sorting/
+│           └── metadata.*
+├── postprocessing/
+│   ├── session_0/
+│   │   ├── shank_0/
+│   │   │   ├── sorting_analyzer/
+│   │   │   ├── quality_metrics.csv
+│   │   │   ├── postprocessing_plots/
+│   │   │   │   └── *.png
+│   │   │   └── metadata.*
+│   │   └── shank_1/
+│   │       ├── sorting_analyzer/
+│   │       ├── quality_metrics.csv
+│   │       ├── postprocessing_plots/
+│   │       │   └── *.png
+│   │       └── metadata.*
+│   └── session_1/
+│       ├── shank_0/
+│       │   ├── sorting_analyzer/
+│       │   ├── quality_metrics.csv
+│       │   ├── postprocessing_plots/
+│       │   │   └── *.png
+│       │   └── metadata.*
+│       └── shank_1/
+│           ├── sorting_analyzer/
+│           ├── quality_metrics.csv
+│           ├── postprocessing_plots/
+│           │   └── *.png
+│           └── metadata.*
+└── curation/
+    ├── session_0/
+    │   ├── shank_0/
+    │   │   ├── sorting_analyzer/
+    │   │   ├── curation_decisions.*
+    │   │   └── metadata.*
+    │   └── shank_1/
+    │       ├── sorting_analyzer/
+    │       ├── curation_decisions.*
+    │       └── metadata.*
+    └── session_1/
+        ├── shank_0/
+        │   ├── sorting_analyzer/
+        │   ├── curation_decisions.*
+        │   └── metadata.*
+        └── shank_1/
+            ├── sorting_analyzer/
+            ├── curation_decisions.*
+            └── metadata.*
+```
+
+:::
+
+::::

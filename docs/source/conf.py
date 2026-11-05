@@ -75,10 +75,15 @@ templates_path = ["_templates"]
 # Automatically generate stub pages for API
 autosummary_generate = True
 autodoc_default_flags = ["members", "inherited-members"]
-typehints_use_signature = True
-typehints_use_signature_return = True
+autodoc_typehints = "description"
+autodoc_typehints_format = "short"
+typehints_use_signature = False
+typehints_use_signature_return = False
+always_document_param_types = True
+typehints_fully_qualified = False
+python_maximum_signature_line_length = 80
 autodoc_type_aliases = {
-    "RecordingInput": "spikesorted.utils.recordings_structure.RecordingInput",
+    "RecordingInput": "RecordingInput",
 }
 
 # List of patterns, relative to source directory, that match files and

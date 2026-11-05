@@ -40,8 +40,8 @@
     if (sessions !== 'separate') {
       configName += `-${sessions}`;
     }
-    document.getElementById('config-name').textContent = `${configName}.yaml`;
-    document.getElementById('config-command').textContent = `spikesorted --config ./${configName}.yaml`;
+    document.getElementById('config-name').textContent = configName;
+    document.getElementById('config-command').textContent = `spikesorted --config ${configName}`;
     preview.innerHTML = document.querySelector(`#config-source-${configName} pre`).innerHTML;
     result.hidden = false;
   });

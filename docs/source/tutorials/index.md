@@ -10,6 +10,13 @@
 Coming soon...
 :::
 
+:::{grid-item-card} Run spikesorted through the Python API
+:link: python-api
+:link-type: doc
+
+Coming soon...
+:::
+
 :::{grid-item-card} Custom data loading with SpikeInterface
 :link: data-loading
 :link-type: doc
@@ -38,6 +45,7 @@ Coming soon...
 :maxdepth: 1
 
 command-line
+python-api
 data-loading
 multiple-sessions
 quality-metrics

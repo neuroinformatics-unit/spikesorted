@@ -67,3 +67,6 @@ html[data-theme="dark"] .ss-yaml .p { color: #d4d4d4; }
 
 .bd-article h1, .bd-article h2, .bd-article h3 { color: var(--pst-color-text-base); }
 .navbar-brand .logo__title { color: var(--pst-color-primary); }
+
+/* Keep API signature parameters upright. */
+.sig-param { font-style: normal; }

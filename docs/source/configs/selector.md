@@ -46,7 +46,8 @@
 
 </div>
 
-  <p>Save this example as <code id="config-name"></code> and pass its path when you run:</p>
+  <p>This config is available by default in <code>spikesorted</code> as <code id="config-name"></code>.</p>
+  <p>For example, to use it with the command-line interface, try:</p>
   <pre><code id="config-command"></code></pre>
   <pre><code class="ss-yaml" id="config-yaml"></code></pre>
   <button class="ss-config-button" id="config-save" type="button">Save</button>

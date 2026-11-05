@@ -5,6 +5,6 @@
 
 Pipeline Outputs <output-overview>
 Config specification <config>
-Structure On-disk <on-disk-structure>
+Structure on disk <on-disk-structure>
 Developers <developer>
 ```
