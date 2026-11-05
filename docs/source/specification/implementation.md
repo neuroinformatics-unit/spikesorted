@@ -20,7 +20,7 @@ Outputs are saved to `RAW_DATA_METRICS_DIR`
 
 - {ref}`RAW_DATA_QUALITY_METRICS <outputs-raw-data-quality-metrics>` and {ref}`RAW_DATA_QUALITY_PLOTS <outputs-raw-data-quality-plots>` 
 
-- TODO: discuss {ref}`CONCAT_POINTS_QUALITY_METRICS <roadmap-concat-points-quality-metrics>` and {ref}`CONCAT_POINTS_QUALITY_METRICS_PLOTS <roadmap-concat-points-quality-metrics-plots>`
+- TODO: discuss `CONCAT_POINTS_QUALITY_METRICS` and `CONCAT_POINTS_QUALITY_METRICS_PLOTS`.
 - {ref}`CONCAT_REC_TIMES <outputs-concat-rec-times>` if concatenated recordings are detected.
 
 **OPERATIONS**:
@@ -28,7 +28,7 @@ Outputs are saved to `RAW_DATA_METRICS_DIR`
 - Compute raw-data quality metrics using the configured settings.
 - Generate quality-assessment plots from the computed metrics.
 - Save the metrics and plots to `RAW_DATA_METRICS_DIR`.
-- Determine if recordings are concatenated. Quality metrics across concatenation points are a {ref}`roadmap TODO <roadmap-concat-points-quality-metrics>`.
+- Determine if recordings are concatenated. TODO: discuss quality metrics across concatenation points.
 
 **CHECKS**:
 
@@ -53,7 +53,7 @@ Detect bad channels after high-pass filtering at 300 Hz. This is because bandpas
 **Outputs**
 
 - {ref}`BAD_CHANNEL_DETECTION_OUTPUTS <outputs-bad-channel-detection-outputs>`, containing channel IDs and labels.
-- TODO: discuss {ref}`BAD_CHANNEL_DETECTION_METRICS <roadmap-detect-bad-channels-metrics>` and {ref}`BAD_CHANNEL_DETECTION_PLOTS <roadmap-detect-bad-channels-plots>`
+- TODO: discuss `BAD_CHANNEL_DETECTION_METRICS` and `BAD_CHANNEL_DETECTION_PLOTS`.
 
 
 **OPERATIONS**:
@@ -61,7 +61,7 @@ Detect bad channels after high-pass filtering at 300 Hz. This is because bandpas
 - High-pass filter the data, as required by the detect-bad-channels method.
 - Detect bad channels and assign labels using the configured thresholds.
 - Save the channel IDs and labels to the bad-channel output directory.
-- TODO: discuss saving quality metrics and associated plots; see {ref}`Roadmap <roadmap-detect-bad-channels-metrics>`.
+- TODO: discuss saving quality metrics and associated plots.
 
 **CHECKS**:
 
