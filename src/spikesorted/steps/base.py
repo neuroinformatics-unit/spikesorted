@@ -81,14 +81,6 @@ class BasePipelineStep:
         """Perform checks, execute the step, and save its outputs."""
         raise NotImplementedError
 
-    def mem_required_per_core(self) -> int:
-        """Estimate peak working RAM in bytes for one worker."""
-        raise NotImplementedError
-
-    def mem_required_total(self) -> int:
-        """Estimate worker RAM in bytes, excluding already-resident shared data."""
-        return self.mem_required_per_core() * self._resolved_num_cores
-
     def needs_gpu(self) -> bool:
         """Report whether the configured operation requires a GPU."""
         raise NotImplementedError
@@ -121,11 +113,9 @@ class BasePipelineStep:
 
     def _get_recordings_and_paths(
         self, step_name: str
-    ) -> list[tuple[RecordingInput, Path]]:
-        """Return recording/path pairs using the shared session/shank helper."""
-        return [
-            (recording, path)
-            for _, _, recording, path in get_recordings_and_paths(
-                self.recordings, self.output_path, step_name
-            )
-        ]
+    ) -> list[tuple[str, str, RecordingInput, Path]]:
+        """Convenience function for get_recordings_and_paths."""
+        return get_recordings_and_paths(
+            self.recordings, self.output_path, step_name
+        )
+

@@ -1,1 +1,0 @@
-"""Bad-channel detection step."""
