@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from spikesorted.steps.bad_channel_detection.bad_channel_detection import BadChannelDetectionStep
+from spikesorted.steps.bad_channel_detection import BadChannelDetectionStep
 from spikesorted.utils.utils import load_pipeline_config
 
 if TYPE_CHECKING:

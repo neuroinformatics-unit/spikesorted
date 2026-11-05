@@ -14,12 +14,7 @@ import spikeinterface.preprocessing as spre
 
 from spikesorted.utils.recordings_structure import get_num_sessions
 from spikesorted.steps.base import BasePipelineStep
-from spikesorted.steps.bad_channel_detection.bad_channel_union import create_bad_channel_labels_union
-from spikesorted.steps.bad_channel_detection.estimate_bad_channel_detection_memory_usage import (
-    estimate_bad_channel_detection_memory_usage,
-    estimate_filter_memory_usage,
-    _parameter,
-)
+from spikesorted.steps.bad_channel_union import create_bad_channel_labels_union
 
 
 @dataclass(frozen=True)
