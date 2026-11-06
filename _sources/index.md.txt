@@ -31,11 +31,6 @@ See the [Roadmap](community/roadmap.md#planned-pipeline-steps) for additional pl
 :file: includes/front-page/pipeline-diagram.html
 ```
 
-<figcaption>
-
-Select a step to explore it. The side route shows multi-session processing.
-
-</figcaption>
 </figure>
 
 (quality-title)=
@@ -50,7 +45,7 @@ Select a step to explore it. The side route shows multi-session processing.
 
 <figcaption class="ss-rms-caption">
 
-RMS plot over time, as used in the [IBL pipeline](https://docs.internationalbrainlab.org/_autosummary/ibllib.ephys.ephysqc.html).
+RMS plots over time are automatically saved, as used for QC in the [IBL pipeline](https://docs.internationalbrainlab.org/_autosummary/ibllib.ephys.ephysqc.html).
 
 </figcaption>
 </figure>
