@@ -1,10 +1,11 @@
 """
 The pipeline steps `recordings` can be a fairly complex range of input types:
 - a SpikeInterface recording
+- a path to a saved SpikeInterface recording
 - a dict of SpikeInterface recordings split by shank (e.g. `recordings.split_by("group"))`.
 - a tuple of (recording, str) where str is the user-specified name of the session.
-For multiple unnamed sessions, session_0...n are used for folder names.
-A single unnamed session has session_name=None and no session folder.
+For unnamed sessions, ses-001, ses-002, ... are used in input order.
+A single unnamed session uses ses-001. Explicit tuple names are preserved.
 
 This is for a single session. For multiple-sessions, these datatypes
 are stored in a list (where each element is the recording/s from a single session).
@@ -15,6 +16,7 @@ from __future__ import annotations
 from collections.abc import Iterator
 from pathlib import Path
 
+from spikeinterface import load
 from spikeinterface.core import BaseRecording
 
 Recording = str | Path | BaseRecording
@@ -74,14 +76,14 @@ def get_recordings_and_paths(
         if isinstance(session_recording, tuple):
             session_recording, session_name = session_recording
         else:
-            if len(sessions) == 1:
-                session_name = None
-            else:
-                session_name = f"session_{session_idx}"
+            session_name = f"ses-{session_idx + 1:03d}"
 
         # Handle multiple shanks. When only one shank is used, `shank_id`
         # is None and data is not stored in a folder called "shank_<id>".
         for shank_id, recording in iter_over_shanks(session_recording):
+
+            if isinstance(recording, (str, Path)):
+                recording = load(recording)
 
             shank_path = get_path(
                 output_path, step_name, session_name, shank_id

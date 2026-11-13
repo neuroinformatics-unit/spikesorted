@@ -94,3 +94,7 @@ def _run_pipeline_with_slurm(
         create_bad_channel_labels_union(
             recordings, output_path
         )
+
+    run_pipeline_in_slurm_batch(
+        split_recordings, start_at_step="artifact_detection"
+    )

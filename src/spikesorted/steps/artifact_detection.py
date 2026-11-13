@@ -1,5 +1,6 @@
 """Artifact detection step."""
 
+import sys
 import warnings
 
 from dataclasses import dataclass
@@ -30,7 +31,7 @@ class ArtifactDetectionStep(BasePipelineStep):
         ):
             if verbose:
                 shank_id_message = f", shank {shank_id}" if shank_id else ""
-                print(f"Running artifact detection for session {session_name}" + shank_id_message)
+                print(f"Running artifact detection for session {session_name}" + shank_id_message, file=sys.stderr, flush=True)
 
             periods_path = self.get_artifact_periods_filepath(shank_path)
             shank_path.mkdir(parents=True, exist_ok=True)
@@ -79,7 +80,7 @@ class ArtifactDetectionStep(BasePipelineStep):
                 plt.close(figure)
 
             if verbose:
-                print(f"Artifact periods saved to: {periods_path}")
+                print(f"Artifact periods saved to: {periods_path}", file=sys.stderr, flush=True)
 
     def perform_checks(self) -> None:
         """

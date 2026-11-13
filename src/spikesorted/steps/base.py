@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar
 
+from spikeinterface import load
 from spikeinterface.core import BaseRecording
 
 from ..utils.recordings_structure import get_path, get_recordings_and_paths
@@ -111,6 +112,9 @@ class BasePipelineStep:
                 if not recording:
                     raise ValueError("At least one recording is required")
                 recording = next(iter(recording.values()))
+
+            elif isinstance(recording, (str, Path)):
+                recording = load(recording)
 
             else:
                 raise TypeError("Load recording paths before accessing a recording")

@@ -1,5 +1,6 @@
 """Bad-channel detection step (not implemented yet)."""
 
+import sys
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
@@ -78,7 +79,7 @@ class BadChannelDetectionStep(BasePipelineStep):
         ):
             if verbose:
                 shank_id_message = f", shank {shank_id}" if shank_id else ""
-                print(f"Running bad channel detection for session {session_name}" + shank_id_message)
+                print(f"Running bad channel detection for session {session_name}" + shank_id_message, file=sys.stderr, flush=True)
 
             bad_ids_path = self.get_bad_channel_ids_filepath(shank_path)
             labels_path = self.get_bad_channel_labels_filepath(shank_path)
@@ -109,7 +110,7 @@ class BadChannelDetectionStep(BasePipelineStep):
             labels_df.to_csv(labels_path, index=False)
 
             if verbose:
-                print(f"Bad channel IDS and labels saved to: {bad_ids_path.parent}")
+                print(f"Bad channel IDS and labels saved to: {bad_ids_path.parent}", file=sys.stderr, flush=True)
 
         if "combine_sessions" in self.config and get_num_sessions(self.recordings) > 1:
             create_bad_channel_labels_union(self.recordings, self.output_path)
@@ -167,10 +168,9 @@ class BadChannelDetectionStep(BasePipelineStep):
 
         bad_channel_ids = bad_channels["channel_id"].to_numpy()
 
-        # Bad channels can be str or int dtype
-        bad_channels_type = bad_channels["channel_id_dtype"].iloc[0]
-
         if not bad_channels.empty:
+            # Bad channels can be str or int dtype
+            bad_channels_type = bad_channels["channel_id_dtype"].iloc[0]
             bad_channel_ids = bad_channel_ids.astype(
                 bad_channels_type
             )

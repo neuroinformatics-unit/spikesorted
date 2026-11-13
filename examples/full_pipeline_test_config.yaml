@@ -1,0 +1,5 @@
+bad_channel_detection:
+  method: coherence+psd
+
+artifact_detection:
+  saturation: {}

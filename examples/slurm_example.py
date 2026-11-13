@@ -3,20 +3,16 @@
 from datetime import datetime
 from pathlib import Path
 
-import spikeinterface as si
-
 from spikesorted.slurm.slurm_for_pipeline import run_pipeline_with_slurm
+from spikesorted.utils.testing_utils import get_test_data
 
 
 def main():
     repo_path = Path(__file__).resolve().parents[1]
 
     # Recording, config and output paths must be accessible on the compute nodes.
-    # Add more saved recording folders to submit multiple sessions in one array.
-    recording_paths = [
-        repo_path / "tests/data/neuropixels-2010-spikeglx/si_recording",
-    ]
-    recordings = [si.load(path) for path in recording_paths]
+    # Add more recordings to submit multiple sessions in one array.
+    recordings = [get_test_data(repo_path)]
 
     # This fixture already contains one shank. For multiple shanks, each session
     # can instead be a dictionary: {"0": shank_0_recording, "1": shank_1_recording}.
@@ -25,7 +21,7 @@ def main():
 
     job = run_pipeline_with_slurm(
         recordings=recordings,
-        config_path=repo_path / "tests/test_integration/bad_channel_detection.yaml",
+        config_path=repo_path / "examples/full_pipeline_test_config.yaml",
         output_path=output_path,
         overwrite=False,
         num_cores=1,

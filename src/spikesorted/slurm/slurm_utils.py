@@ -41,7 +41,7 @@ def split_recordings_by_shank(
         if isinstance(session_recording, tuple):
             session_recording, session_name = session_recording
         else:
-            session_name = f"session_{session_idx}" if len(sessions) > 1 else None
+            session_name = f"ses-{session_idx + 1:03d}"
 
         for shank_id, recording in iter_over_shanks(session_recording):
             if shank_id is None:
