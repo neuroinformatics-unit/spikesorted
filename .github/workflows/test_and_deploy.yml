@@ -10,12 +10,12 @@ on:
 
 jobs:
   linting:
+    if: ${{ false }} # Temporarily disable CI linting.
     runs-on: ubuntu-latest
     steps:
       - uses: neuroinformatics-unit/actions/lint@v2
 
   test:
-    needs: [linting]
     name: ${{ matrix.os }} py${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:

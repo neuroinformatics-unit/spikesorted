@@ -6,6 +6,6 @@ except PackageNotFoundError:
     # package is not installed
     pass
 
-from .pipeline.pipeline import Pipeline
+from spikesorted.pipeline.pipeline import Pipeline
 
 __all__ = ["Pipeline"]

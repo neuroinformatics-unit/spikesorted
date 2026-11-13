@@ -5,14 +5,15 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from ..pipeline.pipeline import Pipeline
-from ..steps.bad_channel_union import create_bad_channel_labels_union
-from ..utils.utils import load_pipeline_config
-from .slurm_runners import run_slurm_batch, submit_slurm
-from .slurm_utils import split_recordings_by_shank
+from spikesorted.pipeline.pipeline import Pipeline
+from spikesorted.slurm.slurm_runners import run_slurm_batch, submit_slurm
+from spikesorted.slurm.slurm_utils import split_recordings_by_shank
+from spikesorted.steps.bad_channel_union import create_bad_channel_labels_union
+from spikesorted.utils.utils import load_pipeline_config
 
 if TYPE_CHECKING:
-    from ..steps.base import RecordingInput
+    from spikesorted.steps.base import RecordingInput
+
 
 # TODO: we need a unitmatching option here in which we will need to
 # take the union of bad channels even if we are not concatenating
@@ -62,6 +63,7 @@ def _run_pipeline_with_slurm(
     slurm_opts are passed to Submitit's executor.update_parameters().
     Combined sessions synchronize after detection and preprocessing.
     """
+
     def run_pipeline_in_slurm_batch(inputs, start_at_step=None, stop_after_step=None):
         calls = []
         for recording in inputs:
@@ -91,10 +93,6 @@ def _run_pipeline_with_slurm(
         run_pipeline_in_slurm_batch(
             split_recordings, stop_after_step="bad_channel_detection"
         )
-        create_bad_channel_labels_union(
-            recordings, output_path
-        )
+        create_bad_channel_labels_union(recordings, output_path)
 
-    run_pipeline_in_slurm_batch(
-        split_recordings, start_at_step="artifact_detection"
-    )
+    run_pipeline_in_slurm_batch(split_recordings, start_at_step="artifact_detection")

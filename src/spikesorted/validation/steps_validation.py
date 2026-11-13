@@ -7,7 +7,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, create_model
 from spikeinterface.preprocessing import detect_bad_channels
 
-from ..utils.recordings_structure import RecordingInput
+from spikesorted.utils.recordings_structure import RecordingInput
 
 
 class _BaseStepArguments(BaseModel):

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from ..validation.config_validation import PipelineConfig, validate_config
+from spikesorted.validation.config_validation import PipelineConfig, validate_config
 
 
 def load_pipeline_config(config_path: str | Path) -> PipelineConfig:

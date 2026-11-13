@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..utils.recordings_structure import iter_over_shanks
+from spikesorted.utils.recordings_structure import iter_over_shanks
 
 if TYPE_CHECKING:
-    from ..utils.recordings_structure import RecordingInput
+    from spikesorted.utils.recordings_structure import RecordingInput
 
 
 def split_recordings_by_shank(
@@ -37,7 +37,6 @@ def split_recordings_by_shank(
     sessions = recordings if isinstance(recordings, list) else [recordings]
     split_recordings = []
     for session_idx, session_recording in enumerate(sessions):
-
         if isinstance(session_recording, tuple):
             session_recording, session_name = session_recording
         else:

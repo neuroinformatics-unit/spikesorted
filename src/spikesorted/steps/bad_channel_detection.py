@@ -12,10 +12,9 @@ import pandas as pd
 import scipy.signal  # noqa: F401
 import spikeinterface.preprocessing as spre
 
-from ..utils.recordings_structure import get_num_sessions
-from .base import BasePipelineStep
-from .bad_channel_union import create_bad_channel_labels_union
-from ..utils.recordings_structure import get_path
+from spikesorted.steps.bad_channel_union import create_bad_channel_labels_union
+from spikesorted.steps.base import BasePipelineStep
+from spikesorted.utils.recordings_structure import get_num_sessions, get_path
 
 
 @dataclass(frozen=True)
@@ -64,7 +63,9 @@ class BadChannelDetectionStep(BasePipelineStep):
         SpikeInterface's ``detect_bad_channels()``.
 
     Both files include column headers and omit the DataFrame index.
+
     """
+
     def run(self, verbose: bool = True) -> None:
         """Check inputs, high-pass at 300 Hz, and run IBL bad-channel detection.
 
@@ -74,19 +75,29 @@ class BadChannelDetectionStep(BasePipelineStep):
 
         kwargs = self.config["bad_channel_detection"]
 
-        for session_name, shank_id, shank_recording, shank_path in self._get_recordings_and_paths(
-            "bad_channel_detection"
-        ):
+        for (
+            session_name,
+            shank_id,
+            shank_recording,
+            shank_path,
+        ) in self._get_recordings_and_paths("bad_channel_detection"):
             if verbose:
                 shank_id_message = f", shank {shank_id}" if shank_id else ""
-                print(f"Running bad channel detection for session {session_name}" + shank_id_message, file=sys.stderr, flush=True)
+                print(
+                    f"Running bad channel detection for session {session_name}"
+                    + shank_id_message,
+                    file=sys.stderr,
+                    flush=True,
+                )
 
             bad_ids_path = self.get_bad_channel_ids_filepath(shank_path)
             labels_path = self.get_bad_channel_labels_filepath(shank_path)
 
             shank_path.mkdir(parents=True, exist_ok=True)
 
-            filtered_recording = spre.highpass_filter(shank_recording, freq_min=self._highpass_freq_min)
+            filtered_recording = spre.highpass_filter(
+                shank_recording, freq_min=self._highpass_freq_min
+            )
 
             bad_channel_ids, channel_labels = spre.detect_bad_channels(
                 filtered_recording, **kwargs
@@ -110,7 +121,11 @@ class BadChannelDetectionStep(BasePipelineStep):
             labels_df.to_csv(labels_path, index=False)
 
             if verbose:
-                print(f"Bad channel IDS and labels saved to: {bad_ids_path.parent}", file=sys.stderr, flush=True)
+                print(
+                    f"Bad channel IDS and labels saved to: {bad_ids_path.parent}",
+                    file=sys.stderr,
+                    flush=True,
+                )
 
         if "combine_sessions" in self.config and get_num_sessions(self.recordings) > 1:
             create_bad_channel_labels_union(self.recordings, self.output_path)
@@ -131,7 +146,6 @@ class BadChannelDetectionStep(BasePipelineStep):
         for _, _, recording, shank_path in self._get_recordings_and_paths(
             "bad_channel_detection"
         ):
-
             num_channels = recording.get_num_channels()
             if method == "coherence+psd" and num_channels <= 64:
                 warnings.warn(
@@ -155,25 +169,22 @@ class BadChannelDetectionStep(BasePipelineStep):
     @classmethod
     def load_bad_channels(cls, output_path, session_name=None, shank_id=None):
         """Load bad-channel IDs for a session and shank in their original dtype."""
-        channel_ids_path = get_path(
-            output_path, "bad_channel_detection", session_name, shank_id
-        ) / "bad_channel_ids.csv"
+        channel_ids_path = (
+            get_path(output_path, "bad_channel_detection", session_name, shank_id)
+            / "bad_channel_ids.csv"
+        )
 
         if not channel_ids_path.exists():
             return None
 
-        bad_channels = pd.read_csv(
-            channel_ids_path, dtype={"channel_id": str}
-        )
+        bad_channels = pd.read_csv(channel_ids_path, dtype={"channel_id": str})
 
         bad_channel_ids = bad_channels["channel_id"].to_numpy()
 
         if not bad_channels.empty:
             # Bad channels can be str or int dtype
             bad_channels_type = bad_channels["channel_id_dtype"].iloc[0]
-            bad_channel_ids = bad_channel_ids.astype(
-                bad_channels_type
-            )
+            bad_channel_ids = bad_channel_ids.astype(bad_channels_type)
 
         return bad_channel_ids
 
@@ -188,4 +199,3 @@ class BadChannelDetectionStep(BasePipelineStep):
     def needs_gpu(self) -> bool:
         """Report whether the configured detection method requires a GPU."""
         return False
-

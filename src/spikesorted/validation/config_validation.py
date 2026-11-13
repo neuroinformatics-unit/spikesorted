@@ -5,7 +5,7 @@ from typing import Annotated, Any
 from pydantic import AfterValidator, ConfigDict, TypeAdapter, with_config
 from typing_extensions import TypedDict
 
-from .steps_validation import _validate_bad_channel_config
+from spikesorted.validation.steps_validation import _validate_bad_channel_config
 
 
 @with_config(ConfigDict(extra="forbid", strict=True))

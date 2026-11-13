@@ -1,0 +1,41 @@
+raw_data_quality_metrics:
+  chunk_size_s: 1.0
+  num_chunks: 30
+  rolling_rms_window_size_s: 3.0
+  quick_metrics_only: false
+
+bad_channel_detection:
+  method: 'coherence+psd'
+
+preprocessing:
+  remove_bad_channels: {}  # Remove (not interpolate) bad channels
+  phase_shift: {}
+  bandpass_filter:
+    freq_min: 300.0
+    freq_max: 6000.0
+  common_reference:
+    reference: global
+    operator: median
+
+combine_sessions:
+  method: concatenate
+
+sorting:
+  sorter: lupin
+  params:
+    apply_preprocessing: true
+    preprocessing_dict: {}
+    apply_motion_correction: false
+
+postprocessing:
+  random_spikes:
+    max_spikes_per_unit: 2500
+  waveforms:
+    ms_before: 1.0
+    ms_after: 2.0
+  templates: {}
+  quality_metrics:
+    metric_names: all
+  compute_sparsity:
+    method: radius
+    radius_um: 100

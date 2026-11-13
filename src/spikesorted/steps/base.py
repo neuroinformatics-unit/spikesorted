@@ -7,13 +7,13 @@ from typing import TYPE_CHECKING, ClassVar
 from spikeinterface import load
 from spikeinterface.core import BaseRecording
 
-from ..utils.recordings_structure import get_path, get_recordings_and_paths
-from ..utils.utils import load_pipeline_config
-from ..validation.steps_validation import _BaseStepArguments
+from spikesorted.utils.recordings_structure import get_path, get_recordings_and_paths
+from spikesorted.utils.utils import load_pipeline_config
+from spikesorted.validation.steps_validation import _BaseStepArguments
 
 if TYPE_CHECKING:
-    from ..utils.recordings_structure import RecordingInput
-    from ..validation.config_validation import PipelineConfig
+    from spikesorted.utils.recordings_structure import RecordingInput
+    from spikesorted.validation.config_validation import PipelineConfig
 
 
 @dataclass(frozen=True)
@@ -24,7 +24,6 @@ class BasePipelineStep:
 
     Parameters
     ----------
-
     recordings
         A RecordingsInput (either a recording, (recording, str), or {str: recording}
         object, or list thereof).
@@ -39,6 +38,7 @@ class BasePipelineStep:
     num_cores
         Number of cores to parallelize the step. Passed
         to SpikeInterface's `job_kwargs`.
+
     """
 
     recordings: RecordingInput | list[RecordingInput]
@@ -102,7 +102,6 @@ class BasePipelineStep:
         recording = self.recordings
 
         while not isinstance(recording, BaseRecording):
-
             if isinstance(recording, (list, tuple)):
                 if not recording:
                     raise ValueError("At least one recording is required")
@@ -122,18 +121,16 @@ class BasePipelineStep:
         return recording
 
     def get_path(
-        self, step_name: str, session_name: str | None = None, shank_id: str | int | None = None
+        self,
+        step_name: str,
+        session_name: str | None = None,
+        shank_id: str | int | None = None,
     ) -> Path:
         """Return the output directory for a step, session and shank."""
-        return get_path(
-            self.output_path, step_name, session_name, shank_id
-        )
+        return get_path(self.output_path, step_name, session_name, shank_id)
 
     def _get_recordings_and_paths(
         self, step_name: str
     ) -> list[tuple[str | None, str | int | None, RecordingInput, Path]]:
         """Convenience function for get_recordings_and_paths."""
-        return get_recordings_and_paths(
-            self.recordings, self.output_path, step_name
-        )
-
+        return get_recordings_and_paths(self.recordings, self.output_path, step_name)

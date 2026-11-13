@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
-from ..utils.recordings_structure import get_recordings_and_paths_by_shank
+from spikesorted.utils.recordings_structure import get_recordings_and_paths_by_shank
 
 
 def create_bad_channel_labels_union(recordings, output_path):
@@ -36,7 +36,6 @@ def create_bad_channel_labels_union(recordings, output_path):
     union_path = Path(output_path) / "bad_channel_detection" / "session_unions"
 
     for shank_id, recordings_and_paths in recordings_by_shank.items():
-
         bad_channel_ids = {}
         session_names = []
 
@@ -44,7 +43,8 @@ def create_bad_channel_labels_union(recordings, output_path):
             session_names.append(session_name)
             labels = pd.read_csv(
                 path / "bad_channel_ids.csv",
-                dtype={"channel_id": str}, keep_default_na=False,
+                dtype={"channel_id": str},
+                keep_default_na=False,
             )
             bad_channel_ids.update(
                 zip(labels["channel_id"], labels["channel_id_dtype"])
@@ -60,17 +60,18 @@ def create_bad_channel_labels_union(recordings, output_path):
         pd.DataFrame(
             sorted(bad_channel_ids.items()),
             columns=["channel_id", "channel_id_dtype"],
-        ).to_csv(
-            output_path / "bad_channel_ids.csv", index=False
-        )
+        ).to_csv(output_path / "bad_channel_ids.csv", index=False)
         with (output_path / "sessions.yaml").open("w", encoding="utf-8") as file:
             yaml.safe_dump(
                 {"sessions": session_names, "date": generation_date},
-                file, sort_keys=False,
+                file,
+                sort_keys=False,
             )
 
 
-def _confirm_all_and_only_specified_bad_channel_files_exist(recordings_by_shank, output_path):
+def _confirm_all_and_only_specified_bad_channel_files_exist(
+    recordings_by_shank, output_path
+):
     """Require the discovered CSVs to match the supplied sessions/shanks exactly."""
     expected_files = sorted(
         path / "bad_channel_ids.csv"
@@ -81,7 +82,8 @@ def _confirm_all_and_only_specified_bad_channel_files_exist(recordings_by_shank,
     step_path = Path(output_path) / "bad_channel_detection"
 
     existing_files = sorted(
-        path for path in step_path.rglob("bad_channel_ids.csv")
+        path
+        for path in step_path.rglob("bad_channel_ids.csv")
         if not path.is_relative_to(step_path / "session_unions")
     )
 
