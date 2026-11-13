@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=1ca3d75a"></script>
+    <script src="../_static/documentation_options.js?v=2b5b5d30"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
@@ -467,7 +467,10 @@
 <h1>Config specification<a class="headerlink" href="#config-specification" title="Link to this heading">#</a></h1>
 <p>This specification defines the structure and valid contents of the <a class="reference internal" href="../configs/index.html"><span class="std std-doc">Config file</span></a>.</p>
 <p>An example including every step, with a subset of available arguments for each, is shown below:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">raw_data_quality_metrics</span><span class="p">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">output</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">structure</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">neuroblueprint</span>
+
+<span class="nt">raw_data_quality_metrics</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">chunk_size_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
 <span class="w">  </span><span class="nt">num_chunks</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
 <span class="w">  </span><span class="nt">rolling_rms_window_size_s</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3.0</span>
@@ -565,6 +568,14 @@ Only optional steps can be skipped.</p>
 metrics and bad channel detection.</p>
 </div>
 </section>
+<section id="output-layout">
+<h2>Output layout<a class="headerlink" href="#output-layout" title="Link to this heading">#</a></h2>
+<p>The optional <code class="docutils literal notranslate"><span class="pre">output</span></code> section controls folder organisation; it is not a pipeline step.
+Set <code class="docutils literal notranslate"><span class="pre">output.structure</span></code> to <code class="docutils literal notranslate"><span class="pre">neuroblueprint</span></code> (the default), <code class="docutils literal notranslate"><span class="pre">by_session</span></code>, or <code class="docutils literal notranslate"><span class="pre">by_step</span></code>.
+Omitting <code class="docutils literal notranslate"><span class="pre">output</span></code> or <code class="docutils literal notranslate"><span class="pre">structure</span></code> selects <code class="docutils literal notranslate"><span class="pre">neuroblueprint</span></code>.</p>
+<p>Pass the subject directory, for example <code class="docutils literal notranslate"><span class="pre">results/sub-001</span></code>, as <code class="docutils literal notranslate"><span class="pre">output_path</span></code>.
+See <a class="reference internal" href="on-disk-structure.html"><span class="std std-doc">Structure on disk</span></a> for folder trees and session-union paths.</p>
+</section>
 <section id="step-parameters">
 <h2>Step parameters<a class="headerlink" href="#step-parameters" title="Link to this heading">#</a></h2>
 <section id="bad-channel-detection">
@@ -657,6 +668,7 @@ The defaults are designed for Neuropixels 1.0 probes.</p>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#config-structure">Config structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#output-layout">Output layout</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-parameters">Step parameters</a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bad-channel-detection">Bad channel detection</a></li>
 </ul>

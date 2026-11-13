@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=1ca3d75a"></script>
+    <script src="../../../_static/documentation_options.js?v=2b5b5d30"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../../_static/design-tabs.js?v=fcb327ea"></script>
@@ -440,7 +440,9 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassVar</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
@@ -448,10 +450,10 @@
 <span class="c1"># rather than part of the first bad-channel detection chunk.</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">scipy.signal</span>  <span class="c1"># noqa: F401</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">spikeinterface.preprocessing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">spre</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.steps.bad_channel_union</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_bad_channel_labels_union</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.steps.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasePipelineStep</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.utils.recordings_structure</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_num_sessions</span><span class="p">,</span> <span class="n">get_path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.utils.recordings_structure</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_num_sessions</span>
 
 
 <div class="viewcode-block" id="BadChannelDetectionStep">
@@ -505,6 +507,8 @@
 
 <span class="sd">    """</span>
 
+    <span class="n">_step_name</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"bad_channel_detection"</span>
+
 <div class="viewcode-block" id="BadChannelDetectionStep.run">
 <a class="viewcode-back" href="../../../api_index.html#spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.run">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -521,7 +525,7 @@
             <span class="n">shank_id</span><span class="p">,</span>
             <span class="n">shank_recording</span><span class="p">,</span>
             <span class="n">shank_path</span><span class="p">,</span>
-        <span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recordings_and_paths</span><span class="p">(</span><span class="s2">"bad_channel_detection"</span><span class="p">):</span>
+        <span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recordings_and_paths</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
                 <span class="n">shank_id_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">", shank </span><span class="si">{</span><span class="n">shank_id</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">shank_id</span> <span class="k">else</span> <span class="s2">""</span>
                 <span class="nb">print</span><span class="p">(</span>
@@ -569,7 +573,7 @@
                 <span class="p">)</span>
 
         <span class="k">if</span> <span class="s2">"combine_sessions"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="ow">and</span> <span class="n">get_num_sessions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recordings</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">create_bad_channel_labels_union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recordings</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_bad_channel_labels_union</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="BadChannelDetectionStep.perform_checks">
@@ -587,9 +591,7 @@
         <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"bad_channel_detection.method must be explicitly provided"</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">recording</span><span class="p">,</span> <span class="n">shank_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recordings_and_paths</span><span class="p">(</span>
-            <span class="s2">"bad_channel_detection"</span>
-        <span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">recording</span><span class="p">,</span> <span class="n">shank_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recordings_and_paths</span><span class="p">():</span>
             <span class="n">num_channels</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">get_num_channels</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">"coherence+psd"</span> <span class="ow">and</span> <span class="n">num_channels</span> <span class="o">&lt;=</span> <span class="mi">64</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
@@ -613,12 +615,10 @@
 
 <div class="viewcode-block" id="BadChannelDetectionStep.load_bad_channels">
 <a class="viewcode-back" href="../../../api_index.html#spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.load_bad_channels">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">load_bad_channels</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">session_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">shank_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_bad_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_name</span><span class="p">,</span> <span class="n">shank_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""Load bad-channel IDs for a session and shank in their original dtype."""</span>
         <span class="n">channel_ids_path</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">get_path</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">"bad_channel_detection"</span><span class="p">,</span> <span class="n">session_name</span><span class="p">,</span> <span class="n">shank_id</span><span class="p">)</span>
-            <span class="o">/</span> <span class="s2">"bad_channel_ids.csv"</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_output_path</span><span class="p">(</span><span class="n">session_name</span><span class="p">,</span> <span class="n">shank_id</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"bad_channel_ids.csv"</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">channel_ids_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
@@ -655,7 +655,103 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">needs_gpu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Report whether the configured detection method requires a GPU."""</span>
         <span class="k">return</span> <span class="kc">False</span></div>
-</div>
+
+
+<div class="viewcode-block" id="BadChannelDetectionStep.create_bad_channel_labels_union">
+<a class="viewcode-back" href="../../../api_index.html#spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.create_bad_channel_labels_union">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_bad_channel_labels_union</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Create a CSV which contains the union of all bad channel IDs across sessions.</span>
+
+<span class="sd">        When working with multiple sessions, and concatenating or unit-matching, the</span>
+<span class="sd">        same set of channels must be included on all used recordings. This function</span>
+<span class="sd">        uses the individual sessions bad channel detection outputs on disk to create</span>
+<span class="sd">        a union of all bad channel labels.</span>
+
+<span class="sd">        Outputs use "session_unions" as the session name in the configured layout.</span>
+<span class="sd">        A sessions.yaml beside each CSV records the contributing session names and date.</span>
+
+<span class="sd">        This step will throw an error if the set of sessions / shanks on disk</span>
+<span class="sd">        does not exactly match those in `recordings`, as this may indicate the</span>
+<span class="sd">        project has gotten out of sync.</span>
+<span class="sd">        """</span>
+        <span class="n">recordings_by_shank</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">session_name</span><span class="p">,</span> <span class="n">shank_id</span><span class="p">,</span> <span class="n">recording</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recordings_and_paths</span><span class="p">():</span>
+            <span class="n">recordings_by_shank</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">shank_id</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">session_name</span><span class="p">,</span> <span class="n">recording</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_confirm_all_and_only_specified_bad_channel_files_exist</span><span class="p">(</span>
+            <span class="n">recordings_by_shank</span>
+        <span class="p">)</span>
+
+        <span class="c1"># For each session / shank, load the bad channel ids and save their</span>
+        <span class="c1"># union in the shared output folder</span>
+        <span class="n">generation_date</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">shank_id</span><span class="p">,</span> <span class="n">recordings_and_paths</span> <span class="ow">in</span> <span class="n">recordings_by_shank</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">bad_channel_ids</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">session_names</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">session_name</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">recordings_and_paths</span><span class="p">:</span>
+                <span class="n">session_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">session_name</span><span class="p">)</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+                    <span class="n">path</span> <span class="o">/</span> <span class="s2">"bad_channel_ids.csv"</span><span class="p">,</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="p">{</span><span class="s2">"channel_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">},</span>
+                    <span class="n">keep_default_na</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">bad_channel_ids</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">[</span><span class="s2">"channel_id"</span><span class="p">],</span> <span class="n">labels</span><span class="p">[</span><span class="s2">"channel_id_dtype"</span><span class="p">],</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="n">output_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_output_path</span><span class="p">(</span><span class="s2">"session_unions"</span><span class="p">,</span> <span class="n">shank_id</span><span class="p">)</span>
+
+            <span class="n">output_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="nb">sorted</span><span class="p">(</span><span class="n">bad_channel_ids</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"channel_id"</span><span class="p">,</span> <span class="s2">"channel_id_dtype"</span><span class="p">],</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">output_path</span> <span class="o">/</span> <span class="s2">"bad_channel_ids.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">with</span> <span class="p">(</span><span class="n">output_path</span> <span class="o">/</span> <span class="s2">"sessions.yaml"</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span>
+                    <span class="p">{</span><span class="s2">"sessions"</span><span class="p">:</span> <span class="n">session_names</span><span class="p">,</span> <span class="s2">"date"</span><span class="p">:</span> <span class="n">generation_date</span><span class="p">},</span>
+                    <span class="n">file</span><span class="p">,</span>
+                    <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_confirm_all_and_only_specified_bad_channel_files_exist</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">recordings_by_shank</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Require the discovered CSVs to match the supplied sessions/shanks exactly."""</span>
+        <span class="n">expected_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">path</span> <span class="o">/</span> <span class="s2">"bad_channel_ids.csv"</span>
+            <span class="k">for</span> <span class="n">recordings_and_paths</span> <span class="ow">in</span> <span class="n">recordings_by_shank</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">recordings_and_paths</span>
+        <span class="p">)</span>
+
+        <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">)</span>
+        <span class="n">existing_files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">union_files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">shank_id</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"*"</span><span class="p">):</span>
+            <span class="n">pattern</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_output_path</span><span class="p">(</span><span class="s2">"*"</span><span class="p">,</span> <span class="n">shank_id</span><span class="p">)</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+            <span class="n">existing_files</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">pattern</span> <span class="o">/</span> <span class="s2">"bad_channel_ids.csv"</span><span class="p">)))</span>
+            <span class="n">union_pattern</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_output_path</span><span class="p">(</span>
+                <span class="s2">"session_unions"</span><span class="p">,</span> <span class="n">shank_id</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+            <span class="n">union_files</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">union_pattern</span> <span class="o">/</span> <span class="s2">"bad_channel_ids.csv"</span><span class="p">)))</span>
+        <span class="n">existing_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">existing_files</span> <span class="o">-</span> <span class="n">union_files</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">expected_files</span> <span class="o">!=</span> <span class="n">existing_files</span><span class="p">:</span>
+            <span class="n">missing</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">expected_files</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">existing_files</span><span class="p">))</span>
+            <span class="n">unexpected</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">existing_files</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">expected_files</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"Cannot create the bad-channel union: files in the project path "</span>
+                <span class="s2">"do not match the supplied recordings.</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="sa">f</span><span class="s2">"Missing files: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="sa">f</span><span class="s2">"Unexpected files: </span><span class="si">{</span><span class="n">unexpected</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="s2">"Remove folders for sessions or shanks that are not part of this run, "</span>
+                <span class="s2">"and generate any missing bad-channel files before trying again."</span>
+            <span class="p">)</span></div>
 
 </pre></div>
 

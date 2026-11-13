@@ -1,5 +1,10 @@
 # Config
 
+The example configs use `output.structure: neuroblueprint`. Change this to
+`by_session` or `by_step` to select a different
+[output folder layout](../specification/on-disk-structure.md).
+
+
 ```{warning}
 These configs are display only. Finalised configuration files coming soon.
 ```
