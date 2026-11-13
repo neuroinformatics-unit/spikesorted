@@ -1,3 +1,6 @@
+output:
+  structure: neuroblueprint
+
 bad_channel_detection:
   method: coherence+psd
 
