@@ -31,7 +31,7 @@
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx_autodoc_typehints.css?v=057ac668" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=6a604523" />
     <link rel="stylesheet" type="text/css" href="_static/css/landing.css?v=e0f94530" />
     <link rel="stylesheet" type="text/css" href="_static/css/docs.css?v=53dc9d5a" />
   
@@ -41,10 +41,10 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="_static/documentation_options.js?v=a78e2eb6"></script>
+    <script src="_static/documentation_options.js?v=1ca3d75a"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="_static/design-tabs.js?v=fcb327ea"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api_index';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
@@ -533,12 +533,12 @@ each session and shank.</p></li>
 <p class="rubric">Notes</p>
 <p>The following CSV files are saved for each session and shank:</p>
 <dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">bad_channel_ids.csv</span></code></dt><dd><p>One row per detected bad channel, with a single <code class="docutils literal notranslate"><span class="pre">channel_id</span></code>
-column containing its SpikeInterface channel identifier.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">bad_channel_ids.csv</span></code></dt><dd><p>One row per detected bad channel, with <code class="docutils literal notranslate"><span class="pre">channel_id</span></code>
+and <code class="docutils literal notranslate"><span class="pre">channel_id_dtype</span></code> columns storing the identifier and NumPy dtype.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">bad_channel_labels.csv</span></code></dt><dd><p>One row per recording channel, including good channels, with
-columns <code class="docutils literal notranslate"><span class="pre">channel_id</span></code> and <code class="docutils literal notranslate"><span class="pre">label</span></code>. Labels are supplied by
-SpikeInterface’s <code class="docutils literal notranslate"><span class="pre">detect_bad_channels()</span></code>.</p>
+columns <code class="docutils literal notranslate"><span class="pre">channel_id</span></code>, <code class="docutils literal notranslate"><span class="pre">label</span></code> and <code class="docutils literal notranslate"><span class="pre">channel_id_dtype</span></code>.
+Labels are supplied by SpikeInterface’s <code class="docutils literal notranslate"><span class="pre">detect_bad_channels()</span></code>.</p>
 </dd>
 </dl>
 <p>Both files include column headers and omit the DataFrame index.</p>
@@ -560,7 +560,7 @@ SpikeInterface’s <code class="docutils literal notranslate"><span class="pre">
 <dl class="py method">
 <dt class="sig sig-object py" id="spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.perform_checks">
 <span class="sig-name descname"><span class="pre">perform_checks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spikesorted/steps/bad_channel_detection.html#BadChannelDetectionStep.perform_checks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.perform_checks" title="Link to this definition">#</a></dt>
-<dd><p>This function performs the following checks on the bad channel detction intput:</p>
+<dd><p>Check the bad-channel detection input:</p>
 <ul class="simple">
 <li><p>checks required bad channel detection method is passed</p></li>
 <li><p>throw a warning for low-coutn channels</p></li>
@@ -571,6 +571,20 @@ SpikeInterface’s <code class="docutils literal notranslate"><span class="pre">
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></span></span></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.load_bad_channels">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">load_bad_channels</span></span><span class="sig-paren">(</span>
+
+<dl>
+<dd><em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">session_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">shank_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>,</dd>
+</dl>
+
+<span class="sig-paren">)</span><a class="reference internal" href="_modules/spikesorted/steps/bad_channel_detection.html#BadChannelDetectionStep.load_bad_channels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.load_bad_channels" title="Link to this definition">#</a></dt>
+<dd><p>Load bad-channel IDs for a session and shank in their original dtype.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -629,6 +643,24 @@ SpikeInterface’s <code class="docutils literal notranslate"><span class="pre">
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.get_path">
+<span class="sig-name descname"><span class="pre">get_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shank_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.get_path" title="Link to this definition">#</a></dt>
+<dd><p>Return the output directory for a step, session and shank.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step_name</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>)</p></li>
+<li><p><strong>session_name</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <span class="highlight sphinx_autodoc_typehints-value"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></span></span>)</p></li>
+<li><p><strong>shank_id</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <span class="highlight sphinx_autodoc_typehints-value"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></span></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -668,11 +700,13 @@ SpikeInterface’s <code class="docutils literal notranslate"><span class="pre">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spikesorted.steps.bad_channel_detection.BadChannelDetectionStep"><code class="docutils literal notranslate"><span class="pre">BadChannelDetectionStep</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.run"><code class="docutils literal notranslate"><span class="pre">BadChannelDetectionStep.run()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.perform_checks"><code class="docutils literal notranslate"><span class="pre">BadChannelDetectionStep.perform_checks()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.load_bad_channels"><code class="docutils literal notranslate"><span class="pre">BadChannelDetectionStep.load_bad_channels()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.get_bad_channel_ids_filepath"><code class="docutils literal notranslate"><span class="pre">BadChannelDetectionStep.get_bad_channel_ids_filepath()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.get_bad_channel_labels_filepath"><code class="docutils literal notranslate"><span class="pre">BadChannelDetectionStep.get_bad_channel_labels_filepath()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.needs_gpu"><code class="docutils literal notranslate"><span class="pre">BadChannelDetectionStep.needs_gpu()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.config"><code class="docutils literal notranslate"><span class="pre">BadChannelDetectionStep.config</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.get_first_recording"><code class="docutils literal notranslate"><span class="pre">BadChannelDetectionStep.get_first_recording()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#spikesorted.steps.bad_channel_detection.BadChannelDetectionStep.get_path"><code class="docutils literal notranslate"><span class="pre">BadChannelDetectionStep.get_path()</span></code></a></li>
 </ul>
 </li>
 </ul>

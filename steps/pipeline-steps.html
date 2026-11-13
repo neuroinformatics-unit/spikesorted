@@ -31,7 +31,7 @@
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx_autodoc_typehints.css?v=057ac668" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
     <link rel="stylesheet" type="text/css" href="../_static/css/landing.css?v=e0f94530" />
     <link rel="stylesheet" type="text/css" href="../_static/css/docs.css?v=53dc9d5a" />
   
@@ -41,10 +41,10 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=a78e2eb6"></script>
+    <script src="../_static/documentation_options.js?v=1ca3d75a"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'steps/pipeline-steps';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
@@ -452,8 +452,8 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="bad-channel-detection">
-<span id="pipeline-steps-detect-bad-channels"></span><h1>Bad-channel detection<a class="headerlink" href="#bad-channel-detection" title="Link to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="pipeline-steps-detect-bad-channels">
+<span id="bad-channel-detection"></span><h1>Bad-channel detection<a class="headerlink" href="#pipeline-steps-detect-bad-channels" title="Link to this heading">#</a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
 <p>This step detects ‘bad’ channels in the recording, such as broken dead or noisy channels or channels located outside of the brain.
@@ -525,7 +525,7 @@ of individual sessions the union of detected bas channels must removed from all 
 Alternative methods (e.g. std) might be more suitable for use with other probes.</p></li>
 <li><p>No preprocessing should have been applied to the recording. This is the first step in the pipeline.</p></li>
 <li><p>TODO: there is a known issue with the algorithm in which a large number of channels are labelled as ‘out’ when high frequency content in the recording is
-kept. The solution is to bandpass slightly the high frequences. TODO: Ask Alessio Buccino for examples of this issue.</p></li>
+kept. The solution is to bandpass slightly the high frequencies. TODO: Ask Alessio Buccino for examples of this issue.</p></li>
 <li><p>do not allow r2_nighoubrohod in this pipeline which is mostly for LFP recordings</p></li>
 </ul>
 </section>

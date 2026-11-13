@@ -35,7 +35,7 @@ If no bad channels are detected, the file still contains every channel, each lab
 
 ### Bad channels union
 
-The union of all bad channels detected across included sessions. It defines a 
+The union of all bad channels detected across included sessions. It defines a
 shared set of bad channels across the sessions being combined.
 
 The bad channel unions are saved under
@@ -48,4 +48,4 @@ The shank folder is omitted when recordings are not split by shank.
 | `sessions.yaml` | A `sessions` list naming the contributing sessions and a `date` field recording the generation date as `YYYY-MM-DD`. |
 
 If no bad channels are detected in any session, the union CSV contains only
-the `channel_id` header. 
+the `channel_id` header.

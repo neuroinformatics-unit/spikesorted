@@ -31,7 +31,7 @@
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx_autodoc_typehints.css?v=057ac668" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
     <link rel="stylesheet" type="text/css" href="../_static/css/landing.css?v=e0f94530" />
     <link rel="stylesheet" type="text/css" href="../_static/css/docs.css?v=53dc9d5a" />
   
@@ -41,10 +41,10 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=a78e2eb6"></script>
+    <script src="../_static/documentation_options.js?v=1ca3d75a"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
@@ -470,81 +470,81 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="definitions">
 <h1>Definitions<a class="headerlink" href="#definitions" title="Link to this heading">#</a></h1>
-<section id="raw-data-path">
-<span id="definitions-raw-data-path"></span><h2><code class="docutils literal notranslate"><span class="pre">RAW_DATA_PATH</span></code><a class="headerlink" href="#raw-data-path" title="Link to this heading">#</a></h2>
+<section id="definitions-raw-data-path">
+<span id="raw-data-path"></span><span id="raw_data_path"></span><h2><code class="docutils literal notranslate"><span class="pre">RAW_DATA_PATH</span></code><a class="headerlink" href="#definitions-raw-data-path" title="Link to this heading">#</a></h2>
 <p>A filepath to any raw data files or folders that can be loaded by SpikeInterface (e.g. SpikeGLX, Open Ephys, SpikeInterface folder).</p>
 </section>
-<section id="spikeinterface-rec">
-<span id="definitions-spikeinterface-rec"></span><h2><code class="docutils literal notranslate"><span class="pre">SPIKEINTERFACE_REC</span></code><a class="headerlink" href="#spikeinterface-rec" title="Link to this heading">#</a></h2>
+<section id="definitions-spikeinterface-rec">
+<span id="spikeinterface-rec"></span><span id="spikeinterface_rec"></span><h2><code class="docutils literal notranslate"><span class="pre">SPIKEINTERFACE_REC</span></code><a class="headerlink" href="#definitions-spikeinterface-rec" title="Link to this heading">#</a></h2>
 <p>An in-memory SpikeInterface <a class="reference external" href="https://spikeinterface.readthedocs.io/en/stable/api.html#spikeinterface.core.BaseRecording"><code class="docutils literal notranslate"><span class="pre">Recording</span></code></a> object.</p>
 <p>If split by shank, the <code class="docutils literal notranslate"><span class="pre">SPIKEINTERFACE_REC</span></code> may be a dictionary where the keys are shank name and values are recording for that shank e.g. <code class="docutils literal notranslate"><span class="pre">recording=[{&quot;0&quot;:</span> <span class="pre">Recording1,</span> <span class="pre">&quot;1&quot;:</span> <span class="pre">Recording2},</span> <span class="pre">{&quot;0&quot;:</span> <span class="pre">Recording3,</span> <span class="pre">&quot;1&quot;:</span> <span class="pre">Recording4}]</span></code></p>
 </section>
-<section id="raw-data-path-session-list">
-<span id="definitions-raw-data-path-session-list"></span><h2><code class="docutils literal notranslate"><span class="pre">RAW_DATA_PATH_SESSION_LIST</span></code><a class="headerlink" href="#raw-data-path-session-list" title="Link to this heading">#</a></h2>
+<section id="definitions-raw-data-path-session-list">
+<span id="raw-data-path-session-list"></span><span id="raw_data_path_session_list"></span><h2><code class="docutils literal notranslate"><span class="pre">RAW_DATA_PATH_SESSION_LIST</span></code><a class="headerlink" href="#definitions-raw-data-path-session-list" title="Link to this heading">#</a></h2>
 <p>A Python list of <code class="docutils literal notranslate"><span class="pre">RAW_DATA_PATH</span></code>.</p>
 </section>
-<section id="spikeinterface-rec-session-list">
-<span id="definitions-spikeinterface-rec-session-list"></span><h2><code class="docutils literal notranslate"><span class="pre">SPIKEINTERFACE_REC_SESSION_LIST</span></code><a class="headerlink" href="#spikeinterface-rec-session-list" title="Link to this heading">#</a></h2>
+<section id="definitions-spikeinterface-rec-session-list">
+<span id="spikeinterface-rec-session-list"></span><span id="spikeinterface_rec_session_list"></span><h2><code class="docutils literal notranslate"><span class="pre">SPIKEINTERFACE_REC_SESSION_LIST</span></code><a class="headerlink" href="#definitions-spikeinterface-rec-session-list" title="Link to this heading">#</a></h2>
 <p>A Python list of <code class="docutils literal notranslate"><span class="pre">SPIKEINTERFACE_REC</span></code>.</p>
 </section>
-<section id="debugging-rec">
-<span id="definitions-debugging-rec"></span><h2><code class="docutils literal notranslate"><span class="pre">DEBUGGING_REC</span></code><a class="headerlink" href="#debugging-rec" title="Link to this heading">#</a></h2>
+<section id="definitions-debugging-rec">
+<span id="debugging-rec"></span><span id="debugging_rec"></span><h2><code class="docutils literal notranslate"><span class="pre">DEBUGGING_REC</span></code><a class="headerlink" href="#definitions-debugging-rec" title="Link to this heading">#</a></h2>
 <p>A <code class="docutils literal notranslate"><span class="pre">SPIKEINTERFACE_REC</span></code> that has been cut down to allow the pipeline to run quickly.</p>
 <p>The default time to cut a recording down to is 30 seconds, based on the Allen pipeline (as of 02/09/2026).</p>
 </section>
-<section id="data-loader-output-recordings">
-<span id="definitions-data-loader-output-recordings"></span><h2><code class="docutils literal notranslate"><span class="pre">DATA_LOADER_OUTPUT_RECORDINGS</span></code><a class="headerlink" href="#data-loader-output-recordings" title="Link to this heading">#</a></h2>
+<section id="definitions-data-loader-output-recordings">
+<span id="data-loader-output-recordings"></span><span id="data_loader_output_recordings"></span><h2><code class="docutils literal notranslate"><span class="pre">DATA_LOADER_OUTPUT_RECORDINGS</span></code><a class="headerlink" href="#definitions-data-loader-output-recordings" title="Link to this heading">#</a></h2>
 <p>The data returned by the data loader. It may be a <a class="reference internal" href="#definitions-spikeinterface-rec"><span class="std std-ref">SPIKEINTERFACE_REC</span></a>, a <a class="reference internal" href="#definitions-spikeinterface-rec-session-list"><span class="std std-ref">SPIKEINTERFACE_REC_SESSION_LIST</span></a>, a <a class="reference internal" href="#definitions-debugging-rec"><span class="std std-ref">DEBUGGING_REC</span></a> or list thereof.</p>
 </section>
-<section id="preprocessed-output-recordings">
-<span id="definitions-preprocessed-output-recordings"></span><h2><code class="docutils literal notranslate"><span class="pre">PREPROCESSED_OUTPUT_RECORDINGS</span></code><a class="headerlink" href="#preprocessed-output-recordings" title="Link to this heading">#</a></h2>
+<section id="definitions-preprocessed-output-recordings">
+<span id="preprocessed-output-recordings"></span><span id="preprocessed_output_recordings"></span><h2><code class="docutils literal notranslate"><span class="pre">PREPROCESSED_OUTPUT_RECORDINGS</span></code><a class="headerlink" href="#definitions-preprocessed-output-recordings" title="Link to this heading">#</a></h2>
 <p>Takes the form <code class="docutils literal notranslate"><span class="pre">DATA_LOADER_OUTPUT_RECORDINGS</span></code> but the recordings are the final output of the preprocessing step.</p>
 </section>
-<section id="sorting">
-<span id="definitions-sorting"></span><h2><code class="docutils literal notranslate"><span class="pre">SORTING</span></code><a class="headerlink" href="#sorting" title="Link to this heading">#</a></h2>
+<section id="definitions-sorting">
+<span id="sorting"></span><h2><code class="docutils literal notranslate"><span class="pre">SORTING</span></code><a class="headerlink" href="#definitions-sorting" title="Link to this heading">#</a></h2>
 <p>A SpikeInterface <a class="reference external" href="https://spikeinterface.readthedocs.io/en/stable/api.html#spikeinterface.core.BaseSorting"><code class="docutils literal notranslate"><span class="pre">BaseSorting</span></code></a> object.</p>
 </section>
-<section id="sorting-analyzer">
-<span id="definitions-sorting-analyzer"></span><h2><code class="docutils literal notranslate"><span class="pre">SORTING_ANALYZER</span></code><a class="headerlink" href="#sorting-analyzer" title="Link to this heading">#</a></h2>
+<section id="definitions-sorting-analyzer">
+<span id="sorting-analyzer"></span><span id="sorting_analyzer"></span><h2><code class="docutils literal notranslate"><span class="pre">SORTING_ANALYZER</span></code><a class="headerlink" href="#definitions-sorting-analyzer" title="Link to this heading">#</a></h2>
 <p>A SpikeInterface <a class="reference external" href="https://spikeinterface.readthedocs.io/en/stable/api.html#spikeinterface.core.SortingAnalyzer"><code class="docutils literal notranslate"><span class="pre">SortingAnalyzer</span></code></a> object.</p>
 </section>
-<section id="sorter-report">
-<span id="definitions-sorter-report"></span><h2><code class="docutils literal notranslate"><span class="pre">SORTER_REPORT</span></code><a class="headerlink" href="#sorter-report" title="Link to this heading">#</a></h2>
+<section id="definitions-sorter-report">
+<span id="sorter-report"></span><span id="sorter_report"></span><h2><code class="docutils literal notranslate"><span class="pre">SORTER_REPORT</span></code><a class="headerlink" href="#definitions-sorter-report" title="Link to this heading">#</a></h2>
 <p>The report produced for the SpikeInterface sorting result.</p>
 </section>
-<section id="postprocessing-plots">
-<span id="definitions-postprocessing-plots"></span><h2><code class="docutils literal notranslate"><span class="pre">POSTPROCESSING_PLOTS</span></code><a class="headerlink" href="#postprocessing-plots" title="Link to this heading">#</a></h2>
+<section id="definitions-postprocessing-plots">
+<span id="postprocessing-plots"></span><span id="postprocessing_plots"></span><h2><code class="docutils literal notranslate"><span class="pre">POSTPROCESSING_PLOTS</span></code><a class="headerlink" href="#definitions-postprocessing-plots" title="Link to this heading">#</a></h2>
 <p>The collection of plots generated during postprocessing.</p>
 <p><strong>TODO: fill in</strong> (for the most part these will )</p>
-<section id="template-plots">
-<span id="definitions-template-plots"></span><h3><code class="docutils literal notranslate"><span class="pre">TEMPLATE_PLOTS</span></code><a class="headerlink" href="#template-plots" title="Link to this heading">#</a></h3>
+<section id="definitions-template-plots">
+<span id="template-plots"></span><span id="template_plots"></span><h3><code class="docutils literal notranslate"><span class="pre">TEMPLATE_PLOTS</span></code><a class="headerlink" href="#definitions-template-plots" title="Link to this heading">#</a></h3>
 </section>
-<section id="waveform-plots">
-<span id="definitions-waveform-plots"></span><h3><code class="docutils literal notranslate"><span class="pre">WAVEFORM_PLOTS</span></code><a class="headerlink" href="#waveform-plots" title="Link to this heading">#</a></h3>
+<section id="definitions-waveform-plots">
+<span id="waveform-plots"></span><span id="waveform_plots"></span><h3><code class="docutils literal notranslate"><span class="pre">WAVEFORM_PLOTS</span></code><a class="headerlink" href="#definitions-waveform-plots" title="Link to this heading">#</a></h3>
 </section>
-<section id="cluster-plots">
-<span id="definitions-cluster-plots"></span><h3><code class="docutils literal notranslate"><span class="pre">CLUSTER_PLOTS</span></code><a class="headerlink" href="#cluster-plots" title="Link to this heading">#</a></h3>
+<section id="definitions-cluster-plots">
+<span id="cluster-plots"></span><span id="cluster_plots"></span><h3><code class="docutils literal notranslate"><span class="pre">CLUSTER_PLOTS</span></code><a class="headerlink" href="#definitions-cluster-plots" title="Link to this heading">#</a></h3>
 </section>
-<section id="unit-location-plots">
-<span id="definitions-unit-location-plots"></span><h3><code class="docutils literal notranslate"><span class="pre">UNIT_LOCATION_PLOTS</span></code><a class="headerlink" href="#unit-location-plots" title="Link to this heading">#</a></h3>
+<section id="definitions-unit-location-plots">
+<span id="unit-location-plots"></span><span id="unit_location_plots"></span><h3><code class="docutils literal notranslate"><span class="pre">UNIT_LOCATION_PLOTS</span></code><a class="headerlink" href="#definitions-unit-location-plots" title="Link to this heading">#</a></h3>
 </section>
-<section id="autocorrelogram-plots">
-<span id="definitions-autocorrelogram-plots"></span><h3><code class="docutils literal notranslate"><span class="pre">AUTOCORRELOGRAM_PLOTS</span></code><a class="headerlink" href="#autocorrelogram-plots" title="Link to this heading">#</a></h3>
+<section id="definitions-autocorrelogram-plots">
+<span id="autocorrelogram-plots"></span><span id="autocorrelogram_plots"></span><h3><code class="docutils literal notranslate"><span class="pre">AUTOCORRELOGRAM_PLOTS</span></code><a class="headerlink" href="#definitions-autocorrelogram-plots" title="Link to this heading">#</a></h3>
 </section>
-<section id="crosscorrelogram-plots">
-<span id="definitions-crosscorrelogram-plots"></span><h3><code class="docutils literal notranslate"><span class="pre">CROSSCORRELOGRAM_PLOTS</span></code><a class="headerlink" href="#crosscorrelogram-plots" title="Link to this heading">#</a></h3>
+<section id="definitions-crosscorrelogram-plots">
+<span id="crosscorrelogram-plots"></span><span id="crosscorrelogram_plots"></span><h3><code class="docutils literal notranslate"><span class="pre">CROSSCORRELOGRAM_PLOTS</span></code><a class="headerlink" href="#definitions-crosscorrelogram-plots" title="Link to this heading">#</a></h3>
 </section>
-<section id="firing-rate-plots">
-<span id="definitions-firing-rate-plots"></span><h3><code class="docutils literal notranslate"><span class="pre">FIRING_RATE_PLOTS</span></code><a class="headerlink" href="#firing-rate-plots" title="Link to this heading">#</a></h3>
+<section id="definitions-firing-rate-plots">
+<span id="firing-rate-plots"></span><span id="firing_rate_plots"></span><h3><code class="docutils literal notranslate"><span class="pre">FIRING_RATE_PLOTS</span></code><a class="headerlink" href="#definitions-firing-rate-plots" title="Link to this heading">#</a></h3>
 </section>
-<section id="quality-metric-plots">
-<span id="definitions-quality-metric-plots"></span><h3><code class="docutils literal notranslate"><span class="pre">QUALITY_METRIC_PLOTS</span></code><a class="headerlink" href="#quality-metric-plots" title="Link to this heading">#</a></h3>
+<section id="definitions-quality-metric-plots">
+<span id="quality-metric-plots"></span><span id="quality_metric_plots"></span><h3><code class="docutils literal notranslate"><span class="pre">QUALITY_METRIC_PLOTS</span></code><a class="headerlink" href="#definitions-quality-metric-plots" title="Link to this heading">#</a></h3>
 </section>
 </section>
 <section id="inputs">
 <h2>Inputs<a class="headerlink" href="#inputs" title="Link to this heading">#</a></h2>
-<section id="concat-rec-times">
-<span id="outputs-concat-rec-times"></span><h3><code class="docutils literal notranslate"><span class="pre">CONCAT_REC_TIMES</span></code><a class="headerlink" href="#concat-rec-times" title="Link to this heading">#</a></h3>
+<section id="outputs-concat-rec-times">
+<span id="concat-rec-times"></span><span id="concat_rec_times"></span><h3><code class="docutils literal notranslate"><span class="pre">CONCAT_REC_TIMES</span></code><a class="headerlink" href="#outputs-concat-rec-times" title="Link to this heading">#</a></h3>
 <p>A CSV or <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html">pandas <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code></a> containing the start and stop times of sessions which have been concatenated. This can be used by the pipeline to split the sorting.</p>
 <p>Each row contains the start and stop times of one session, in seconds.</p>
 <p>The two columns are:</p>
@@ -553,23 +553,23 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;stop_time&quot;</span></code>: session stop time, as a float</p></li>
 </ul>
 </section>
-<section id="probe">
-<span id="outputs-probe"></span><h3><code class="docutils literal notranslate"><span class="pre">PROBE</span></code><a class="headerlink" href="#probe" title="Link to this heading">#</a></h3>
+<section id="outputs-probe">
+<span id="probe"></span><h3><code class="docutils literal notranslate"><span class="pre">PROBE</span></code><a class="headerlink" href="#outputs-probe" title="Link to this heading">#</a></h3>
 <p>A ProbeInterface <a class="reference external" href="https://probeinterface.readthedocs.io/en/main/api.html#probeinterface.Probe"><code class="docutils literal notranslate"><span class="pre">Probe</span></code></a> object.</p>
 </section>
-<section id="output-path">
-<span id="outputs-output-path"></span><h3><code class="docutils literal notranslate"><span class="pre">OUTPUT_PATH</span></code><a class="headerlink" href="#output-path" title="Link to this heading">#</a></h3>
+<section id="outputs-output-path">
+<span id="output-path"></span><span id="output_path"></span><h3><code class="docutils literal notranslate"><span class="pre">OUTPUT_PATH</span></code><a class="headerlink" href="#outputs-output-path" title="Link to this heading">#</a></h3>
 <p>The root directory for the pipeline output. Here outputs from steps are saved and used as inputs for following steps.</p>
 </section>
-<section id="pipeline-config">
-<span id="outputs-pipeline-config"></span><h3><code class="docutils literal notranslate"><span class="pre">PIPELINE_CONFIG</span></code><a class="headerlink" href="#pipeline-config" title="Link to this heading">#</a></h3>
+<section id="outputs-pipeline-config">
+<span id="pipeline-config"></span><span id="pipeline_config"></span><h3><code class="docutils literal notranslate"><span class="pre">PIPELINE_CONFIG</span></code><a class="headerlink" href="#outputs-pipeline-config" title="Link to this heading">#</a></h3>
 <p>The YAML configuration file for the pipeline. See <a class="reference internal" href="config.html"><span class="std std-doc">Configs</span></a>.</p>
 </section>
 </section>
 <section id="outputs">
 <h2>Outputs<a class="headerlink" href="#outputs" title="Link to this heading">#</a></h2>
-<section id="raw-data-quality-metrics">
-<span id="outputs-raw-data-quality-metrics"></span><h3><code class="docutils literal notranslate"><span class="pre">RAW_DATA_QUALITY_METRICS</span></code><a class="headerlink" href="#raw-data-quality-metrics" title="Link to this heading">#</a></h3>
+<section id="outputs-raw-data-quality-metrics">
+<span id="raw-data-quality-metrics"></span><span id="raw_data_quality_metrics"></span><h3><code class="docutils literal notranslate"><span class="pre">RAW_DATA_QUALITY_METRICS</span></code><a class="headerlink" href="#outputs-raw-data-quality-metrics" title="Link to this heading">#</a></h3>
 <p>A set of metrics that estimate the quality of raw data, based on the IBL <a class="reference external" href="https://doi.org/10.6084/m9.figshare.19705522">spike-sorting white paper</a>.</p>
 <p>For steps that are measured after preprocessing, <code class="docutils literal notranslate"><span class="pre">phase_shift</span></code>, a TEMPORAL_FILTER and COMMON_REFERENCE step are applied, based on the PIPELINE_CONFIG.</p>
 <p>These metrics are computed and stored on disk, and used to generate <a class="reference internal" href="#outputs-raw-data-quality-plots"><span class="std std-ref">RAW_DATA_QUALITY_PLOTS</span></a>. No hard thresholds are applied to these metrics to determine inclusion or exclusion of data, instead this is decided by visual inspection of the plots.</p>
@@ -592,8 +592,8 @@
 <p><strong>TODO: specify format for storage</strong>
 <strong>TODO: determine chunking rules</strong></p>
 </section>
-<section id="raw-data-quality-plots">
-<span id="outputs-raw-data-quality-plots"></span><h3><code class="docutils literal notranslate"><span class="pre">RAW_DATA_QUALITY_PLOTS</span></code><a class="headerlink" href="#raw-data-quality-plots" title="Link to this heading">#</a></h3>
+<section id="outputs-raw-data-quality-plots">
+<span id="raw-data-quality-plots"></span><span id="raw_data_quality_plots"></span><h3><code class="docutils literal notranslate"><span class="pre">RAW_DATA_QUALITY_PLOTS</span></code><a class="headerlink" href="#outputs-raw-data-quality-plots" title="Link to this heading">#</a></h3>
 <p>Plots used for quality-assessment, saved as <code class="docutils literal notranslate"><span class="pre">.png</span></code>. These are computed from the <code class="docutils literal notranslate"><span class="pre">RAW_DATA_QUALITY_METRICS</span></code> as developed by the <a class="reference external" href="https://doi.org/10.6084/m9.figshare.19705522">IBL</a>.</p>
 <ul class="simple">
 <li><p><strong>AP-band and LFP-band RMS</strong>: a time x channel plot of RMS. Separate plots contrasting before and after preprocessing.</p></li>
@@ -601,38 +601,38 @@
 <li><p><strong>AP-band and LFP-band Spectral Density</strong>: a channel x frequency heatmap with intensity representing power, <span class="math notranslate nohighlight">\(V^2/Hz\)</span></p></li>
 </ul>
 </section>
-<section id="bad-channel-detection-outputs">
-<span id="outputs-bad-channel-detection-outputs"></span><h3><code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_DETECTION_OUTPUTS</span></code><a class="headerlink" href="#bad-channel-detection-outputs" title="Link to this heading">#</a></h3>
+<section id="outputs-bad-channel-detection-outputs">
+<span id="bad-channel-detection-outputs"></span><span id="bad_channel_detection_outputs"></span><h3><code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_DETECTION_OUTPUTS</span></code><a class="headerlink" href="#outputs-bad-channel-detection-outputs" title="Link to this heading">#</a></h3>
 <p>Outputs from the <a class="reference internal" href="../steps/pipeline-steps.html#pipeline-steps-detect-bad-channels"><span class="std std-ref">detect bad channels step</span></a>.</p>
-<section id="bad-channel-ids">
-<span id="outputs-bad-channel-ids"></span><h4><code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_IDS</span></code><a class="headerlink" href="#bad-channel-ids" title="Link to this heading">#</a></h4>
+<section id="outputs-bad-channel-ids">
+<span id="bad-channel-ids"></span><span id="bad_channel_ids"></span><h4><code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_IDS</span></code><a class="headerlink" href="#outputs-bad-channel-ids" title="Link to this heading">#</a></h4>
 <p>The channel IDs identified as bad by the detect-bad-channels step.</p>
 <p><strong>TODO:</strong> Document cross-session bad-channel ID unions for concatenation and unit matching, including per-shank behavior, the <code class="docutils literal notranslate"><span class="pre">session_unions</span></code> directory, and <code class="docutils literal notranslate"><span class="pre">sessions.yaml</span></code> alongside each union CSV listing the contributing session names and generation date.</p>
 </section>
-<section id="bad-channel-labels">
-<span id="outputs-bad-channel-labels"></span><h4><code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_LABELS</span></code><a class="headerlink" href="#bad-channel-labels" title="Link to this heading">#</a></h4>
+<section id="outputs-bad-channel-labels">
+<span id="bad-channel-labels"></span><span id="bad_channel_labels"></span><h4><code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_LABELS</span></code><a class="headerlink" href="#outputs-bad-channel-labels" title="Link to this heading">#</a></h4>
 <p>The bad-channel classification associated with each <code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_ID</span></code>.</p>
 </section>
 </section>
-<section id="artefact-detection-plots">
-<span id="outputs-artefact-detection-plots"></span><h3><code class="docutils literal notranslate"><span class="pre">ARTEFACT_DETECTION_PLOTS</span></code><a class="headerlink" href="#artefact-detection-plots" title="Link to this heading">#</a></h3>
+<section id="outputs-artefact-detection-plots">
+<span id="artefact-detection-plots"></span><span id="artefact_detection_plots"></span><h3><code class="docutils literal notranslate"><span class="pre">ARTEFACT_DETECTION_PLOTS</span></code><a class="headerlink" href="#outputs-artefact-detection-plots" title="Link to this heading">#</a></h3>
 <p>A plot of a random selection of detected artefact periods denoted by a linear region overlaid on the preprocessed data.</p>
 </section>
-<section id="preprocess-step-plots">
-<span id="outputs-preprocess-step-plots"></span><h3><code class="docutils literal notranslate"><span class="pre">PREPROCESS_STEP_PLOTS</span></code><a class="headerlink" href="#preprocess-step-plots" title="Link to this heading">#</a></h3>
+<section id="outputs-preprocess-step-plots">
+<span id="preprocess-step-plots"></span><span id="preprocess_step_plots"></span><h3><code class="docutils literal notranslate"><span class="pre">PREPROCESS_STEP_PLOTS</span></code><a class="headerlink" href="#outputs-preprocess-step-plots" title="Link to this heading">#</a></h3>
 <p>A plot of the data at each preprocessing stage.</p>
 </section>
-<section id="motion-correction-plots">
-<span id="outputs-motion-correction-plots"></span><h3><code class="docutils literal notranslate"><span class="pre">MOTION_CORRECTION_PLOTS</span></code><a class="headerlink" href="#motion-correction-plots" title="Link to this heading">#</a></h3>
+<section id="outputs-motion-correction-plots">
+<span id="motion-correction-plots"></span><span id="motion_correction_plots"></span><h3><code class="docutils literal notranslate"><span class="pre">MOTION_CORRECTION_PLOTS</span></code><a class="headerlink" href="#outputs-motion-correction-plots" title="Link to this heading">#</a></h3>
 <p>See <a class="reference external" href="https://spikeinterface.readthedocs.io/en/latest/api.html#spikeinterface.widgets.plot_motion">plot_motion()</a>.</p>
 </section>
-<section id="session-concatenation-plots">
-<span id="outputs-session-concatenation-plots"></span><h3><code class="docutils literal notranslate"><span class="pre">SESSION_CONCATENATION_PLOTS</span></code><a class="headerlink" href="#session-concatenation-plots" title="Link to this heading">#</a></h3>
+<section id="outputs-session-concatenation-plots">
+<span id="session-concatenation-plots"></span><span id="session_concatenation_plots"></span><h3><code class="docutils literal notranslate"><span class="pre">SESSION_CONCATENATION_PLOTS</span></code><a class="headerlink" href="#outputs-session-concatenation-plots" title="Link to this heading">#</a></h3>
 <p>Plots that show the preprocessed data across the concatenation points for each session.
 <strong>TODO:</strong> this could be supplemented by quality metrics across these boundaries, inter-session alignment plots.</p>
 </section>
-<section id="artefact-periods-csv">
-<span id="outputs-artefact-periods-csv"></span><h3><code class="docutils literal notranslate"><span class="pre">ARTEFACT_PERIODS_CSV</span></code><a class="headerlink" href="#artefact-periods-csv" title="Link to this heading">#</a></h3>
+<section id="outputs-artefact-periods-csv">
+<span id="artefact-periods-csv"></span><span id="artefact_periods_csv"></span><h3><code class="docutils literal notranslate"><span class="pre">ARTEFACT_PERIODS_CSV</span></code><a class="headerlink" href="#outputs-artefact-periods-csv" title="Link to this heading">#</a></h3>
 <p>A CSV or <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html">pandas <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code></a> containing the start and stop times of periods
 detected as artefacts.</p>
 <p>Each row is a detected period.</p>
@@ -643,14 +643,14 @@ detected as artefacts.</p>
 <li><p>(optional) <code class="docutils literal notranslate"><span class="pre">label</span></code>: Label of the event period. Permitted values are <code class="docutils literal notranslate"><span class="pre">SATURATION</span></code> or <code class="docutils literal notranslate"><span class="pre">ENVELOPE</span></code>.</p></li>
 </ul>
 </section>
-<section id="artefact-periods-curated-csv">
-<span id="outputs-artefact-periods-curated-csv"></span><h3><code class="docutils literal notranslate"><span class="pre">ARTEFACT_PERIODS_CURATED_CSV</span></code><a class="headerlink" href="#artefact-periods-curated-csv" title="Link to this heading">#</a></h3>
+<section id="outputs-artefact-periods-curated-csv">
+<span id="artefact-periods-curated-csv"></span><span id="artefact_periods_curated_csv"></span><h3><code class="docutils literal notranslate"><span class="pre">ARTEFACT_PERIODS_CURATED_CSV</span></code><a class="headerlink" href="#outputs-artefact-periods-curated-csv" title="Link to this heading">#</a></h3>
 <p>An <code class="docutils literal notranslate"><span class="pre">ARTEFACT_PERIODS_CURATED_CSV</span></code> is a CSV file that has been curated. It is the same format of
 <code class="docutils literal notranslate"><span class="pre">ARTEFACT_PERIODS_CSV</span></code>. It indicates it has been manually curated by including the suffix <code class="docutils literal notranslate"><span class="pre">_curated</span></code>
 in the filename.</p>
 </section>
-<section id="quality-metrics-csv">
-<span id="outputs-quality-metrics-csv"></span><h3><code class="docutils literal notranslate"><span class="pre">QUALITY_METRICS_CSV</span></code><a class="headerlink" href="#quality-metrics-csv" title="Link to this heading">#</a></h3>
+<section id="outputs-quality-metrics-csv">
+<span id="quality-metrics-csv"></span><span id="quality_metrics_csv"></span><h3><code class="docutils literal notranslate"><span class="pre">QUALITY_METRICS_CSV</span></code><a class="headerlink" href="#outputs-quality-metrics-csv" title="Link to this heading">#</a></h3>
 <p>Per-unit quality metrics table, following SpikeInterface quality metrics in <a class="reference external" href="https://github.com/AllenNeuralDynamics/aind-ephys-pipeline/blob/main/docs/source/parameters.rst"><code class="docutils literal notranslate"><span class="pre">quality_metrics.metric_names</span></code></a>:</p>
 <p><strong>TODO:</strong> log and/or link to the exact quality metrics used and their definitions</p>
 </section>
@@ -680,49 +680,49 @@ in the filename.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#raw-data-path"><code class="docutils literal notranslate"><span class="pre">RAW_DATA_PATH</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spikeinterface-rec"><code class="docutils literal notranslate"><span class="pre">SPIKEINTERFACE_REC</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#raw-data-path-session-list"><code class="docutils literal notranslate"><span class="pre">RAW_DATA_PATH_SESSION_LIST</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spikeinterface-rec-session-list"><code class="docutils literal notranslate"><span class="pre">SPIKEINTERFACE_REC_SESSION_LIST</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#debugging-rec"><code class="docutils literal notranslate"><span class="pre">DEBUGGING_REC</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-loader-output-recordings"><code class="docutils literal notranslate"><span class="pre">DATA_LOADER_OUTPUT_RECORDINGS</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preprocessed-output-recordings"><code class="docutils literal notranslate"><span class="pre">PREPROCESSED_OUTPUT_RECORDINGS</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sorting"><code class="docutils literal notranslate"><span class="pre">SORTING</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sorting-analyzer"><code class="docutils literal notranslate"><span class="pre">SORTING_ANALYZER</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sorter-report"><code class="docutils literal notranslate"><span class="pre">SORTER_REPORT</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#postprocessing-plots"><code class="docutils literal notranslate"><span class="pre">POSTPROCESSING_PLOTS</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#template-plots"><code class="docutils literal notranslate"><span class="pre">TEMPLATE_PLOTS</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#waveform-plots"><code class="docutils literal notranslate"><span class="pre">WAVEFORM_PLOTS</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cluster-plots"><code class="docutils literal notranslate"><span class="pre">CLUSTER_PLOTS</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unit-location-plots"><code class="docutils literal notranslate"><span class="pre">UNIT_LOCATION_PLOTS</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autocorrelogram-plots"><code class="docutils literal notranslate"><span class="pre">AUTOCORRELOGRAM_PLOTS</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#crosscorrelogram-plots"><code class="docutils literal notranslate"><span class="pre">CROSSCORRELOGRAM_PLOTS</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#firing-rate-plots"><code class="docutils literal notranslate"><span class="pre">FIRING_RATE_PLOTS</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quality-metric-plots"><code class="docutils literal notranslate"><span class="pre">QUALITY_METRIC_PLOTS</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-raw-data-path"><code class="docutils literal notranslate"><span class="pre">RAW_DATA_PATH</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-spikeinterface-rec"><code class="docutils literal notranslate"><span class="pre">SPIKEINTERFACE_REC</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-raw-data-path-session-list"><code class="docutils literal notranslate"><span class="pre">RAW_DATA_PATH_SESSION_LIST</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-spikeinterface-rec-session-list"><code class="docutils literal notranslate"><span class="pre">SPIKEINTERFACE_REC_SESSION_LIST</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-debugging-rec"><code class="docutils literal notranslate"><span class="pre">DEBUGGING_REC</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-data-loader-output-recordings"><code class="docutils literal notranslate"><span class="pre">DATA_LOADER_OUTPUT_RECORDINGS</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-preprocessed-output-recordings"><code class="docutils literal notranslate"><span class="pre">PREPROCESSED_OUTPUT_RECORDINGS</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-sorting"><code class="docutils literal notranslate"><span class="pre">SORTING</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-sorting-analyzer"><code class="docutils literal notranslate"><span class="pre">SORTING_ANALYZER</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-sorter-report"><code class="docutils literal notranslate"><span class="pre">SORTER_REPORT</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-postprocessing-plots"><code class="docutils literal notranslate"><span class="pre">POSTPROCESSING_PLOTS</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-template-plots"><code class="docutils literal notranslate"><span class="pre">TEMPLATE_PLOTS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-waveform-plots"><code class="docutils literal notranslate"><span class="pre">WAVEFORM_PLOTS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-cluster-plots"><code class="docutils literal notranslate"><span class="pre">CLUSTER_PLOTS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-unit-location-plots"><code class="docutils literal notranslate"><span class="pre">UNIT_LOCATION_PLOTS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-autocorrelogram-plots"><code class="docutils literal notranslate"><span class="pre">AUTOCORRELOGRAM_PLOTS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-crosscorrelogram-plots"><code class="docutils literal notranslate"><span class="pre">CROSSCORRELOGRAM_PLOTS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-firing-rate-plots"><code class="docutils literal notranslate"><span class="pre">FIRING_RATE_PLOTS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions-quality-metric-plots"><code class="docutils literal notranslate"><span class="pre">QUALITY_METRIC_PLOTS</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inputs">Inputs</a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#concat-rec-times"><code class="docutils literal notranslate"><span class="pre">CONCAT_REC_TIMES</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#probe"><code class="docutils literal notranslate"><span class="pre">PROBE</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#output-path"><code class="docutils literal notranslate"><span class="pre">OUTPUT_PATH</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pipeline-config"><code class="docutils literal notranslate"><span class="pre">PIPELINE_CONFIG</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs-concat-rec-times"><code class="docutils literal notranslate"><span class="pre">CONCAT_REC_TIMES</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs-probe"><code class="docutils literal notranslate"><span class="pre">PROBE</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs-output-path"><code class="docutils literal notranslate"><span class="pre">OUTPUT_PATH</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs-pipeline-config"><code class="docutils literal notranslate"><span class="pre">PIPELINE_CONFIG</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs">Outputs</a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#raw-data-quality-metrics"><code class="docutils literal notranslate"><span class="pre">RAW_DATA_QUALITY_METRICS</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#raw-data-quality-plots"><code class="docutils literal notranslate"><span class="pre">RAW_DATA_QUALITY_PLOTS</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bad-channel-detection-outputs"><code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_DETECTION_OUTPUTS</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bad-channel-ids"><code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_IDS</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bad-channel-labels"><code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_LABELS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs-raw-data-quality-metrics"><code class="docutils literal notranslate"><span class="pre">RAW_DATA_QUALITY_METRICS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs-raw-data-quality-plots"><code class="docutils literal notranslate"><span class="pre">RAW_DATA_QUALITY_PLOTS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs-bad-channel-detection-outputs"><code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_DETECTION_OUTPUTS</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs-bad-channel-ids"><code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_IDS</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs-bad-channel-labels"><code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_LABELS</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#artefact-detection-plots"><code class="docutils literal notranslate"><span class="pre">ARTEFACT_DETECTION_PLOTS</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#preprocess-step-plots"><code class="docutils literal notranslate"><span class="pre">PREPROCESS_STEP_PLOTS</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#motion-correction-plots"><code class="docutils literal notranslate"><span class="pre">MOTION_CORRECTION_PLOTS</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#session-concatenation-plots"><code class="docutils literal notranslate"><span class="pre">SESSION_CONCATENATION_PLOTS</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#artefact-periods-csv"><code class="docutils literal notranslate"><span class="pre">ARTEFACT_PERIODS_CSV</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#artefact-periods-curated-csv"><code class="docutils literal notranslate"><span class="pre">ARTEFACT_PERIODS_CURATED_CSV</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quality-metrics-csv"><code class="docutils literal notranslate"><span class="pre">QUALITY_METRICS_CSV</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs-artefact-detection-plots"><code class="docutils literal notranslate"><span class="pre">ARTEFACT_DETECTION_PLOTS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs-preprocess-step-plots"><code class="docutils literal notranslate"><span class="pre">PREPROCESS_STEP_PLOTS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs-motion-correction-plots"><code class="docutils literal notranslate"><span class="pre">MOTION_CORRECTION_PLOTS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs-session-concatenation-plots"><code class="docutils literal notranslate"><span class="pre">SESSION_CONCATENATION_PLOTS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs-artefact-periods-csv"><code class="docutils literal notranslate"><span class="pre">ARTEFACT_PERIODS_CSV</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs-artefact-periods-curated-csv"><code class="docutils literal notranslate"><span class="pre">ARTEFACT_PERIODS_CURATED_CSV</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs-quality-metrics-csv"><code class="docutils literal notranslate"><span class="pre">QUALITY_METRICS_CSV</span></code></a></li>
 </ul>
 </li>
 </ul>

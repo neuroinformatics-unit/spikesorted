@@ -31,7 +31,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx_autodoc_typehints.css?v=057ac668" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=6a604523" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/landing.css?v=e0f94530" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/docs.css?v=53dc9d5a" />
   
@@ -41,10 +41,10 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../_static/documentation_options.js?v=a78e2eb6"></script>
+    <script src="../../_static/documentation_options.js?v=1ca3d75a"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../_static/design-tabs.js?v=fcb327ea"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'specification/steps/bad-channel-detection';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
@@ -475,7 +475,7 @@ file, the union of bad channels across sessions is also saved for each shank.</p
 <section id="outputs">
 <h2>Outputs<a class="headerlink" href="#outputs" title="Link to this heading">#</a></h2>
 <section id="bad-channel-ids">
-<h3><code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_IDS</span></code><a class="headerlink" href="#bad-channel-ids" title="Link to this heading">#</a></h3>
+<span id="bad_channel_ids"></span><h3><code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_IDS</span></code><a class="headerlink" href="#bad-channel-ids" title="Link to this heading">#</a></h3>
 <p>The channel IDs identified as bad by the detect-bad-channels step.</p>
 <p>Saved as <code class="docutils literal notranslate"><span class="pre">bad_channel_ids.csv</span></code>, with one row per detected bad channel:</p>
 <div class="pst-scrollable-table-container"><table class="table">
@@ -494,7 +494,7 @@ file, the union of bad channels across sessions is also saved for each shank.</p
 <p>If no bad channels are detected, the file contains only the <code class="docutils literal notranslate"><span class="pre">channel_id</span></code> header.</p>
 </section>
 <section id="bad-channel-labels">
-<h3><code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_LABELS</span></code><a class="headerlink" href="#bad-channel-labels" title="Link to this heading">#</a></h3>
+<span id="bad_channel_labels"></span><h3><code class="docutils literal notranslate"><span class="pre">BAD_CHANNEL_LABELS</span></code><a class="headerlink" href="#bad-channel-labels" title="Link to this heading">#</a></h3>
 <p>The classification associated with each channel ID.</p>
 <p>Saved as <code class="docutils literal notranslate"><span class="pre">bad_channel_labels.csv</span></code>, with one row for every channel in the input recording:</p>
 <div class="pst-scrollable-table-container"><table class="table">

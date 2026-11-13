@@ -31,7 +31,7 @@
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx_autodoc_typehints.css?v=057ac668" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
     <link rel="stylesheet" type="text/css" href="../_static/css/landing.css?v=e0f94530" />
     <link rel="stylesheet" type="text/css" href="../_static/css/docs.css?v=53dc9d5a" />
   
@@ -41,10 +41,10 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=a78e2eb6"></script>
+    <script src="../_static/documentation_options.js?v=1ca3d75a"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'specification/implementation';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
@@ -499,8 +499,8 @@
 <li><p>Warn when probe-specific metric settings are used on recordings with substantially different channel counts or geometry.</p></li>
 </ul>
 </section>
-<section id="detect-bad-channels">
-<span id="implementation-detect-bad-channels"></span><h2>Detect bad channels<a class="headerlink" href="#detect-bad-channels" title="Link to this heading">#</a></h2>
+<section id="implementation-detect-bad-channels">
+<span id="detect-bad-channels"></span><h2>Detect bad channels<a class="headerlink" href="#implementation-detect-bad-channels" title="Link to this heading">#</a></h2>
 <p>This (optional) step uses IBL’s bad-channel detection algorithm to detect bad channels. The bad-channel information is used to
 remove bad channels before artefact detection, and remove or interpolate bad channels during preprocessing.</p>
 <p>Detect bad channels after high-pass filtering at 300 Hz. This is because bandpass filtering removes the high frequencies used for noisy-channel detection.</p>
@@ -762,7 +762,7 @@ See the <a class="reference internal" href="config.html"><span class="std std-do
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#raw-data-quality-metrics">Raw data quality metrics</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#detect-bad-channels">Detect bad channels</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-detect-bad-channels">Detect bad channels</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#artifact-detection">Artifact detection</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#artifact-curation">Artifact curation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preprocessing">Preprocessing</a></li>

@@ -31,7 +31,7 @@
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx_autodoc_typehints.css?v=057ac668" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
     <link rel="stylesheet" type="text/css" href="../_static/css/landing.css?v=e0f94530" />
     <link rel="stylesheet" type="text/css" href="../_static/css/docs.css?v=53dc9d5a" />
   
@@ -41,10 +41,10 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=a78e2eb6"></script>
+    <script src="../_static/documentation_options.js?v=1ca3d75a"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'specification/data-loader';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
@@ -464,7 +464,7 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="data-loader">
 <h1>Data Loader<a class="headerlink" href="#data-loader" title="Link to this heading">#</a></h1>
-<p>The data loading step ensures all possbile ways of passing raw data are coerced into in-memory SpikeInterface objects.</p>
+<p>The data loading step ensures all possible ways of passing raw data are coerced into in-memory SpikeInterface objects.</p>
 <p>It should exist as a convenience function rather than as a fixed step in the pipeline, as its output may be passed to any of <a class="reference internal" href="implementation.html#raw-data-quality-metrics"><span class="std std-ref">raw data metrics</span></a>, <a class="reference internal" href="implementation.html#artifact-detection"><span class="std std-ref">artefact detection</span></a>, <a class="reference internal" href="implementation.html#artifact-curation"><span class="std std-ref">artefact curation</span></a>, <a class="reference internal" href="implementation.html#preprocessing"><span class="std std-ref">preprocessing</span></a>, or the <a class="reference internal" href="../steps/index.html#pipeline-steps"><span class="std std-ref">full pipeline</span></a>. As such, no information related to data loading (e.g. file paths) is encoded in the <a class="reference internal" href="definitions.html#outputs-pipeline-config"><span class="std std-ref">PIPELINE_CONFIG</span></a>.</p>
 <p>It essentially takes SpikeInterface recordings, or paths to raw data, and ensures they are loaded SpikeInterface recordings with probes attached. If recordings are concatenated, this is detected and concatenation times flagged.</p>
 <p><strong>INPUTS:</strong></p>

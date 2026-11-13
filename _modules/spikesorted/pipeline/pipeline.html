@@ -30,7 +30,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_autodoc_typehints.css?v=057ac668" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=6a604523" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/landing.css?v=e0f94530" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/docs.css?v=53dc9d5a" />
   
@@ -40,10 +40,10 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=a78e2eb6"></script>
+    <script src="../../../_static/documentation_options.js?v=1ca3d75a"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../../_static/design-tabs.js?v=fcb327ea"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spikesorted/pipeline/pipeline';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
@@ -442,6 +442,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.steps.artifact_detection</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArtifactDetectionStep</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.steps.bad_channel_detection</span><span class="w"> </span><span class="kn">import</span> <span class="n">BadChannelDetectionStep</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.utils.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_pipeline_config</span>
 
@@ -479,11 +480,12 @@
 <a class="viewcode-back" href="../../../api_index.html#spikesorted.Pipeline.run">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Run from start_at_step, stopping after stop_after_step executes."""</span>
-
         <span class="n">configs</span> <span class="o">=</span> <span class="n">load_pipeline_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="s2">"bad_channel_detection"</span> <span class="ow">in</span> <span class="n">configs</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_at_step</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"bad_channel_detection"</span><span class="p">]:</span>
-
+        <span class="k">if</span> <span class="s2">"bad_channel_detection"</span> <span class="ow">in</span> <span class="n">configs</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_at_step</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">"bad_channel_detection"</span><span class="p">,</span>
+        <span class="p">]:</span>
             <span class="n">bad_channel_detection</span> <span class="o">=</span> <span class="n">BadChannelDetectionStep</span><span class="p">(</span>
                 <span class="n">recordings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">recordings</span><span class="p">,</span>
                 <span class="n">config_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="p">,</span>
@@ -494,9 +496,25 @@
             <span class="n">bad_channel_detection</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_after_step</span> <span class="o">==</span> <span class="s2">"bad_channel_detection"</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="s2">"artifact_detection"</span> <span class="ow">in</span> <span class="n">configs</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_at_step</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">"bad_channel_detection"</span><span class="p">,</span>
+            <span class="s2">"artifact_detection"</span><span class="p">,</span>
+        <span class="p">]:</span>
+            <span class="n">artifact_detection</span> <span class="o">=</span> <span class="n">ArtifactDetectionStep</span><span class="p">(</span>
+                <span class="n">recordings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">recordings</span><span class="p">,</span>
+                <span class="n">config_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="p">,</span>
+                <span class="n">output_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span>
+                <span class="n">overwrite</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">overwrite</span><span class="p">,</span>
+                <span class="n">num_cores</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_cores</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">artifact_detection</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_after_step</span> <span class="o">==</span> <span class="s2">"artifact_detection"</span><span class="p">:</span>
             <span class="k">return</span></div>
 </div>
-
 
 </pre></div>
 

@@ -31,7 +31,7 @@
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx_autodoc_typehints.css?v=057ac668" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=6a604523" />
     <link rel="stylesheet" type="text/css" href="_static/css/landing.css?v=e0f94530" />
     <link rel="stylesheet" type="text/css" href="_static/css/docs.css?v=53dc9d5a" />
   
@@ -41,10 +41,10 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="_static/documentation_options.js?v=a78e2eb6"></script>
+    <script src="_static/documentation_options.js?v=1ca3d75a"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="_static/design-tabs.js?v=fcb327ea"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
@@ -655,8 +655,8 @@ document.addEventListener("DOMContentLoaded", () => {
     <a class="ss-doc-card" href="tutorials/index.html"><span class="ss-doc-card-title">Tutorials</span><span class="ss-doc-card-description">Guides for common uses of <code>spikesorted</code>.</span></a>
     <a class="ss-doc-card" href="steps/index.html"><span class="ss-doc-card-title">Pipeline Steps</span><span class="ss-doc-card-description">Details on each step in the pipeline.</span></a>
   </nav>
-<section id="pipeline-overview">
-<span id="pipeline-title"></span><h2>Pipeline overview<a class="headerlink" href="#pipeline-overview" title="Link to this heading">#</a></h2>
+<section id="pipeline-title">
+<span id="pipeline-overview"></span><h2>Pipeline overview<a class="headerlink" href="#pipeline-title" title="Link to this heading">#</a></h2>
 <p>Apply a modern extracellular electrophysiology pipeline to your recordings, with options to tailor each step to your data.</p>
 <p>See the <a class="reference internal" href="community/roadmap.html#planned-pipeline-steps"><span class="std std-ref">Roadmap</span></a> for additional planned steps and features.</p>
 <figure class="ss-pipeline">
@@ -690,8 +690,8 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
 </figure>
 </section>
-<section id="assess-quality">
-<span id="quality-title"></span><h2>Assess quality<a class="headerlink" href="#assess-quality" title="Link to this heading">#</a></h2>
+<section id="quality-title">
+<span id="assess-quality"></span><h2>Assess quality<a class="headerlink" href="#quality-title" title="Link to this heading">#</a></h2>
 <div class="ss-quality-overview">
 <figure class="ss-rms-figure">
         <a href="_static/images/raw-data-quality-source.png" aria-label="View the original quality plots at full size">
@@ -709,11 +709,11 @@ opened in <a class="reference external" href="https://spikeinterface-gui.readthe
 </div>
 </div>
 </section>
-<section id="encode-and-share">
-<span id="configuration-title"></span><h2>Encode and share<a class="headerlink" href="#encode-and-share" title="Link to this heading">#</a></h2>
-<p>Define your pipeline in a YAML configuration file, improviding reproducability and
+<section id="configuration-title">
+<span id="encode-and-share"></span><h2>Encode and share<a class="headerlink" href="#configuration-title" title="Link to this heading">#</a></h2>
+<p>Define your pipeline in a YAML configuration file, improviding reproducibility and
 facilatating analysis sharing.</p>
-<p><code class="docutils literal notranslate"><span class="pre">spikesorted</span></code> comes pre-loaded with popular default cofigurations.
+<p><code class="docutils literal notranslate"><span class="pre">spikesorted</span></code> comes pre-loaded with popular default configurations.
 See the <a class="reference internal" href="configs/index.html"><span class="std std-doc">Configs</span></a> page for details, including how to generate your own.</p>
 <div class="ss-config-example">
 <div class="ss-config-filename">np-standard-kilosort4.yaml</div>
@@ -758,8 +758,8 @@ See the <a class="reference internal" href="configs/index.html"><span class="std
 </div>
 </div>
 </section>
-<section id="standardised-outputs">
-<span id="outputs-title"></span><h2>Standardised outputs<a class="headerlink" href="#standardised-outputs" title="Link to this heading">#</a></h2>
+<section id="outputs-title">
+<span id="standardised-outputs"></span><h2>Standardised outputs<a class="headerlink" href="#outputs-title" title="Link to this heading">#</a></h2>
 <p>Pipeline outputs are saved in a predefined, standardised folder structure.
 This streamlines navigating data and facilitates data sharing,
 supporting the development of common analysis tools.</p>
@@ -778,8 +778,8 @@ what to expect from each pipeline step. See the
 </figure>
 </div>
 </section>
-<section id="flexible-data-loading">
-<span id="python-title"></span><span id="python-input"></span><h2>Flexible data loading<a class="headerlink" href="#flexible-data-loading" title="Link to this heading">#</a></h2>
+<section id="python-title">
+<span id="flexible-data-loading"></span><span id="python-input"></span><h2>Flexible data loading<a class="headerlink" href="#python-title" title="Link to this heading">#</a></h2>
 <p>Use <a class="reference external" href="https://spikeinterface.readthedocs.io/">SpikeInterface</a> to load and prepare
 recordings before passing them to <code class="docutils literal notranslate"><span class="pre">spikesorted</span></code>. This is useful for attaching a
 custom probe layout or concatenating multiple runs into a session.</p>
@@ -805,8 +805,8 @@ custom probe layout or concatenating multiple runs into a session.</p>
 </pre></div>
 </div>
 </section>
-<section id="try-spikesorted">
-<span id="try-title"></span><h2>Try <code class="docutils literal notranslate"><span class="pre">spikesorted</span></code><a class="headerlink" href="#try-spikesorted" title="Link to this heading">#</a></h2>
+<section id="try-title">
+<span id="try-spikesorted"></span><h2>Try <code class="docutils literal notranslate"><span class="pre">spikesorted</span></code><a class="headerlink" href="#try-title" title="Link to this heading">#</a></h2>
 <p>Running a standard pipeline on an existing recording session is as simple as installing:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>spikesorted
 </pre></div>
