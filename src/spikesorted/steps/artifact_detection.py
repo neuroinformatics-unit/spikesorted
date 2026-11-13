@@ -4,6 +4,7 @@ import sys
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
+from typing import ClassVar
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -19,9 +20,17 @@ from .base import BasePipelineStep
 class ArtifactDetectionStep(BasePipelineStep):
     """ """
 
+    _step_name: ClassVar[str] = "artifact_detection"
+
     def run(self, verbose: bool = True) -> None:
         """Detect saturation periods and save sample indices and times in seconds."""
         self.perform_checks()
+
+        bad_channel_detection = BadChannelDetectionStep(
+            recordings=self.recordings,
+            config_path=self.config_path,
+            output_path=self.output_path,
+        )
 
         saturation_kwargs = self.config["artifact_detection"].get("saturation")
 
@@ -30,7 +39,7 @@ class ArtifactDetectionStep(BasePipelineStep):
             shank_id,
             shank_recording,
             shank_path,
-        ) in self._get_recordings_and_paths("artifact_detection"):
+        ) in self._get_recordings_and_paths():
             if verbose:
                 shank_id_message = f", shank {shank_id}" if shank_id else ""
                 print(
@@ -44,8 +53,8 @@ class ArtifactDetectionStep(BasePipelineStep):
             shank_path.mkdir(parents=True, exist_ok=True)
 
             # Remove bad channels if they exist
-            bad_channel_ids = BadChannelDetectionStep.load_bad_channels(
-                self.output_path, session_name, shank_id
+            bad_channel_ids = bad_channel_detection.load_bad_channels(
+                session_name, shank_id
             )
             if bad_channel_ids is None:
                 warnings.warn(
@@ -109,9 +118,7 @@ class ArtifactDetectionStep(BasePipelineStep):
             )
 
         if not self.overwrite:
-            for _, _, _, shank_path in self._get_recordings_and_paths(
-                "artifact_detection"
-            ):
+            for _, _, _, shank_path in self._get_recordings_and_paths():
                 if shank_path.exists():
                     raise FileExistsError(
                         "Artifact detection output folder already exists: "

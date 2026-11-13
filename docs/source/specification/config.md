@@ -5,6 +5,9 @@ This specification defines the structure and valid contents of the [Config file]
 An example including every step, with a subset of available arguments for each, is shown below:
 
 ```yaml
+output:
+  structure: neuroblueprint
+
 raw_data_quality_metrics:
   chunk_size_s: 1.0
   num_chunks: 30
@@ -70,6 +73,15 @@ Only optional steps can be skipped.
 It is best practice to include all applicable steps, especially raw data quality
 metrics and bad channel detection.
 ```
+
+## Output layout
+
+The optional `output` section controls folder organisation; it is not a pipeline step.
+Set `output.structure` to `neuroblueprint` (the default), `by_session`, or `by_step`.
+Omitting `output` or `structure` selects `neuroblueprint`.
+
+Pass the subject directory, for example `results/sub-001`, as `output_path`.
+See [Structure on disk](on-disk-structure.md) for folder trees and session-union paths.
 
 ## Step parameters
 

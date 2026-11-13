@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from spikesorted.pipeline.pipeline import Pipeline
 from spikesorted.slurm.slurm_runners import run_slurm_batch, submit_slurm
 from spikesorted.slurm.slurm_utils import split_recordings_by_shank
-from spikesorted.steps.bad_channel_union import create_bad_channel_labels_union
+from spikesorted.steps.bad_channel_detection import BadChannelDetectionStep
 from spikesorted.utils.utils import load_pipeline_config
 
 if TYPE_CHECKING:
@@ -93,6 +93,10 @@ def _run_pipeline_with_slurm(
         run_pipeline_in_slurm_batch(
             split_recordings, stop_after_step="bad_channel_detection"
         )
-        create_bad_channel_labels_union(recordings, output_path)
+        BadChannelDetectionStep(
+            recordings=recordings,
+            config_path=config_path,
+            output_path=output_path,
+        ).create_bad_channel_labels_union()
 
     run_pipeline_in_slurm_batch(split_recordings, start_at_step="artifact_detection")

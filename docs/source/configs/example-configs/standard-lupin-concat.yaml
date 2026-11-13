@@ -1,3 +1,6 @@
+output:
+  structure: neuroblueprint
+
 raw_data_quality_metrics:
   chunk_size_s: 1.0
   num_chunks: 30

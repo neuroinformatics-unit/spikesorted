@@ -1,11 +1,18 @@
 """Validate pipeline configuration using SpikeInterface's declared parameters."""
 
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 from pydantic import AfterValidator, ConfigDict, TypeAdapter, with_config
 from typing_extensions import TypedDict
 
 from spikesorted.validation.steps_validation import _validate_bad_channel_config
+
+
+@with_config(ConfigDict(extra="forbid", strict=True))
+class OutputConfig(TypedDict, total=False):
+    """Output folder layout; omitted structure uses NeuroBlueprint."""
+
+    structure: Literal["neuroblueprint", "by_session", "by_step"]
 
 
 @with_config(ConfigDict(extra="forbid", strict=True))
@@ -15,6 +22,7 @@ class PipelineConfig(TypedDict, total=False):
     bad_channel_detection: Annotated[
         dict[str, Any], AfterValidator(_validate_bad_channel_config)
     ]
+    output: OutputConfig
     raw_data_quality_metrics: Any
     artifact_detection: Any
     artifact_curation: Any

@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, ClassVar
 from spikeinterface import load
 from spikeinterface.core import BaseRecording
 
-from spikesorted.utils.recordings_structure import get_path, get_recordings_and_paths
+from spikesorted.utils.recordings_structure import get_recordings
 from spikesorted.utils.utils import load_pipeline_config
 from spikesorted.validation.steps_validation import _BaseStepArguments
 
@@ -47,6 +47,8 @@ class BasePipelineStep:
     overwrite: bool = False
     num_cores: int = 1
 
+    _step_name: ClassVar[str]
+
     _highpass_freq_min: ClassVar[float] = 300
 
     _config: PipelineConfig = field(init=False, repr=False, compare=False)
@@ -76,7 +78,7 @@ class BasePipelineStep:
 
     def perform_checks(self) -> None:
         """Check that every recording contains exactly one segment."""
-        for session_name, shank_id, recording, _ in self._get_recordings_and_paths(""):
+        for session_name, shank_id, recording, _ in self._get_recordings_and_paths():
             if recording.get_num_segments() != 1:
                 raise ValueError(
                     f"Only single-segment recordings are supported; "
@@ -121,17 +123,31 @@ class BasePipelineStep:
 
         return recording
 
-    def get_path(
+    def _get_output_path(
         self,
-        step_name: str,
-        session_name: str | None = None,
+        session_name: str,
         shank_id: str | int | None = None,
     ) -> Path:
-        """Return the output directory for a step, session and shank."""
-        return get_path(self.output_path, step_name, session_name, shank_id)
+        """Return this step's output directory using the configured layout."""
+        structure = self.config.get("output", {}).get("structure", "neuroblueprint")
+        shank = () if shank_id is None else (f"shank_{shank_id}",)
+        layouts = {
+            "neuroblueprint": (session_name, "ephys", *shank, self._step_name),
+            "by_session": (session_name, self._step_name, *shank),
+            "by_step": (self._step_name, session_name, *shank),
+        }
+        return Path(self.output_path).joinpath(*layouts[structure])
 
     def _get_recordings_and_paths(
-        self, step_name: str
-    ) -> list[tuple[str | None, str | int | None, BaseRecording, Path]]:
-        """Convenience function for get_recordings_and_paths."""
-        return get_recordings_and_paths(self.recordings, self.output_path, step_name)
+        self,
+    ) -> list[tuple[str, str | int | None, BaseRecording, Path]]:
+        """Pair each named recording with this step's output path."""
+        return [
+            (
+                session_name,
+                shank_id,
+                recording,
+                self._get_output_path(session_name, shank_id),
+            )
+            for session_name, shank_id, recording in get_recordings(self.recordings)
+        ]
