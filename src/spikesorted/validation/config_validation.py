@@ -25,7 +25,7 @@ class PipelineConfig(TypedDict, total=False):
     curation: Any
 
 
-_pipeline_config_adapter = TypeAdapter(PipelineConfig)
+_pipeline_config_adapter: TypeAdapter[PipelineConfig] = TypeAdapter(PipelineConfig)
 
 
 def validate_config(config: object) -> PipelineConfig:

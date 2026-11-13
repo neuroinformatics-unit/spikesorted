@@ -66,5 +66,5 @@ of individual sessions the union of detected bas channels must removed from all 
   Alternative methods (e.g. std) might be more suitable for use with other probes.
 - No preprocessing should have been applied to the recording. This is the first step in the pipeline.
 - TODO: there is a known issue with the algorithm in which a large number of channels are labelled as 'out' when high frequency content in the recording is
-kept. The solution is to bandpass slightly the high frequences. TODO: Ask Alessio Buccino for examples of this issue.
+kept. The solution is to bandpass slightly the high frequencies. TODO: Ask Alessio Buccino for examples of this issue.
 - do not allow r2_nighoubrohod in this pipeline which is mostly for LFP recordings

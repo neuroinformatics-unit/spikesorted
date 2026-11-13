@@ -1,18 +1,17 @@
 """Download pinned raw data and prepare the SpikeInterface example recording."""
 
 import argparse
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import hashlib
 import json
-from pathlib import Path
 import shutil
 import stat
 import time
-from urllib.parse import quote, urlsplit, urlunsplit
-from urllib.request import Request, urlopen
 import zipfile
 import zlib
-
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
+from urllib.parse import quote, urlsplit, urlunsplit
+from urllib.request import Request, urlopen
 
 DATA = Path(__file__).resolve().parent
 CHUNK = 1024 * 1024
@@ -78,7 +77,7 @@ def extract(entry, verify_only):
             if prefix:
                 if not relative.startswith(prefix):
                     raise ValueError(f"Unexpected archive member: {relative}")
-                relative = relative[len(prefix):]
+                relative = relative[len(prefix) :]
             path = inside(root, relative)
             if member.is_dir():
                 continue
@@ -100,13 +99,15 @@ def extract(entry, verify_only):
                 with archive.open(member) as source, partial.open("wb") as target:
                     shutil.copyfileobj(source, target, CHUNK)
                 partial.replace(path)
-            records.append({
-                "path": path.relative_to(DATA).as_posix(),
-                "size": path.stat().st_size,
-                "sha256": checksum(path, "sha256"),
-                "archive": entry["path"],
-                "member": member.filename,
-            })
+            records.append(
+                {
+                    "path": path.relative_to(DATA).as_posix(),
+                    "size": path.stat().st_size,
+                    "sha256": checksum(path, "sha256"),
+                    "archive": entry["path"],
+                    "member": member.filename,
+                }
+            )
     return records
 
 
@@ -118,10 +119,16 @@ def prepare_recording(manifest):
     if inventory_path.exists():
         saved = json.loads(inventory_path.read_text(encoding="utf-8"))
         generated = [entry for entry in saved["files"] if "url" not in entry]
-        if saved.get("manifest") == manifest and generated and all(
-            valid(inside(DATA, entry["path"]), {
-                "size": entry["size"], "checksum": "sha256:" + entry["sha256"]
-            }) for entry in generated
+        if (
+            saved.get("manifest") == manifest
+            and generated
+            and all(
+                valid(
+                    inside(DATA, entry["path"]),
+                    {"size": entry["size"], "checksum": "sha256:" + entry["sha256"]},
+                )
+                for entry in generated
+            )
         ):
             print(f"Reusing verified recording: {output}", flush=True)
             return generated
@@ -137,34 +144,50 @@ def prepare_recording(manifest):
     loaded = si.load(output)
     print(f"Prepared {loaded}", flush=True)
     return [
-        {"path": path.relative_to(DATA).as_posix(), "size": path.stat().st_size,
-         "sha256": checksum(path, "sha256")}
-        for path in sorted(output.rglob("*")) if path.is_file()
+        {
+            "path": path.relative_to(DATA).as_posix(),
+            "size": path.stat().st_size,
+            "sha256": checksum(path, "sha256"),
+        }
+        for path in sorted(output.rglob("*"))
+        if path.is_file()
     ]
+
+
+def verify_test_data(manifest):
+    for entry in manifest["files"]:
+        fetch(entry, verify_only=True)
+    inventory = json.loads((DATA / "inventory.json").read_text(encoding="utf-8-sig"))
+    if inventory.get("manifest") != manifest:
+        raise ValueError(
+            "Manifest changed; run the downloader to prepare the recording again."
+        )
+    verified = 0
+    for entry in inventory["files"]:
+        path = inside(DATA, entry["path"])
+        # Archive caches may be removed after extraction.
+        if entry["path"].startswith(".archives/") and not path.exists():
+            continue
+        if not valid(
+            path, {"size": entry["size"], "checksum": "sha256:" + entry["sha256"]}
+        ):
+            raise ValueError(f"Missing or corrupt file: {entry['path']}")
+        verified += 1
+    print(f"Verified {verified} local files against the SHA-256 inventory.")
+    return
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--verify-only", action="store_true",
-                        help="Check downloads and extracted files without network access.")
+    parser.add_argument(
+        "--verify-only",
+        action="store_true",
+        help="Check downloads and extracted files without network access.",
+    )
     args = parser.parse_args()
     manifest = json.loads((DATA / "manifest.json").read_text(encoding="utf-8-sig"))
     if args.verify_only:
-        for entry in manifest["files"]:
-            fetch(entry, verify_only=True)
-        inventory = json.loads((DATA / "inventory.json").read_text(encoding="utf-8-sig"))
-        if inventory.get("manifest") != manifest:
-            raise ValueError("Manifest changed; run the downloader to prepare the recording again.")
-        verified = 0
-        for entry in inventory["files"]:
-            path = inside(DATA, entry["path"])
-            # Archive caches may be removed after extraction.
-            if entry["path"].startswith(".archives/") and not path.exists():
-                continue
-            if not valid(path, {"size": entry["size"], "checksum": "sha256:" + entry["sha256"]}):
-                raise ValueError(f"Missing or corrupt file: {entry['path']}")
-            verified += 1
-        print(f"Verified {verified} local files against the SHA-256 inventory.")
+        verify_test_data(manifest)
         return
     entries = manifest["files"]
     total = sum(entry["size"] for entry in entries)
@@ -178,18 +201,23 @@ def main():
     inventory = []
     for entry in entries:
         path = inside(DATA, entry["path"])
-        inventory.append({
-            "path": entry["path"],
-            "size": entry["size"],
-            "sha256": checksum(path, "sha256"),
-            "url": entry["url"],
-        })
+        inventory.append(
+            {
+                "path": entry["path"],
+                "size": entry["size"],
+                "sha256": checksum(path, "sha256"),
+                "url": entry["url"],
+            }
+        )
         if "extract_to" in entry:
             inventory.extend(extract(entry, args.verify_only))
     inventory.extend(prepare_recording(manifest))
     inventory_path = DATA / "inventory.json"
     inventory_path.write_text(
-        json.dumps({"schema_version": 1, "manifest": manifest, "files": inventory}, indent=2) + "\n",
+        json.dumps(
+            {"schema_version": 1, "manifest": manifest, "files": inventory}, indent=2
+        )
+        + "\n",
         encoding="utf-8",
     )
     print(f"All {len(inventory)} downloaded/prepared files verified.", flush=True)
@@ -197,4 +225,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

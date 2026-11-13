@@ -18,7 +18,7 @@ The metrics and detect-bad-channels results are written to the `RAW_DATA_METRICS
 
 Outputs are saved to `RAW_DATA_METRICS_DIR`
 
-- {ref}`RAW_DATA_QUALITY_METRICS <outputs-raw-data-quality-metrics>` and {ref}`RAW_DATA_QUALITY_PLOTS <outputs-raw-data-quality-plots>` 
+- {ref}`RAW_DATA_QUALITY_METRICS <outputs-raw-data-quality-metrics>` and {ref}`RAW_DATA_QUALITY_PLOTS <outputs-raw-data-quality-plots>`
 
 - TODO: discuss `CONCAT_POINTS_QUALITY_METRICS` and `CONCAT_POINTS_QUALITY_METRICS_PLOTS`.
 - {ref}`CONCAT_REC_TIMES <outputs-concat-rec-times>` if concatenated recordings are detected.
@@ -66,7 +66,7 @@ Detect bad channels after high-pass filtering at 300 Hz. This is because bandpas
 **CHECKS**:
 
 - This algorithm was developed for Neuropixels probes. Different settings should be recommended for probes with lower channel counts.
-- No preprocessing should have been applied to the recording so far. 
+- No preprocessing should have been applied to the recording so far.
 - If too many are out mention adjusting threshold as this is a known issue. Or maybe we bandpass but with a very high cutoff. Ask Alessio for a few examples of this issue.
 
 
@@ -79,7 +79,7 @@ This (optional) step can detect two types of artifact:
 
 see [`detect_and_remove_artifacts()`](https://spikeinterface.readthedocs.io/en/latest/api.html#spikeinterface.preprocessing.detect_and_remove_artifacts) for details.
 
-These detected periods are used in [Preprocessing](#preprocessing) to zero or otherwise remove the periods. 
+These detected periods are used in [Preprocessing](#preprocessing) to zero or otherwise remove the periods.
 
 **Inputs**
 
@@ -131,11 +131,11 @@ This (optional) stepprovides the user with the option to curate the automaticall
 
 ## Preprocessing
 
-Preprocesses recordings, supporting: 
+Preprocesses recordings, supporting:
 
 - Bad channel removal or interpolation (interpolation after filtering).
 - Phase shift correction.
-- TEMPORAL_FILTER steps 
+- TEMPORAL_FILTER steps
 - Artifact period filling with zeros, noise, or another configured strategy.
 - - COMMON_REFERENCE steps
 - Motion correction.
@@ -143,7 +143,7 @@ Preprocesses recordings, supporting:
 - Session concatenation
 - Whitening.
 
-This can get quite complicated if we have both multiple shanks and sessions, when 
+This can get quite complicated if we have both multiple shanks and sessions, when
 this step concatenates across sessions. It should check that all passed shanks are available for all sessions (should they be concatenated). It will also need to handle taking the intersection of good channels, in this case.
 
 
@@ -182,7 +182,7 @@ Event periods and bad channel labels must match the organization of the passed r
 
 **CHECKS**:
 
-- Warn when recordings intended for multi-session processing do not share compatible channel sets or sampling rates. 
+- Warn when recordings intended for multi-session processing do not share compatible channel sets or sampling rates.
 - per-shank and per-session organisation must be consistent on disk and match passed recordings.
 - Apply phase-shift correction only when the probe supports it.
 - Do not re-run whitening or motion correction in the sorter if already run through SpikeInterface preprocessing.

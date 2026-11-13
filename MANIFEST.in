@@ -1,5 +1,8 @@
 include LICENSE
 include README.md
+include AGENTS.md
+include TODO.md
+recursive-include examples *.py *.yaml
 exclude .pre-commit-config.yaml
 
 recursive-exclude * __pycache__

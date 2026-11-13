@@ -13,6 +13,7 @@ dependencies = [
     "spikeinterface==0.105.3",
     "scipy",
     "pandas",
+    "matplotlib",
     "submitit",
 ]
 
@@ -105,6 +106,8 @@ fix = true
 [tool.ruff.lint]
 # See https://docs.astral.sh/ruff/rules/
 ignore = [
+  "SIM102", # preserve explicit nested checks
+  "SIM108", # preserve explicit if/else blocks
   "D203", # one blank line before class
   "D213", # multi-line-summary second line
 ]
@@ -116,7 +119,6 @@ select = [
   "B",      # flake8 bugbear
   "SIM",    # flake8 simplify
   "C90",    # McCabe complexity
-  "D",      # pydocstyle
   "NPY201", # checks for syntax that was deprecated in numpy2.0
 ]
 per-file-ignores = { "**/tests/**" = [
@@ -133,6 +135,11 @@ per-file-ignores = { "**/tests/**" = [
 
 [tool.ruff.format]
 docstring-code-format = true # Also format code in docstrings
+
+[[tool.mypy.overrides]]
+# SpikeInterface does not ship a py.typed marker.
+module = ["spikeinterface", "spikeinterface.*"]
+ignore_missing_imports = true
 
 [tool.tox]
 legacy_tox_ini = """

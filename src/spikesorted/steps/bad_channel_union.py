@@ -15,7 +15,8 @@ def create_bad_channel_labels_union(recordings, output_path):
     uses the individual sessions bad channel detection outputs on disk to create
     a union of all bad channel labels.
 
-    The outputs are stored in a "session_unions" folder in the "bad_channel_detection" folder.
+    The outputs are stored in a "session_unions" folder within
+    "bad_channel_detection".
     A sessions.yaml beside each CSV records the contributing session names and date.
 
     This step will throw an error if the set of sessions / shanks on disk
@@ -36,17 +37,19 @@ def create_bad_channel_labels_union(recordings, output_path):
     union_path = Path(output_path) / "bad_channel_detection" / "session_unions"
 
     for shank_id, recordings_and_paths in recordings_by_shank.items():
-
-        bad_channel_ids = set()
+        bad_channel_ids = {}
         session_names = []
 
         for session_name, _, path in recordings_and_paths:
             session_names.append(session_name)
             labels = pd.read_csv(
                 path / "bad_channel_ids.csv",
-                dtype={"channel_id": str}, keep_default_na=False,
+                dtype={"channel_id": str},
+                keep_default_na=False,
             )
-            bad_channel_ids.update(labels["channel_id"])
+            bad_channel_ids.update(
+                zip(labels["channel_id"], labels["channel_id_dtype"], strict=False)
+            )
 
         if shank_id is None:
             output_path = union_path
@@ -55,17 +58,21 @@ def create_bad_channel_labels_union(recordings, output_path):
 
         output_path.mkdir(parents=True, exist_ok=True)
 
-        pd.DataFrame({"channel_id": sorted(bad_channel_ids)}).to_csv(
-            output_path / "bad_channel_ids.csv", index=False
-        )
+        pd.DataFrame(
+            sorted(bad_channel_ids.items()),
+            columns=["channel_id", "channel_id_dtype"],
+        ).to_csv(output_path / "bad_channel_ids.csv", index=False)
         with (output_path / "sessions.yaml").open("w", encoding="utf-8") as file:
             yaml.safe_dump(
                 {"sessions": session_names, "date": generation_date},
-                file, sort_keys=False,
+                file,
+                sort_keys=False,
             )
 
 
-def _confirm_all_and_only_specified_bad_channel_files_exist(recordings_by_shank, output_path):
+def _confirm_all_and_only_specified_bad_channel_files_exist(
+    recordings_by_shank, output_path
+):
     """Require the discovered CSVs to match the supplied sessions/shanks exactly."""
     expected_files = sorted(
         path / "bad_channel_ids.csv"
@@ -76,7 +83,8 @@ def _confirm_all_and_only_specified_bad_channel_files_exist(recordings_by_shank,
     step_path = Path(output_path) / "bad_channel_detection"
 
     existing_files = sorted(
-        path for path in step_path.rglob("bad_channel_ids.csv")
+        path
+        for path in step_path.rglob("bad_channel_ids.csv")
         if not path.is_relative_to(step_path / "session_unions")
     )
 
