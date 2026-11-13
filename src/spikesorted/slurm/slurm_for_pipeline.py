@@ -72,7 +72,7 @@ def _run_pipeline_with_slurm(
                 config_path=config_path,
                 output_path=output_path,
                 overwrite=overwrite,
-                num_cores=num_cores,
+                n_jobs=num_cores,
                 verbose=verbose,
                 start_at_step=start_at_step,
                 stop_after_step=stop_after_step,

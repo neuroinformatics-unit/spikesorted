@@ -1,5 +1,7 @@
 """Helpers for loading the repository's example recording."""
 
+import sys
+from contextlib import redirect_stdout
 from pathlib import Path
 
 import spikeinterface as si
@@ -16,4 +18,5 @@ def get_test_data(repo_path: str | Path):
             "python tests/data/fetch_test_data.py"
         )
 
-    return si.load(recording_path)
+    with redirect_stdout(sys.stderr):
+        return si.load(recording_path)

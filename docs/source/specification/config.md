@@ -85,6 +85,47 @@ See [Structure on disk](on-disk-structure.md) for folder trees and session-union
 
 ## Step parameters
 
+### Raw-data quality metrics
+
+`raw_data_quality_metrics` must be a mapping. Its metric options are validated
+against the pinned SpikeInterface function's declared types, without adding
+defaults to the config or coercing supplied values.
+
+- `first_chunk_time_s` must be finite and nonnegative.
+- `chunk_size_s` and `rolling_rms_window_size_s` must be finite and positive.
+- `num_chunks` must be a positive integer.
+- `compute_raw_rolling_rms` and `quick_metrics_only` must be booleans.
+
+Unknown options are rejected. The pipeline supplies the recording, output
+`folder`, and `verbose` arguments; these cannot be set in this section.
+Separate LFP and preprocessed recordings are not currently configurable here.
+
+Execution options are set once at pipeline entry using SI's process-global settings:
+
+```python
+Pipeline(..., n_jobs=8).run()
+```
+
+Steps use these global settings rather than accepting their own CPU/job arguments.
+Job options do not belong in the bad-channel or raw-data metric YAML sections.
+Raw-data metrics still controls its own chunk sizes using its metric-specific
+window settings. Recording-dependent checks, including whether chunks fit,
+remain with SI. `Pipeline.run()` first calls `si.set_global_job_kwargs(n_jobs=self.n_jobs)`.
+`n_jobs` defaults to 1, and the global setting persists after the pipeline finishes.
+For standalone steps, call
+`spikeinterface.set_global_job_kwargs(...)` before running them.
+
+SLURM sets `n_jobs` inside each worker pipeline from its `num_cores` allocation.
+
+### Pipeline execution boundaries
+
+The Python API's `start_at_step` and `stop_after_step` arguments are checked
+once at the start of `Pipeline.run()`. Each must be `None` or name an implemented
+step: `bad_channel_detection`, `raw_data_quality_metrics`, or
+`artifact_detection`, in that execution order. The start cannot follow the stop;
+using the same step for both runs only that step if configured. Boundaries refer
+to positions in the pipeline; steps omitted from the config remain skipped.
+
 ### Bad channel detection
 
 All supported parameters and their descriptions can be found in the

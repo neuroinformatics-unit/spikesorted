@@ -2,6 +2,7 @@
 
 import sys
 import warnings
+from contextlib import redirect_stdout
 from dataclasses import dataclass
 from typing import ClassVar
 
@@ -56,9 +57,10 @@ class RawDataQualityMetricsStep(BasePipelineStep):
             elif len(bad_channel_ids) != 0:
                 shank_recording = shank_recording.remove_channels(bad_channel_ids)
 
-            raw_data_quality_metrics(
-                shank_recording, folder=shank_path, verbose=verbose, **kwargs
-            )
+            with redirect_stdout(sys.stderr):
+                raw_data_quality_metrics(
+                    shank_recording, folder=shank_path, verbose=verbose, **kwargs
+                )
 
             if verbose:
                 print(

@@ -2,6 +2,7 @@
 
 import sys
 import warnings
+from contextlib import redirect_stdout
 from dataclasses import dataclass
 from pathlib import Path
 from typing import ClassVar
@@ -67,9 +68,12 @@ class ArtifactDetectionStep(BasePipelineStep):
                 shank_recording = shank_recording.remove_channels(bad_channel_ids)
 
             # Perform artefact detection and save the results to CSV
-            periods = spre.detect_artifact_periods(
-                shank_recording, method="saturation", method_kwargs=saturation_kwargs
-            )
+            with redirect_stdout(sys.stderr):
+                periods = spre.detect_artifact_periods(
+                    shank_recording,
+                    method="saturation",
+                    method_kwargs=saturation_kwargs,
+                )
 
             periods_df = pd.DataFrame(
                 {
@@ -184,12 +188,13 @@ class ArtifactDetectionStep(BasePipelineStep):
             time_range = recording.sample_index_to_time(
                 np.array([first_sample, last_sample])
             )
-            sw.plot_traces(
-                recording,
-                time_range=time_range,
-                backend="matplotlib",
-                ax=axis,
-            )
+            with redirect_stdout(sys.stderr):
+                sw.plot_traces(
+                    recording,
+                    time_range=time_range,
+                    backend="matplotlib",
+                    ax=axis,
+                )
             # draw a band at the detection period
             artefact_times = recording.sample_index_to_time(
                 np.array(

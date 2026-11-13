@@ -5,10 +5,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import spikeinterface as si
+
 from spikesorted.steps.artifact_detection import ArtifactDetectionStep
 from spikesorted.steps.bad_channel_detection import BadChannelDetectionStep
 from spikesorted.steps.raw_data_quality_metrics import RawDataQualityMetricsStep
 from spikesorted.utils.utils import load_pipeline_config
+from spikesorted.validation.pipeline_validation import validate_pipeline_steps
 
 if TYPE_CHECKING:
     from spikesorted.utils.recordings_structure import RecordingInput
@@ -25,7 +28,7 @@ class Pipeline:
         start_at_step: str | None = None,
         stop_after_step: str | None = None,
         overwrite: bool = False,
-        num_cores: int = 1,
+        n_jobs: int = 1,
         verbose: bool = True,
     ) -> None:
         """Store recordings, configuration path, output root, and execution options."""
@@ -35,12 +38,14 @@ class Pipeline:
         self.start_at_step = start_at_step
         self.stop_after_step = stop_after_step
         self.overwrite = overwrite
-        self.num_cores = num_cores
+        self.n_jobs = n_jobs
         self.verbose = verbose
 
     def run(self) -> None:
         """Run from start_at_step, stopping after stop_after_step executes."""
+        si.set_global_job_kwargs(n_jobs=self.n_jobs)
         configs = load_pipeline_config(self.config_path)
+        validate_pipeline_steps(self.start_at_step, self.stop_after_step)
 
         if "bad_channel_detection" in configs and self.start_at_step in [
             None,
@@ -51,7 +56,6 @@ class Pipeline:
                 config_path=self.config_path,
                 output_path=self.output_path,
                 overwrite=self.overwrite,
-                num_cores=self.num_cores,
             )
             bad_channel_detection.run(self.verbose)
 
@@ -68,7 +72,6 @@ class Pipeline:
                 config_path=self.config_path,
                 output_path=self.output_path,
                 overwrite=self.overwrite,
-                num_cores=self.num_cores,
             )
             raw_data_quality_metrics.run(self.verbose)
 
@@ -86,7 +89,6 @@ class Pipeline:
                 config_path=self.config_path,
                 output_path=self.output_path,
                 overwrite=self.overwrite,
-                num_cores=self.num_cores,
             )
             artifact_detection.run(self.verbose)
 

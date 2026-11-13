@@ -2,6 +2,7 @@
 
 import sys
 import warnings
+from contextlib import redirect_stdout
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -42,9 +43,6 @@ class BadChannelDetectionStep(BasePipelineStep):
 
     overwrite : bool, optional
         Whether to overwrite existing output CSV files. Default is False.
-
-    num_cores : int, optional
-        Number of CPU cores allocated to the step. Default is 1.
 
     See Also
     --------
@@ -99,13 +97,14 @@ class BadChannelDetectionStep(BasePipelineStep):
 
             shank_path.mkdir(parents=True, exist_ok=True)
 
-            filtered_recording = spre.highpass_filter(
-                shank_recording, freq_min=self._highpass_freq_min
-            )
+            with redirect_stdout(sys.stderr):
+                filtered_recording = spre.highpass_filter(
+                    shank_recording, freq_min=self._highpass_freq_min
+                )
 
-            bad_channel_ids, channel_labels = spre.detect_bad_channels(
-                filtered_recording, **kwargs
-            )
+                bad_channel_ids, channel_labels = spre.detect_bad_channels(
+                    filtered_recording, **kwargs
+                )
 
             channel_id_dtype = shank_recording.get_channel_ids().dtype.str
             bad_ids_df = pd.DataFrame(
