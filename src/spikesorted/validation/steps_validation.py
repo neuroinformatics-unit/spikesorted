@@ -78,6 +78,8 @@ RawDataQualityMetricsConfig = create_model(
             for name, parameter in signature(
                 raw_data_quality_metrics, eval_str=True
             ).parameters.items()
+            # The step supplies raw AP data, folder and verbosity. Separate LFP
+            # input is unsupported; SI creates the default preprocessed view.
             if name
             not in {
                 "raw_ap_recording",

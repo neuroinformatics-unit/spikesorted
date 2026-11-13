@@ -10,6 +10,7 @@ dependencies = [
     "PyYAML",
     "pydantic",
     "typing_extensions",
+    # Temporary fork for in-progress SI steps not yet available in an upstream release.
     "spikeinterface @ git+https://github.com/JoeZiminski/spikeinterface.git@bb4be33a4fc9941253187ed074e27f4cc5d76cd6",
     "scipy",
     "pandas",

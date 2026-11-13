@@ -44,6 +44,7 @@ repos:
                 - types-PyYAML
                 - pandas-stubs
                 - pydantic
+                # Match the temporary fork for in-progress SI steps in pyproject.toml.
                 - spikeinterface @ git+https://github.com/JoeZiminski/spikeinterface.git@bb4be33a4fc9941253187ed074e27f4cc5d76cd6
                 - scipy-stubs
                 - matplotlib
