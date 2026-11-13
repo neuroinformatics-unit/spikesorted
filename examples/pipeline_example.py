@@ -1,4 +1,4 @@
-"""Run bad-channel and artifact detection on the local Neuropixels test recording."""
+"""Run bad-channel detection, raw-data metrics and artifact detection locally."""
 
 import sys
 from datetime import datetime

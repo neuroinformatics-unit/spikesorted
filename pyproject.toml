@@ -10,7 +10,7 @@ dependencies = [
     "PyYAML",
     "pydantic",
     "typing_extensions",
-    "spikeinterface==0.105.3",
+    "spikeinterface @ git+https://github.com/JoeZiminski/spikeinterface.git@bb4be33a4fc9941253187ed074e27f4cc5d76cd6",
     "scipy",
     "pandas",
     "matplotlib",
