@@ -13,6 +13,7 @@ dependencies = [
     "spikeinterface==0.105.3",
     "scipy",
     "pandas",
+    "matplotlib",
     "submitit",
 ]
 
