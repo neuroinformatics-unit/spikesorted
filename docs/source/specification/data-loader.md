@@ -1,6 +1,6 @@
 # Data Loader
 
-The data loading step ensures all possbile ways of passing raw data are coerced into in-memory SpikeInterface objects.
+The data loading step ensures all possible ways of passing raw data are coerced into in-memory SpikeInterface objects.
 
 It should exist as a convenience function rather than as a fixed step in the pipeline, as its output may be passed to any of [raw data metrics](implementation.md#raw-data-quality-metrics), [artefact detection](implementation.md#artifact-detection), [artefact curation](implementation.md#artifact-curation), [preprocessing](implementation.md#preprocessing), or the [full pipeline](../steps/index.md#pipeline-steps). As such, no information related to data loading (e.g. file paths) is encoded in the {ref}`PIPELINE_CONFIG <outputs-pipeline-config>`.
 
@@ -21,9 +21,9 @@ It essentially takes SpikeInterface recordings, or paths to raw data, and ensure
 
 **OPERATIONS:**
 
-- Load a {ref}`RAW_DATA_PATH <definitions-raw-data-path>` or {ref}`RAW_DATA_PATH_SESSION_LIST <definitions-raw-data-path-session-list>` to {ref}`SPIKEINTERFACE_REC <definitions-spikeinterface-rec>` or {ref}`SPIKEINTERFACE_REC_SESSION_LIST <definitions-spikeinterface-rec-session-list>`, respectively.  
+- Load a {ref}`RAW_DATA_PATH <definitions-raw-data-path>` or {ref}`RAW_DATA_PATH_SESSION_LIST <definitions-raw-data-path-session-list>` to {ref}`SPIKEINTERFACE_REC <definitions-spikeinterface-rec>` or {ref}`SPIKEINTERFACE_REC_SESSION_LIST <definitions-spikeinterface-rec-session-list>`, respectively.
 - (optional) time slice the recordings to produce a {ref}`DEBUGGING_REC <definitions-debugging-rec>`.
-- Automatically determine the AP stream, otherwise use `STREAM_NAME`. 
+- Automatically determine the AP stream, otherwise use `STREAM_NAME`.
 - Set a passed `PROBE` on the recordings, if passed and they are not automatically detected.
 
 **CHECKS:**

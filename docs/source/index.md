@@ -51,10 +51,10 @@ RMS plots over time are automatically saved, as used for QC in the [IBL pipeline
 </figure>
 <div class="ss-quality-description">
 
-`spikesorted` saves quality metrics and plots to help you quickly assess 
+`spikesorted` saves quality metrics and plots to help you quickly assess
 the quality of each recording.
 
-Sorting outputs native SpikeInterface objects that can be 
+Sorting outputs native SpikeInterface objects that can be
 opened in [spikeinterface-gui](https://spikeinterface-gui.readthedocs.io/en/latest/) for manual curation.
 
 </div>
@@ -63,10 +63,10 @@ opened in [spikeinterface-gui](https://spikeinterface-gui.readthedocs.io/en/late
 (configuration-title)=
 ## Encode and share
 
-Define your pipeline in a YAML configuration file, improviding reproducability and 
-facilatating analysis sharing. 
+Define your pipeline in a YAML configuration file, improviding reproducibility and
+facilatating analysis sharing.
 
-`spikesorted` comes pre-loaded with popular default cofigurations.
+`spikesorted` comes pre-loaded with popular default configurations.
 See the [Configs](configs/index.md) page for details, including how to generate your own.
 
 <div class="ss-config-example">
@@ -122,7 +122,7 @@ This streamlines navigating data and facilitates data sharing,
 supporting the development of common analysis tools.
 
 The outputs are fully specified, so you know exactly
-what to expect from each pipeline step. See the 
+what to expect from each pipeline step. See the
 [Specification](specification/index.md) for details on each step and the
 [standardised output structure](specification/on-disk-structure.md).
 

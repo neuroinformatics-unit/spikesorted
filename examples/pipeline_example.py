@@ -1,8 +1,9 @@
 """Run bad-channel and artifact detection on the local Neuropixels test recording."""
 
+import sys
 from datetime import datetime
 from pathlib import Path
-import sys
+
 from spikesorted.pipeline.pipeline import Pipeline
 from spikesorted.utils.testing_utils import get_test_data
 

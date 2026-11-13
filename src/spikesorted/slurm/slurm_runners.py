@@ -24,9 +24,7 @@ def _get_executor(log_path: Path, slurm_opts: dict) -> submitit.AutoExecutor:
         submitit executor object defining requested SLURM node parameters.
 
     """
-    executor = submitit.AutoExecutor(
-        folder=log_path, cluster="slurm"
-    )
+    executor = submitit.AutoExecutor(folder=log_path, cluster="slurm")
 
     executor.update_parameters(**slurm_opts)
 

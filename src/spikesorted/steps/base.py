@@ -50,7 +50,7 @@ class BasePipelineStep:
     _highpass_freq_min: ClassVar[float] = 300
 
     _config: PipelineConfig = field(init=False, repr=False, compare=False)
-    _resolved_num_cores: int = field(init=False, repr=False, compare=False)
+    _resolved_num_cores: int | None = field(init=False, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         """Validate all attributes and store loaded / computed attributes."""
@@ -92,10 +92,11 @@ class BasePipelineStep:
         """Report whether the configured operation requires a GPU."""
         raise NotImplementedError
 
-    def _resolve_num_cores(self) -> int:
+    def _resolve_num_cores(self) -> int | None:
         """TODO: add "auto" feature"""
         if self.num_cores != "auto":
             return self.num_cores
+        return None
 
     def get_first_recording(self) -> BaseRecording:
         """Return the first loaded recording from session/shank containers."""
@@ -131,6 +132,6 @@ class BasePipelineStep:
 
     def _get_recordings_and_paths(
         self, step_name: str
-    ) -> list[tuple[str | None, str | int | None, RecordingInput, Path]]:
+    ) -> list[tuple[str | None, str | int | None, BaseRecording, Path]]:
         """Convenience function for get_recordings_and_paths."""
         return get_recordings_and_paths(self.recordings, self.output_path, step_name)

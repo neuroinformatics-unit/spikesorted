@@ -2,7 +2,6 @@
 
 import sys
 import warnings
-
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -12,26 +11,34 @@ import pandas as pd
 import spikeinterface.preprocessing as spre
 import spikeinterface.widgets as sw
 
-from .base import BasePipelineStep
 from .bad_channel_detection import BadChannelDetectionStep
+from .base import BasePipelineStep
 
 
 @dataclass(frozen=True)
 class ArtifactDetectionStep(BasePipelineStep):
-    """
-    """
+    """ """
+
     def run(self, verbose: bool = True) -> None:
         """Detect saturation periods and save sample indices and times in seconds."""
         self.perform_checks()
 
         saturation_kwargs = self.config["artifact_detection"].get("saturation")
 
-        for session_name, shank_id, shank_recording, shank_path in self._get_recordings_and_paths(
-            "artifact_detection"
-        ):
+        for (
+            session_name,
+            shank_id,
+            shank_recording,
+            shank_path,
+        ) in self._get_recordings_and_paths("artifact_detection"):
             if verbose:
                 shank_id_message = f", shank {shank_id}" if shank_id else ""
-                print(f"Running artifact detection for session {session_name}" + shank_id_message, file=sys.stderr, flush=True)
+                print(
+                    f"Running artifact detection for session {session_name}"
+                    + shank_id_message,
+                    file=sys.stderr,
+                    flush=True,
+                )
 
             periods_path = self.get_artifact_periods_filepath(shank_path)
             shank_path.mkdir(parents=True, exist_ok=True)
@@ -42,8 +49,10 @@ class ArtifactDetectionStep(BasePipelineStep):
             )
             if bad_channel_ids is None:
                 warnings.warn(
-                    f"No bad channel ids found for session {session_name}, shank {shank_id}. "
-                    "Bad channels not removed before artifact detection."
+                    f"No bad channel ids found for session {session_name}, "
+                    f"shank {shank_id}. "
+                    "Bad channels not removed before artifact detection.",
+                    stacklevel=2,
                 )
             elif len(bad_channel_ids) != 0:
                 shank_recording = shank_recording.remove_channels(bad_channel_ids)
@@ -69,9 +78,7 @@ class ArtifactDetectionStep(BasePipelineStep):
             periods_df.to_csv(periods_path, index=False)
 
             # Create a plot of a few artefacts and save this to disk.
-            figure = self._get_artifact_plots(
-                shank_recording, periods
-            )
+            figure = self._get_artifact_plots(shank_recording, periods)
             if figure is not None:
                 plots_path = shank_path / "artifact_detection_plots"
                 plots_path.mkdir(parents=True, exist_ok=True)
@@ -80,11 +87,14 @@ class ArtifactDetectionStep(BasePipelineStep):
                 plt.close(figure)
 
             if verbose:
-                print(f"Artifact periods saved to: {periods_path}", file=sys.stderr, flush=True)
+                print(
+                    f"Artifact periods saved to: {periods_path}",
+                    file=sys.stderr,
+                    flush=True,
+                )
 
     def perform_checks(self) -> None:
-        """
-        """
+        """ """
         super().perform_checks()
 
         all_kwargs = self.config["artifact_detection"]
@@ -94,7 +104,9 @@ class ArtifactDetectionStep(BasePipelineStep):
 
         envelope_kwargs = all_kwargs.get("envelope")
         if envelope_kwargs:
-            raise NotImplementedError("`envelope` option for artifact detection is not currently supported.")
+            raise NotImplementedError(
+                "`envelope` option for artifact detection is not currently supported."
+            )
 
         if not self.overwrite:
             for _, _, _, shank_path in self._get_recordings_and_paths(
@@ -128,7 +140,8 @@ class ArtifactDetectionStep(BasePipelineStep):
         n_cols = (n_plots + n_rows - 1) // n_rows
 
         figure, axes = plt.subplots(
-            n_rows, n_cols,
+            n_rows,
+            n_cols,
             figsize=(4 * n_cols, 3 * n_rows),
             squeeze=False,
             layout="constrained",
@@ -142,14 +155,15 @@ class ArtifactDetectionStep(BasePipelineStep):
 
         # Centre each artifact in a window three times the longest artifact
         artifact_durations = (
-            selected_artifacts["end_sample_index"] - selected_artifacts["start_sample_index"]
+            selected_artifacts["end_sample_index"]
+            - selected_artifacts["start_sample_index"]
         )
         window_samples = 3 * int(artifact_durations.max())
         half_window_samples = window_samples // 2
 
         # For each artefact, add to the subplot the data, with artefact
         # centered, and two lines indicated the start/stop of the period.
-        for axis, period in zip(axes, selected_artifacts):
+        for axis, period in zip(axes, selected_artifacts, strict=False):
             artefact_start = int(period["start_sample_index"])
             artefact_stop = int(period["end_sample_index"])
             centre_sample = (artefact_start + artefact_stop) // 2
@@ -171,14 +185,18 @@ class ArtifactDetectionStep(BasePipelineStep):
             )
             # draw a band at the detection period
             artefact_times = recording.sample_index_to_time(
-                np.array([
-                    artefact_start,
-                    min(artefact_stop, recording.get_num_samples() - 1),
-                ])
+                np.array(
+                    [
+                        artefact_start,
+                        min(artefact_stop, recording.get_num_samples() - 1),
+                    ]
+                )
             )
             axis.axvspan(
-                artefact_times[0], artefact_times[1],
-                color="tab:orange", alpha=0.2,
+                artefact_times[0],
+                artefact_times[1],
+                color="tab:orange",
+                alpha=0.2,
             )
             axis.set_title(f"Artifact at {artefact_times[0]:.3f} s")
 

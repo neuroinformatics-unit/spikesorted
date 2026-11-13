@@ -13,7 +13,6 @@ repos:
           - id: check-symlinks
           - id: check-yaml
           - id: debug-statements
-          - id: check-docstring-first
           - id: check-executables-have-shebangs
           - id: check-merge-conflict
           - id: check-toml
@@ -42,6 +41,13 @@ repos:
             args: [--config-file=pyproject.toml]
             additional_dependencies:
                 - types-setuptools
+                - types-PyYAML
+                - pandas-stubs
+                - pydantic
+                - spikeinterface==0.105.3
+                - scipy-stubs
+                - matplotlib
+                - submitit
     - repo: https://github.com/mgedmin/check-manifest
       rev: "0.50"
       hooks:

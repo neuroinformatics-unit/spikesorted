@@ -11,12 +11,12 @@ The **Config** file encodes which pipeline steps are run, and how they are run.
 For full details on the required config structure, see the [Config Specification](../specification/config.md) page.
 
 To generate your own configs, create a new [YAML file](../specification/config.md#config-structure) from scratch,
-or generate, save and edit a configuration file below. `spikesorted` functions accept 
+or generate, save and edit a configuration file below. `spikesorted` functions accept
 either the name of a default `config` name or path to a custom configuration file.
 
 ## Select a configuration
 
-You can generate and download an example config file below for inspection. Alterantively,
+You can generate and download an example config file below for inspection. Alternatively,
 these settings can be used in `spikesorted` by using the default keyword arguments as suggested
 after generation.
 

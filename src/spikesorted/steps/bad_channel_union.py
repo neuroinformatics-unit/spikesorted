@@ -15,7 +15,8 @@ def create_bad_channel_labels_union(recordings, output_path):
     uses the individual sessions bad channel detection outputs on disk to create
     a union of all bad channel labels.
 
-    The outputs are stored in a "session_unions" folder in the "bad_channel_detection" folder.
+    The outputs are stored in a "session_unions" folder within
+    "bad_channel_detection".
     A sessions.yaml beside each CSV records the contributing session names and date.
 
     This step will throw an error if the set of sessions / shanks on disk
@@ -47,7 +48,7 @@ def create_bad_channel_labels_union(recordings, output_path):
                 keep_default_na=False,
             )
             bad_channel_ids.update(
-                zip(labels["channel_id"], labels["channel_id_dtype"])
+                zip(labels["channel_id"], labels["channel_id_dtype"], strict=False)
             )
 
         if shank_id is None:

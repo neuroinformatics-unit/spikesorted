@@ -83,7 +83,7 @@ The key parameters are listed below.
 ``method``
 
 This selects the bad channel detection method to use. `coherence+psd`,
-the method of the IBL's bad channel detection is reccomended.  
+the method of the IBL's bad channel detection is recommended.
 
 The key thresholds for this method can be adjusted to change detection sensitivity.
 The defaults are designed for Neuropixels 1.0 probes.
@@ -101,4 +101,3 @@ Either noise criterion can flag a channel as noisy; both do not need to be met.
 | --- | --- | --- |
 | `n_neighbors` | `11` | Window size, in channels, for the median filter used to estimate the local similarity trend. It must be odd. A smaller window may help for lower-density probes. |
 | `outside_channels_location` | `top` | Specifies whether outside-brain channels can be detected at the `top`, `bottom`, or `both` ends of the probe. |
-

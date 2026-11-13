@@ -97,7 +97,7 @@ The YAML configuration file for the pipeline. See [Configs](config.md).
 
 (outputs-raw-data-quality-metrics)=
 ### `RAW_DATA_QUALITY_METRICS`
-A set of metrics that estimate the quality of raw data, based on the IBL [spike-sorting white paper](https://doi.org/10.6084/m9.figshare.19705522). 
+A set of metrics that estimate the quality of raw data, based on the IBL [spike-sorting white paper](https://doi.org/10.6084/m9.figshare.19705522).
 
 For steps that are measured after preprocessing, `phase_shift`, a TEMPORAL_FILTER and COMMON_REFERENCE step are applied, based on the PIPELINE_CONFIG.
 
@@ -157,7 +157,7 @@ See [plot_motion()](https://spikeinterface.readthedocs.io/en/latest/api.html#spi
 
 (outputs-session-concatenation-plots)=
 ### `SESSION_CONCATENATION_PLOTS`
-Plots that show the preprocessed data across the concatenation points for each session. 
+Plots that show the preprocessed data across the concatenation points for each session.
 **TODO:** this could be supplemented by quality metrics across these boundaries, inter-session alignment plots.
 
 
@@ -172,7 +172,7 @@ The three columns are:
 
 - `"start_time"`: taking float values
 - `"stop_time"`: taking float values
-- (optional) `label`: Label of the event period. Permitted values are `SATURATION` or `ENVELOPE`. 
+- (optional) `label`: Label of the event period. Permitted values are `SATURATION` or `ENVELOPE`.
 
 (outputs-artefact-periods-curated-csv)=
 ### `ARTEFACT_PERIODS_CURATED_CSV`
@@ -185,4 +185,3 @@ in the filename.
 Per-unit quality metrics table, following SpikeInterface quality metrics in [`quality_metrics.metric_names`](https://github.com/AllenNeuralDynamics/aind-ephys-pipeline/blob/main/docs/source/parameters.rst):
 
 **TODO:** log and/or link to the exact quality metrics used and their definitions
-

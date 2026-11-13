@@ -59,8 +59,8 @@ class BadChannelDetectionStep(BasePipelineStep):
 
     ``bad_channel_labels.csv``
         One row per recording channel, including good channels, with
-        columns ``channel_id``, ``label`` and ``channel_id_dtype``. Labels are supplied by
-        SpikeInterface's ``detect_bad_channels()``.
+        columns ``channel_id``, ``label`` and ``channel_id_dtype``.
+        Labels are supplied by SpikeInterface's ``detect_bad_channels()``.
 
     Both files include column headers and omit the DataFrame index.
 
@@ -131,7 +131,7 @@ class BadChannelDetectionStep(BasePipelineStep):
             create_bad_channel_labels_union(self.recordings, self.output_path)
 
     def perform_checks(self) -> None:
-        """This function performs the following checks on the bad channel detction intput:
+        """Check the bad-channel detection input:
 
         - checks required bad channel detection method is passed
         - throw a warning for low-coutn channels
