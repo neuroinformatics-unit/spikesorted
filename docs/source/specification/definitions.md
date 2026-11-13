@@ -99,9 +99,9 @@ The YAML configuration file for the pipeline. See [Configs](config.md).
 ### `RAW_DATA_QUALITY_METRICS`
 A set of metrics that estimate the quality of raw data, based on the IBL [spike-sorting white paper](https://doi.org/10.6084/m9.figshare.19705522).
 
-For steps that are measured after preprocessing, `phase_shift`, a TEMPORAL_FILTER and COMMON_REFERENCE step are applied, based on the PIPELINE_CONFIG.
+For metrics measured after preprocessing, use the quality-metrics function's default 300 Hz high-pass filter and common median reference. Using preprocessing settings from the PIPELINE_CONFIG is deferred.
 
-These metrics are computed and stored on disk, and used to generate {ref}`RAW_DATA_QUALITY_PLOTS <outputs-raw-data-quality-plots>`. No hard thresholds are applied to these metrics to determine inclusion or exclusion of data, instead this is decided by visual inspection of the plots.
+RMS summaries are stored as CSVs, and the computed metrics are used to generate {ref}`RAW_DATA_QUALITY_PLOTS <outputs-raw-data-quality-plots>`. PSD and rolling-RMS arrays do not need to be saved. No hard thresholds are applied to these metrics to determine inclusion or exclusion of data, instead this is decided by visual inspection of the plots.
 
 **Before and after preprocessing:**
 
@@ -118,7 +118,6 @@ These metrics are computed and stored on disk, and used to generate {ref}`RAW_DA
 - **Spectral Density LFP** LFP-band power spectral density in $V^2/Hz$ computed per channel using Welch's method.
 - **Spike Rate** spike-like events per second from simple threshold detection on the preprocessed AP signal. These spikes can be overlaid on the RMS or raw data to get a first idea if any spikes are detectable from the data and if issues in the RMS appear to translate to issues in spike detection.
 
-**TODO: specify format for storage**
 **TODO: determine chunking rules**
 
 (outputs-raw-data-quality-plots)=

@@ -1,4 +1,4 @@
-"""Run bad-channel and artifact detection on the local Neuropixels test recording."""
+"""Run bad-channel detection, raw-data metrics and artifact detection locally."""
 
 import sys
 from datetime import datetime
@@ -21,6 +21,7 @@ def main():
         output_path=output_path,
         stop_after_step="artifact_detection",
         overwrite=False,
+        n_jobs=1,
     ).run()
 
     print(f"Results saved to: {output_path}", file=sys.stderr, flush=True)
