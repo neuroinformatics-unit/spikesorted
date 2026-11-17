@@ -6,7 +6,7 @@ The [Data loader](data-loader.md) is separate from the pipeline steps and return
 
 This step computes IBL's quality metrics on raw recordings.
 
-The metrics and detect-bad-channels results are written to the `RAW_DATA_METRICS_DIR` in the {ref}`OUTPUT_PATH <outputs-output-path>`.
+The metric summaries and plots are written to the `RAW_DATA_METRICS_DIR` in the {ref}`OUTPUT_PATH <outputs-output-path>`.
 
 **Inputs**
 
@@ -20,20 +20,18 @@ Outputs are saved to `RAW_DATA_METRICS_DIR`
 
 - {ref}`RAW_DATA_QUALITY_METRICS <outputs-raw-data-quality-metrics>` and {ref}`RAW_DATA_QUALITY_PLOTS <outputs-raw-data-quality-plots>`
 
-- TODO: discuss `CONCAT_POINTS_QUALITY_METRICS` and `CONCAT_POINTS_QUALITY_METRICS_PLOTS`.
-- {ref}`CONCAT_REC_TIMES <outputs-concat-rec-times>` if concatenated recordings are detected.
+Concatenation-boundary metadata, metrics and plots are deferred.
 
 **OPERATIONS**:
 
-- Compute raw-data quality metrics using the configured settings.
+- Remove previously detected bad channels from the raw recording.
+- Compute raw-data quality metrics using the configured metric settings. For the preprocessed view, use the quality-metrics function's default 300 Hz high-pass filter and common median reference. Using pipeline-specific preprocessing settings is deferred.
 - Generate quality-assessment plots from the computed metrics.
-- Save the metrics and plots to `RAW_DATA_METRICS_DIR`.
-- Determine if recordings are concatenated. TODO: discuss quality metrics across concatenation points.
+- Save the RMS summary CSVs and plots to `RAW_DATA_METRICS_DIR` using the function's `folder` argument. PSD and rolling-RMS arrays do not need to be saved.
 
 **CHECKS**:
 
 - Confirm that the input data can be resolved to an AP recording suitable for metric computation.
-- Warn when probe-specific metric settings are used on recordings with substantially different channel counts or geometry.
 
 
 (implementation-detect-bad-channels)=

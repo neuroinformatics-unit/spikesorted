@@ -5,7 +5,10 @@ from typing import Annotated, Any, Literal
 from pydantic import AfterValidator, ConfigDict, TypeAdapter, with_config
 from typing_extensions import TypedDict
 
-from spikesorted.validation.steps_validation import _validate_bad_channel_config
+from spikesorted.validation.steps_validation import (
+    _validate_bad_channel_config,
+    _validate_raw_data_quality_metrics_config,
+)
 
 
 @with_config(ConfigDict(extra="forbid", strict=True))
@@ -23,7 +26,9 @@ class PipelineConfig(TypedDict, total=False):
         dict[str, Any], AfterValidator(_validate_bad_channel_config)
     ]
     output: OutputConfig
-    raw_data_quality_metrics: Any
+    raw_data_quality_metrics: Annotated[
+        dict[str, Any], AfterValidator(_validate_raw_data_quality_metrics_config)
+    ]
     artifact_detection: Any
     artifact_curation: Any
     preprocessing: Any
@@ -40,7 +45,7 @@ def validate_config(config: object) -> PipelineConfig:
     """Return a validated dictionary without adding defaults or coercing values.
 
     Other allowed sections remain unchanged until their validators are implemented.
-    Apart from the unsupported neighborhood_r2 method, constraints absent from SI's
-    annotations remain SI's responsibility; unannotated parameters accept any value.
+    Raw-data metric sampling options also require finite, valid ranges.
+    Recording-dependent constraints remain SI's responsibility.
     """
     return _pipeline_config_adapter.validate_python(config)

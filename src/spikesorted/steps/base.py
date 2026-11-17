@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import sys
+from contextlib import redirect_stdout
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar
@@ -35,9 +37,6 @@ class BasePipelineStep:
     overwrite
         If `True`, existing outputs found in `output_path`
         will be deleted and overwritten.
-    num_cores
-        Number of cores to parallelize the step. Passed
-        to SpikeInterface's `job_kwargs`.
 
     """
 
@@ -45,14 +44,12 @@ class BasePipelineStep:
     config_path: str | Path
     output_path: str | Path
     overwrite: bool = False
-    num_cores: int = 1
 
     _step_name: ClassVar[str]
 
     _highpass_freq_min: ClassVar[float] = 300
 
     _config: PipelineConfig = field(init=False, repr=False, compare=False)
-    _resolved_num_cores: int | None = field(init=False, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         """Validate all attributes and store loaded / computed attributes."""
@@ -62,14 +59,10 @@ class BasePipelineStep:
                 "config_path": self.config_path,
                 "output_path": self.output_path,
                 "overwrite": self.overwrite,
-                "num_cores": self.num_cores,
             }
         )
         loaded_config = load_pipeline_config(self.config_path)
         object.__setattr__(self, "_config", loaded_config)
-
-        resolved_num_cores = self._resolve_num_cores()
-        object.__setattr__(self, "_resolved_num_cores", resolved_num_cores)
 
     @property
     def config(self) -> PipelineConfig:
@@ -94,12 +87,6 @@ class BasePipelineStep:
         """Report whether the configured operation requires a GPU."""
         raise NotImplementedError
 
-    def _resolve_num_cores(self) -> int | None:
-        """TODO: add "auto" feature"""
-        if self.num_cores != "auto":
-            return self.num_cores
-        return None
-
     def get_first_recording(self) -> BaseRecording:
         """Return the first loaded recording from session/shank containers."""
         recording = self.recordings
@@ -116,7 +103,8 @@ class BasePipelineStep:
                 recording = next(iter(recording.values()))
 
             elif isinstance(recording, (str, Path)):
-                recording = load(recording)
+                with redirect_stdout(sys.stderr):
+                    recording = load(recording)
 
             else:
                 raise TypeError("Load recording paths before accessing a recording")

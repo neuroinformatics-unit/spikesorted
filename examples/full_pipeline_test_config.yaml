@@ -4,5 +4,12 @@ output:
 bad_channel_detection:
   method: coherence+psd
 
+raw_data_quality_metrics:
+  # Short windows for the 0.5-second example recording.
+  chunk_size_s: 0.1
+  num_chunks: 4
+  rolling_rms_window_size_s: 0.1
+  compute_raw_rolling_rms: true
+
 artifact_detection:
   saturation: {}

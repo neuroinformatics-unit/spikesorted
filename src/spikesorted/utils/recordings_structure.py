@@ -13,7 +13,9 @@ are stored in a list (where each element is the recording/s from a single sessio
 
 from __future__ import annotations
 
+import sys
 from collections.abc import Iterator
+from contextlib import redirect_stdout
 from pathlib import Path
 from typing import TypeAlias
 
@@ -59,7 +61,8 @@ def get_recordings(
         # is None and data is not stored in a folder called "shank_<id>".
         for shank_id, recording in iter_over_shanks(session_recording):
             if isinstance(recording, (str, Path)):
-                recording = load(recording)
+                with redirect_stdout(sys.stderr):
+                    recording = load(recording)
 
             named_recordings.append((session_name, shank_id, recording))
 
