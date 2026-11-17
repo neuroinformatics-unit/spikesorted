@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=2b5b5d30"></script>
+    <script src="../_static/documentation_options.js?v=8f23d929"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
@@ -571,8 +571,8 @@
 <section id="outputs-raw-data-quality-metrics">
 <span id="raw-data-quality-metrics"></span><span id="raw_data_quality_metrics"></span><h3><code class="docutils literal notranslate"><span class="pre">RAW_DATA_QUALITY_METRICS</span></code><a class="headerlink" href="#outputs-raw-data-quality-metrics" title="Link to this heading">#</a></h3>
 <p>A set of metrics that estimate the quality of raw data, based on the IBL <a class="reference external" href="https://doi.org/10.6084/m9.figshare.19705522">spike-sorting white paper</a>.</p>
-<p>For steps that are measured after preprocessing, <code class="docutils literal notranslate"><span class="pre">phase_shift</span></code>, a TEMPORAL_FILTER and COMMON_REFERENCE step are applied, based on the PIPELINE_CONFIG.</p>
-<p>These metrics are computed and stored on disk, and used to generate <a class="reference internal" href="#outputs-raw-data-quality-plots"><span class="std std-ref">RAW_DATA_QUALITY_PLOTS</span></a>. No hard thresholds are applied to these metrics to determine inclusion or exclusion of data, instead this is decided by visual inspection of the plots.</p>
+<p>For metrics measured after preprocessing, use the quality-metrics function’s default 300 Hz high-pass filter and common median reference. Using preprocessing settings from the PIPELINE_CONFIG is deferred.</p>
+<p>RMS summaries are stored as CSVs, and the computed metrics are used to generate <a class="reference internal" href="#outputs-raw-data-quality-plots"><span class="std std-ref">RAW_DATA_QUALITY_PLOTS</span></a>. PSD and rolling-RMS arrays do not need to be saved. No hard thresholds are applied to these metrics to determine inclusion or exclusion of data, instead this is decided by visual inspection of the plots.</p>
 <p><strong>Before and after preprocessing:</strong></p>
 <ul>
 <li><p><strong>RMS (AP and LFP bands):</strong> To obtain a quick measure of data quality, RMS is computed from one 1-second chunk every 300 seconds. The following summary metrics are then calculated:</p>
@@ -589,8 +589,7 @@
 <li><p><strong>Spectral Density LFP</strong> LFP-band power spectral density in <span class="math notranslate nohighlight">\(V^2/Hz\)</span> computed per channel using Welch’s method.</p></li>
 <li><p><strong>Spike Rate</strong> spike-like events per second from simple threshold detection on the preprocessed AP signal. These spikes can be overlaid on the RMS or raw data to get a first idea if any spikes are detectable from the data and if issues in the RMS appear to translate to issues in spike detection.</p></li>
 </ul>
-<p><strong>TODO: specify format for storage</strong>
-<strong>TODO: determine chunking rules</strong></p>
+<p><strong>TODO: determine chunking rules</strong></p>
 </section>
 <section id="outputs-raw-data-quality-plots">
 <span id="raw-data-quality-plots"></span><span id="raw_data_quality_plots"></span><h3><code class="docutils literal notranslate"><span class="pre">RAW_DATA_QUALITY_PLOTS</span></code><a class="headerlink" href="#outputs-raw-data-quality-plots" title="Link to this heading">#</a></h3>

@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=2b5b5d30"></script>
+    <script src="../_static/documentation_options.js?v=8f23d929"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
@@ -472,7 +472,7 @@
 <section id="raw-data-quality-metrics">
 <h2>Raw data quality metrics<a class="headerlink" href="#raw-data-quality-metrics" title="Link to this heading">#</a></h2>
 <p>This step computes IBL’s quality metrics on raw recordings.</p>
-<p>The metrics and detect-bad-channels results are written to the <code class="docutils literal notranslate"><span class="pre">RAW_DATA_METRICS_DIR</span></code> in the <a class="reference internal" href="definitions.html#outputs-output-path"><span class="std std-ref">OUTPUT_PATH</span></a>.</p>
+<p>The metric summaries and plots are written to the <code class="docutils literal notranslate"><span class="pre">RAW_DATA_METRICS_DIR</span></code> in the <a class="reference internal" href="definitions.html#outputs-output-path"><span class="std std-ref">OUTPUT_PATH</span></a>.</p>
 <p><strong>Inputs</strong></p>
 <ul class="simple">
 <li><p><a class="reference internal" href="definitions.html#definitions-data-loader-output-recordings"><span class="std std-ref">DATA_LOADER_OUTPUT_RECORDINGS</span></a></p></li>
@@ -483,20 +483,18 @@
 <p>Outputs are saved to <code class="docutils literal notranslate"><span class="pre">RAW_DATA_METRICS_DIR</span></code></p>
 <ul class="simple">
 <li><p><a class="reference internal" href="definitions.html#outputs-raw-data-quality-metrics"><span class="std std-ref">RAW_DATA_QUALITY_METRICS</span></a> and <a class="reference internal" href="definitions.html#outputs-raw-data-quality-plots"><span class="std std-ref">RAW_DATA_QUALITY_PLOTS</span></a></p></li>
-<li><p>TODO: discuss <code class="docutils literal notranslate"><span class="pre">CONCAT_POINTS_QUALITY_METRICS</span></code> and <code class="docutils literal notranslate"><span class="pre">CONCAT_POINTS_QUALITY_METRICS_PLOTS</span></code>.</p></li>
-<li><p><a class="reference internal" href="definitions.html#outputs-concat-rec-times"><span class="std std-ref">CONCAT_REC_TIMES</span></a> if concatenated recordings are detected.</p></li>
 </ul>
+<p>Concatenation-boundary metadata, metrics and plots are deferred.</p>
 <p><strong>OPERATIONS</strong>:</p>
 <ul class="simple">
-<li><p>Compute raw-data quality metrics using the configured settings.</p></li>
+<li><p>Remove previously detected bad channels from the raw recording.</p></li>
+<li><p>Compute raw-data quality metrics using the configured metric settings. For the preprocessed view, use the quality-metrics function’s default 300 Hz high-pass filter and common median reference. Using pipeline-specific preprocessing settings is deferred.</p></li>
 <li><p>Generate quality-assessment plots from the computed metrics.</p></li>
-<li><p>Save the metrics and plots to <code class="docutils literal notranslate"><span class="pre">RAW_DATA_METRICS_DIR</span></code>.</p></li>
-<li><p>Determine if recordings are concatenated. TODO: discuss quality metrics across concatenation points.</p></li>
+<li><p>Save the RMS summary CSVs and plots to <code class="docutils literal notranslate"><span class="pre">RAW_DATA_METRICS_DIR</span></code> using the function’s <code class="docutils literal notranslate"><span class="pre">folder</span></code> argument. PSD and rolling-RMS arrays do not need to be saved.</p></li>
 </ul>
 <p><strong>CHECKS</strong>:</p>
 <ul class="simple">
 <li><p>Confirm that the input data can be resolved to an AP recording suitable for metric computation.</p></li>
-<li><p>Warn when probe-specific metric settings are used on recordings with substantially different channel counts or geometry.</p></li>
 </ul>
 </section>
 <section id="implementation-detect-bad-channels">
