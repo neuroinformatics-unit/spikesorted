@@ -11,6 +11,7 @@ PIPELINE_STEP_NAMES = (
     "bad_channel_detection",
     "raw_data_quality_metrics",
     "artifact_detection",
+    "preprocessing",
 )
 
 
@@ -24,13 +25,19 @@ class _PipelineArguments(BaseModel):
     output_path: str | Path
     start_at_step: (
         Literal[
-            "bad_channel_detection", "raw_data_quality_metrics", "artifact_detection"
+            "bad_channel_detection",
+            "raw_data_quality_metrics",
+            "artifact_detection",
+            "preprocessing",
         ]
         | None
     )
     stop_after_step: (
         Literal[
-            "bad_channel_detection", "raw_data_quality_metrics", "artifact_detection"
+            "bad_channel_detection",
+            "raw_data_quality_metrics",
+            "artifact_detection",
+            "preprocessing",
         ]
         | None
     )

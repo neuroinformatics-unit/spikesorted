@@ -167,13 +167,26 @@ class BadChannelDetectionStep(BasePipelineStep):
                         "or choose a different output_path."
                     )
 
-    def load_bad_channels(self, session_name, shank_id=None):
-        """Load bad-channel IDs for a session and shank in their original dtype."""
+    def load_bad_channels(
+        self, session_name, shank_id=None, combine_sessions=False, required=False
+    ):
+        """Load session or union bad-channel IDs in their original dtype.
+
+        combine_sessions selects the union for the shank. Missing files return
+        None unless required is True, in which case FileNotFoundError is raised.
+        """
+        if combine_sessions:
+            session_name = "session_unions"
+
         channel_ids_path = (
             self._get_output_path(session_name, shank_id) / "bad_channel_ids.csv"
         )
 
         if not channel_ids_path.exists():
+            if required:
+                raise FileNotFoundError(
+                    f"Bad-channel CSV not found: {channel_ids_path}"
+                )
             return None
 
         bad_channels = pd.read_csv(channel_ids_path, dtype={"channel_id": str})

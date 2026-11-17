@@ -131,6 +131,35 @@ class ArtifactDetectionStep(BasePipelineStep):
                         "or choose a different output_path."
                     )
 
+    def load_artifacts_against_recording(
+        self, session_name, shank_id, recording
+    ) -> pd.DataFrame:
+        """Load saved artefact periods and check their times against a recording."""
+        periods_path = self.get_artifact_periods_filepath(
+            self._get_output_path(session_name, shank_id)
+        )
+        if not periods_path.is_file():
+            raise FileNotFoundError(f"Artefact CSV not found: {periods_path}")
+
+        # check_artifact_period_times
+        periods = pd.read_csv(periods_path)
+        if not periods.empty:
+            for sample_column, time_column in (
+                ("start_sample_index", "start_time"),
+                ("end_sample_index", "stop_time"),
+            ):
+                times = recording.sample_index_to_time(
+                    periods[sample_column].to_numpy()
+                )
+                # Check with for now arbitrary, small tolerance
+                if not np.allclose(times, periods[time_column], rtol=0, atol=1e-8):
+                    raise ValueError(
+                        f"Artefact {sample_column} does not match "
+                        f"{time_column}: {periods_path}"
+                    )
+
+        return periods
+
     def get_artifact_periods_filepath(self, shank_path: Path) -> Path:
         """Return the event-periods CSV path for a shank output directory."""
         return shank_path / "event_periods.csv"

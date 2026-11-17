@@ -79,8 +79,8 @@ class BasePipelineStep:
                     f"{recording.get_num_segments()} segments."
                 )
 
-    def run(self, verbose: bool = True) -> None:
-        """Perform checks, execute the step, and save its outputs."""
+    def run(self, verbose: bool = True) -> list[RecordingInput] | None:
+        """Perform checks and execute the step, saving or returning its outputs."""
         raise NotImplementedError
 
     def needs_gpu(self) -> bool:

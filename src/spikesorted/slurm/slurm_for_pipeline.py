@@ -99,6 +99,6 @@ def _run_pipeline_with_slurm(
             output_path=output_path,
         ).create_bad_channel_labels_union()
 
-    run_pipeline_in_slurm_batch(
+    return run_pipeline_in_slurm_batch(
         split_recordings, start_at_step="raw_data_quality_metrics"
     )
