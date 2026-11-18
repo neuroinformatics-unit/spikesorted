@@ -1,4 +1,4 @@
-"""Run from a SLURM login node with spikesorted installed in the active environment."""
+"""Run through preprocessing from a SLURM login node with spikesorted installed."""
 
 from datetime import datetime
 from pathlib import Path
@@ -39,7 +39,8 @@ def main():
     )
     print(f"Coordinator job submitted: {job.job_id}")
     print(f"Results and SLURM logs: {output_path}")
-    # job.result()  # Uncomment only if you want this caller to wait.
+    # Uncomment to wait and retrieve one list of preprocessed recordings per worker.
+    # preprocessed_recordings_by_worker = job.result()
 
 
 if __name__ == "__main__":

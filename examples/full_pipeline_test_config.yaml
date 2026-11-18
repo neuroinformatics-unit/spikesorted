@@ -13,3 +13,15 @@ raw_data_quality_metrics:
 
 artifact_detection:
   saturation: {}
+
+preprocessing:
+  remove_bad_channels: {}
+  phase_shift: {}
+  bandpass_filter:
+    freq_min: 300.0
+    freq_max: 6000.0
+  common_reference:
+    reference: global
+    operator: median
+  silence_periods:
+    mode: zeros

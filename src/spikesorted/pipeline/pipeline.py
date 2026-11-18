@@ -55,7 +55,7 @@ class Pipeline:
         self.verbose = verbose
 
     def run(self) -> list[RecordingInput] | None:
-        """Run the selected steps, returning lazy recordings after preprocessing."""
+        """Run the selected steps, returning recordings after preprocessing."""
         si.set_global_job_kwargs(n_jobs=self.n_jobs)
         configs = load_pipeline_config(self.config_path)
 

@@ -2,15 +2,19 @@
 
 from __future__ import annotations
 
+import shutil
 import sys
 from contextlib import redirect_stdout
 from dataclasses import dataclass
+from functools import partial
+from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar
 
 import numpy as np
 import spikeinterface.preprocessing as spre
 from spikeinterface.core.base import base_period_dtype
 
+from spikesorted.plotting.preprocessing import plot_preprocessing_stages
 from spikesorted.step_configs import SPATIAL_OPERATIONS, TEMPORAL_FILTERS
 from spikesorted.steps.artifact_detection import ArtifactDetectionStep
 from spikesorted.steps.bad_channel_detection import BadChannelDetectionStep
@@ -30,6 +34,7 @@ class PreprocessingStep(BasePipelineStep):
         """Check preprocessing inputs and operation order.
 
         - Require one segment per session/shank recording.
+        - Reject existing preprocessing output unless overwrite is enabled.
         - Reject simultaneous bad-channel removal and interpolation.
         - Require removal before filtering and referencing.
         - Require interpolation after temporal filtering and before referencing
@@ -38,6 +43,7 @@ class PreprocessingStep(BasePipelineStep):
         - Require silencing after temporal filtering.
         - Error if a union exists without combine_sessions, or combine_sessions
           is configured without the required union.
+        - Require explicit bad-channel removal when a union exists.
 
         Required detection files and artefact times are checked by the loaders
         when the preprocessing inputs are loaded.
@@ -64,7 +70,11 @@ class PreprocessingStep(BasePipelineStep):
             output_path=self.output_path,
         )
 
-        for session_name, shank_id, recording, _ in self._get_recordings_and_paths():
+        for _, shank_id, _, step_path in self._get_recordings_and_paths():
+            if step_path.exists() and not self.overwrite:
+                raise FileExistsError(
+                    f"Preprocessing output already exists: {step_path}"
+                )
             self._check_combine_sessions_bad_channels_union(
                 bad_channel_detection, shank_id
             )
@@ -83,6 +93,10 @@ class PreprocessingStep(BasePipelineStep):
             if not union_path.is_file():
                 raise FileNotFoundError(
                     f"combine_sessions requires a bad-channel union: {union_path}"
+                )
+            if "remove_bad_channels" not in self.config["preprocessing"]:
+                raise ValueError(
+                    "A bad-channel union requires explicit remove_bad_channels."
                 )
         else:
             if union_path.is_file():
@@ -135,12 +149,17 @@ class PreprocessingStep(BasePipelineStep):
         return all(lhs_index < user_operations.index(operation) for operation in rhs)
 
     def run(self, verbose: bool = True) -> list[RecordingInput]:
-        """Return lazy recordings as named sessions, retaining their shank IDs."""
+        """Save outputs and return named recordings, retaining their shank IDs."""
         self.perform_checks()
 
         processed_sessions = {}
 
-        for session_name, shank_id, recording, _ in self._get_recordings_and_paths():
+        for (
+            session_name,
+            shank_id,
+            recording,
+            step_path,
+        ) in self._get_recordings_and_paths():
             if verbose:
                 shank_message = f", shank {shank_id}" if shank_id is not None else ""
                 print(
@@ -172,10 +191,17 @@ class PreprocessingStep(BasePipelineStep):
                     operation = "detect_and_remove_bad_channels"
                 pipeline.append({"name": operation, "params": kwargs})
 
+            stages = {}
+            pipeline = self._capture_pipeline_stages(pipeline, user_operations, stages)
+
             with redirect_stdout(sys.stderr):
                 processed = spre.apply_preprocessing_pipeline(
                     recording, pipeline, apply_precomputed_kwargs=True
                 )
+
+            processed = self._save_outputs(
+                processed, recording, stages, step_path, verbose
+            )
 
             processed_sessions.setdefault(session_name, {})[shank_id] = processed
 
@@ -187,6 +213,52 @@ class PreprocessingStep(BasePipelineStep):
                 recordings.append((shanks, session_name))
 
         return recordings
+
+    def _save_outputs(self, processed, recording, stages, step_path, verbose):
+        """Replace the step output and persist samples or native SI metadata."""
+        if step_path.exists():
+            step_path.resolve().relative_to(Path(self.output_path).resolve())
+            shutil.rmtree(step_path)
+        step_path.mkdir(parents=True)
+        plot_preprocessing_stages(
+            recording,
+            stages,
+            self.config["preprocessing"],
+            step_path / "preprocessing_plots",
+        )
+
+        if self.config.get("output", {}).get("save_preprocessed_recording", True):
+            processed = processed.save(folder=step_path / "recording", verbose=verbose)
+        else:
+            processed.dump_to_json(step_path / "metadata.json", include_properties=True)
+        return processed
+
+    def _capture_pipeline_stages(self, pipeline, user_operations, stages):
+        """Wrap this pipeline's functions to retain their actual outputs for plots."""
+        pipeline = spre.PreprocessingPipeline(pipeline)
+        pipeline.function_names_to_functions = (
+            pipeline.function_names_to_functions.copy()
+        )
+        for operation in user_operations:
+            name = (
+                "detect_and_remove_bad_channels"
+                if operation == "remove_bad_channels"
+                else operation
+            )
+            pipeline.function_names_to_functions[name] = partial(
+                self._capture_stage,
+                pipeline.function_names_to_functions[name],
+                stages,
+                operation,
+            )
+        return pipeline
+
+    @staticmethod
+    def _capture_stage(function, stages, operation, recording, **kwargs):
+        """Keep each output for plotting while SpikeInterface executes the pipeline."""
+        processed = function(recording, **kwargs)
+        stages[operation] = processed
+        return processed
 
     def _load_bad_channels(self, session_name, shank_id):
         """Load the required session or union bad-channel IDs."""
