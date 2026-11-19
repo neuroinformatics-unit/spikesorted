@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=c341fef2"></script>
+    <script src="../../../_static/documentation_options.js?v=a1b47e79"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../../_static/design-tabs.js?v=fcb327ea"></script>
@@ -573,7 +573,14 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_after_step</span> <span class="o">==</span> <span class="s2">"preprocessing"</span><span class="p">:</span>
             <span class="k">return</span>
 
-        <span class="k">if</span> <span class="s2">"sorting"</span> <span class="ow">in</span> <span class="n">configs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_at_step</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">"bad_channel_detection"</span><span class="p">,</span>
+            <span class="s2">"raw_data_quality_metrics"</span><span class="p">,</span>
+            <span class="s2">"artifact_detection"</span><span class="p">,</span>
+            <span class="s2">"preprocessing"</span><span class="p">,</span>
+            <span class="s2">"sorting"</span><span class="p">,</span>
+        <span class="p">]:</span>
             <span class="n">sorting</span> <span class="o">=</span> <span class="n">SortingStep</span><span class="p">(</span>
                 <span class="n">recordings</span><span class="o">=</span><span class="n">recordings</span><span class="p">,</span>
                 <span class="n">config_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="p">,</span>
@@ -581,6 +588,9 @@
                 <span class="n">overwrite</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">overwrite</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">sorting</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_after_step</span> <span class="o">==</span> <span class="s2">"sorting"</span><span class="p">:</span>
+            <span class="k">return</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
 </div>
