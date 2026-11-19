@@ -44,6 +44,7 @@ class _PipelineArguments(BaseModel):
     overwrite: bool
     n_jobs: int
     verbose: bool
+    save_preprocessed_copy: bool
 
     @field_validator("n_jobs")
     @classmethod

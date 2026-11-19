@@ -2,23 +2,30 @@
 
 from __future__ import annotations
 
+import copy
 import shutil
 import sys
 from contextlib import redirect_stdout
 from dataclasses import dataclass
-from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar
 
-import numpy as np
 import spikeinterface.preprocessing as spre
-from spikeinterface.core.base import base_period_dtype
 
-from spikesorted.plotting.preprocessing import plot_preprocessing_stages
-from spikesorted.step_configs import SPATIAL_OPERATIONS, TEMPORAL_FILTERS
-from spikesorted.steps.artifact_detection import ArtifactDetectionStep
-from spikesorted.steps.bad_channel_detection import BadChannelDetectionStep
+from spikesorted.plotting.preprocessing import plot_preprocessing
+from spikesorted.step_configs import (
+    SPATIAL_OPERATIONS,
+    TEMPORAL_FILTERS,
+    get_bad_channel_step,
+)
+from spikesorted.steps.artifact_detection.utils import artefact_period_loader
+from spikesorted.steps.bad_channel_detection.utils import (
+    bad_channel_id_loader,
+    get_bad_channel_ids_filepath,
+)
 from spikesorted.steps.base import BasePipelineStep
+from spikesorted.utils.output_paths import get_step_output_path
+from spikesorted.utils.utils import message_user
 
 if TYPE_CHECKING:
     from spikesorted.utils.recordings_structure import RecordingInput
@@ -28,6 +35,8 @@ if TYPE_CHECKING:
 class PreprocessingStep(BasePipelineStep):
     """Preprocess each session and shank using the configured operation order."""
 
+    save_preprocessed_copy: bool = True
+
     _step_name: ClassVar[str] = "preprocessing"
 
     def perform_checks(self) -> None:
@@ -35,17 +44,17 @@ class PreprocessingStep(BasePipelineStep):
 
         - Require one segment per session/shank recording.
         - Reject existing preprocessing output unless overwrite is enabled.
+        - Prepare output folders, replacing existing ones when overwrite is enabled.
         - Reject simultaneous bad-channel removal and interpolation.
         - Require removal before filtering and referencing.
         - Require interpolation after temporal filtering and before referencing
           or spatial filtering.
         - Require phase shifting before referencing or spatial filtering.
         - Require silencing after temporal filtering.
-        - Error if a union exists without combine_sessions, or combine_sessions
-          is configured without the required union.
         - Require explicit bad-channel removal when a union exists.
 
-        Required detection files and artefact times are checked by the loaders
+        Union/config consistency, required detection files and artefact times
+        are checked by the loaders
         when the preprocessing inputs are loaded.
         """
         if {"remove_bad_channels", "interpolate_bad_channels"} <= self.config[
@@ -64,46 +73,37 @@ class PreprocessingStep(BasePipelineStep):
         #         "remove_bad_channels" in preprocessing
         #         or "interpolate_bad_channels" in preprocessing
         #     )
-        bad_channel_detection = BadChannelDetectionStep(
-            recordings=self.recordings,
-            config_path=self.config_path,
-            output_path=self.output_path,
-        )
-
         for _, shank_id, _, step_path in self._get_recordings_and_paths():
             if step_path.exists() and not self.overwrite:
                 raise FileExistsError(
                     f"Preprocessing output already exists: {step_path}"
                 )
-            self._check_combine_sessions_bad_channels_union(
-                bad_channel_detection, shank_id
+            union_path = get_bad_channel_ids_filepath(
+                get_step_output_path(
+                    self.output_path,
+                    self.config,
+                    "bad_channel_detection",
+                    "session_unions",
+                    shank_id,
+                )
             )
-
-    def _check_combine_sessions_bad_channels_union(
-        self, bad_channel_detection, shank_id
-    ):
-        """"""
-        combine_sessions = "combine_sessions" in self.config
-
-        union_path = bad_channel_detection.get_bad_channel_ids_filepath(
-            bad_channel_detection._get_output_path("session_unions", shank_id)
-        )
-
-        if combine_sessions:
-            if not union_path.is_file():
-                raise FileNotFoundError(
-                    f"combine_sessions requires a bad-channel union: {union_path}"
-                )
-            if "remove_bad_channels" not in self.config["preprocessing"]:
+            if (
+                union_path.is_file()
+                and "remove_bad_channels" not in self.config["preprocessing"]
+            ):
                 raise ValueError(
-                    "A bad-channel union requires explicit remove_bad_channels."
+                    f"Bad-channel union exists at {union_path}, but preprocessing "
+                    "does not include remove_bad_channels. Add explicit "
+                    "remove_bad_channels; interpolation alone does not satisfy "
+                    "the union requirement."
                 )
-        else:
-            if union_path.is_file():
-                raise ValueError(
-                    "Bad-channel union exists but combine_sessions is not "
-                    f"configured: {union_path}"
-                )
+
+        for _, _, _, step_path in self._get_recordings_and_paths():
+            if step_path.exists():
+                step_path.resolve().relative_to(Path(self.output_path).resolve())
+                shutil.rmtree(step_path)
+
+            step_path.mkdir(parents=True)
 
     def _check_operation_order(self) -> None:
         """Check the configured order without rearranging any operations."""
@@ -160,48 +160,42 @@ class PreprocessingStep(BasePipelineStep):
             recording,
             step_path,
         ) in self._get_recordings_and_paths():
-            if verbose:
-                shank_message = f", shank {shank_id}" if shank_id is not None else ""
-                print(
-                    f"Preprocessing session {session_name}{shank_message}",
-                    file=sys.stderr,
-                    flush=True,
-                )
+            shank_message = f", shank {shank_id}" if shank_id is not None else ""
+            message_user(
+                f"Preprocessing session {session_name}{shank_message}",
+                verbose,
+            )
 
-            user_operations = {
-                operation: kwargs.copy()
-                for operation, kwargs in self.config["preprocessing"].items()
-            }
-            if "silence_periods" in user_operations:
-                user_operations["silence_periods"]["periods"] = (
-                    self._load_silence_periods(session_name, shank_id, recording)
-                )
+            spikeinterface_kwargs = copy.deepcopy(self.config["preprocessing"])
 
-            for operation in ("remove_bad_channels", "interpolate_bad_channels"):
-                if operation in user_operations:
-                    bad_channel_ids = self._load_bad_channels(session_name, shank_id)
-                    if len(bad_channel_ids) == 0:
-                        del user_operations[operation]
-                    else:
-                        user_operations[operation]["bad_channel_ids"] = bad_channel_ids
+            self._load_artefact_periods_into_kwargs(
+                spikeinterface_kwargs, session_name, shank_id, recording, verbose
+            )
+            self._load_bad_channels_into_kwargs(
+                spikeinterface_kwargs, session_name, shank_id, verbose
+            )
 
-            pipeline = []
-            for operation, kwargs in user_operations.items():
-                if operation == "remove_bad_channels":
-                    operation = "detect_and_remove_bad_channels"
-                pipeline.append({"name": operation, "params": kwargs})
-
-            stages = {}
-            pipeline = self._capture_pipeline_stages(pipeline, user_operations, stages)
+            pipeline = self._rename_steps_for_spikeinterface(spikeinterface_kwargs)
 
             with redirect_stdout(sys.stderr):
                 processed = spre.apply_preprocessing_pipeline(
                     recording, pipeline, apply_precomputed_kwargs=True
                 )
 
-            processed = self._save_outputs(
-                processed, recording, stages, step_path, verbose
+            plot_preprocessing(
+                recording,
+                processed,
+                step_path / "preprocessing_plots",
             )
+
+            if self.save_preprocessed_copy:
+                processed = processed.save(
+                    folder=step_path / "recording", verbose=verbose
+                )
+            else:
+                processed.dump_to_json(
+                    step_path / "metadata.json", include_properties=True
+                )
 
             processed_sessions.setdefault(session_name, {})[shank_id] = processed
 
@@ -214,77 +208,54 @@ class PreprocessingStep(BasePipelineStep):
 
         return recordings
 
-    def _save_outputs(self, processed, recording, stages, step_path, verbose):
-        """Replace the step output and persist samples or native SI metadata."""
-        if step_path.exists():
-            step_path.resolve().relative_to(Path(self.output_path).resolve())
-            shutil.rmtree(step_path)
-        step_path.mkdir(parents=True)
-        plot_preprocessing_stages(
-            recording,
-            stages,
-            self.config["preprocessing"],
-            step_path / "preprocessing_plots",
-        )
-
-        if self.config.get("output", {}).get("save_preprocessed_recording", True):
-            processed = processed.save(folder=step_path / "recording", verbose=verbose)
-        else:
-            processed.dump_to_json(step_path / "metadata.json", include_properties=True)
-        return processed
-
-    def _capture_pipeline_stages(self, pipeline, user_operations, stages):
-        """Wrap this pipeline's functions to retain their actual outputs for plots."""
-        pipeline = spre.PreprocessingPipeline(pipeline)
-        pipeline.function_names_to_functions = (
-            pipeline.function_names_to_functions.copy()
-        )
-        for operation in user_operations:
-            name = (
-                "detect_and_remove_bad_channels"
-                if operation == "remove_bad_channels"
-                else operation
+    def _load_bad_channels_into_kwargs(
+        self, spikeinterface_kwargs, session_name, shank_id, verbose
+    ):
+        """Load bad-channel IDs into kwargs, skipping an empty bad-channel step."""
+        handle_bad_channel_step = get_bad_channel_step(spikeinterface_kwargs)
+        if handle_bad_channel_step is not None:
+            # remove or interpolate
+            bad_channel_ids = bad_channel_id_loader(
+                self.output_path,
+                self.config,
+                session_name,
+                shank_id,
+                required=True,
+                verbose=verbose,
             )
-            pipeline.function_names_to_functions[name] = partial(
-                self._capture_stage,
-                pipeline.function_names_to_functions[name],
-                stages,
-                operation,
+            if len(bad_channel_ids) == 0:
+                del spikeinterface_kwargs[handle_bad_channel_step]
+            else:
+                spikeinterface_kwargs[handle_bad_channel_step]["bad_channel_ids"] = (
+                    bad_channel_ids
+                )
+
+    def _load_artefact_periods_into_kwargs(
+        self, spikeinterface_kwargs, session_name, shank_id, recording, verbose
+    ):
+        """Load validated artefact periods into the configured silencing step."""
+        if "silence_periods" in spikeinterface_kwargs:
+            spikeinterface_kwargs["silence_periods"]["periods"] = (
+                artefact_period_loader(
+                    self.output_path,
+                    self.config,
+                    session_name,
+                    shank_id,
+                    recording,
+                    verbose=verbose,
+                )
             )
+
+    def _rename_steps_for_spikeinterface(self, spikeinterface_kwargs):
+        """Translate the removal name and convert kwargs to SI's ordered list."""
+        names = {
+            "remove_bad_channels": "detect_and_remove_bad_channels",
+        }
+        pipeline = []
+        for step, kwargs in spikeinterface_kwargs.items():
+            if step in names:
+                step = names[step]
+
+            pipeline.append({"name": step, "params": kwargs})
+
         return pipeline
-
-    @staticmethod
-    def _capture_stage(function, stages, operation, recording, **kwargs):
-        """Keep each output for plotting while SpikeInterface executes the pipeline."""
-        processed = function(recording, **kwargs)
-        stages[operation] = processed
-        return processed
-
-    def _load_bad_channels(self, session_name, shank_id):
-        """Load the required session or union bad-channel IDs."""
-        bad_channel_detection = BadChannelDetectionStep(
-            recordings=self.recordings,
-            config_path=self.config_path,
-            output_path=self.output_path,
-        )
-        return bad_channel_detection.load_bad_channels(
-            session_name,
-            shank_id,
-            combine_sessions="combine_sessions" in self.config,
-            required=True,
-        )
-
-    def _load_silence_periods(self, session_name, shank_id, recording):
-        """Load validated artefact periods in SpikeInterface's sample format."""
-        artifact_detection = ArtifactDetectionStep(
-            recordings=self.recordings,
-            config_path=self.config_path,
-            output_path=self.output_path,
-        )
-        periods = artifact_detection.load_artifacts_against_recording(
-            session_name, shank_id, recording
-        )
-        si_periods = np.zeros(len(periods), dtype=base_period_dtype)
-        for column in ("start_sample_index", "end_sample_index"):
-            si_periods[column] = periods[column].to_numpy()
-        return si_periods

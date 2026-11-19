@@ -1,11 +1,11 @@
-"""Plots of recording data at each preprocessing stage."""
+"""Plots of raw and preprocessed recording data."""
 
 import matplotlib.pyplot as plt
 import spikeinterface.widgets as sw
 
 
-def plot_preprocessing_stages(recording, stages, user_operations, plots_path):
-    """Plot one-second start, middle and end windows at every configured stage."""
+def plot_preprocessing(recording, processed, plots_path):
+    """Plot one-second start, middle and end windows before and after preprocessing."""
     plots_path.mkdir()
     start = recording.get_start_time()
     duration = recording.get_duration()
@@ -17,12 +17,7 @@ def plot_preprocessing_stages(recording, stages, user_operations, plots_path):
         "end": (start + duration - window, start + duration),
     }
     for name, time_range in time_ranges.items():
-        window_path = plots_path / name
-        window_path.mkdir()
-        current = recording
-        for index, operation in enumerate(["raw", *user_operations]):
-            # Empty bad-channel operations are no-ops but still have a stage plot.
-            current = stages.get(operation, current)
+        for label, current in (("raw", recording), ("prepro", processed)):
             widget = sw.plot_traces(
                 current,
                 time_range=time_range,
@@ -31,7 +26,7 @@ def plot_preprocessing_stages(recording, stages, user_operations, plots_path):
                 return_in_uV=recording.has_scaleable_traces(),
             )
             try:
-                widget.figure.suptitle(operation)
-                widget.figure.savefig(window_path / f"{index:03d}_{operation}.png")
+                widget.figure.suptitle(label)
+                widget.figure.savefig(plots_path / f"{name}_{label}.png")
             finally:
                 plt.close(widget.figure)

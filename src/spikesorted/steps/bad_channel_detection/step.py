@@ -18,6 +18,13 @@ import yaml
 
 from spikesorted.steps.base import BasePipelineStep
 from spikesorted.utils.recordings_structure import get_num_sessions
+from spikesorted.utils.utils import message_user
+
+from .utils import (
+    get_bad_channel_ids_filepath,
+    save_bad_channel_ids,
+    save_bad_channel_labels,
+)
 
 
 @dataclass(frozen=True)
@@ -83,17 +90,14 @@ class BadChannelDetectionStep(BasePipelineStep):
             shank_recording,
             shank_path,
         ) in self._get_recordings_and_paths():
-            if verbose:
-                shank_id_message = f", shank {shank_id}" if shank_id else ""
-                print(
-                    f"Running bad channel detection for session {session_name}"
-                    + shank_id_message,
-                    file=sys.stderr,
-                    flush=True,
-                )
+            shank_id_message = f", shank {shank_id}" if shank_id else ""
+            message_user(
+                f"Running bad channel detection for session {session_name}"
+                + shank_id_message,
+                verbose,
+            )
 
-            bad_ids_path = self.get_bad_channel_ids_filepath(shank_path)
-            labels_path = self.get_bad_channel_labels_filepath(shank_path)
+            bad_ids_path = get_bad_channel_ids_filepath(shank_path)
 
             shank_path.mkdir(parents=True, exist_ok=True)
 
@@ -107,28 +111,18 @@ class BadChannelDetectionStep(BasePipelineStep):
                 )
 
             channel_id_dtype = shank_recording.get_channel_ids().dtype.str
-            bad_ids_df = pd.DataFrame(
-                {
-                    "channel_id": bad_channel_ids,
-                    "channel_id_dtype": channel_id_dtype,
-                }
+            save_bad_channel_ids(shank_path, bad_channel_ids, channel_id_dtype)
+            save_bad_channel_labels(
+                shank_path,
+                shank_recording.get_channel_ids(),
+                channel_labels,
+                channel_id_dtype,
             )
-            labels_df = pd.DataFrame(
-                {
-                    "channel_id": shank_recording.get_channel_ids(),
-                    "label": channel_labels,
-                    "channel_id_dtype": channel_id_dtype,
-                }
-            )
-            bad_ids_df.to_csv(bad_ids_path, index=False)
-            labels_df.to_csv(labels_path, index=False)
 
-            if verbose:
-                print(
-                    f"Bad channel IDS and labels saved to: {bad_ids_path.parent}",
-                    file=sys.stderr,
-                    flush=True,
-                )
+            message_user(
+                f"Bad channel IDS and labels saved to: {bad_ids_path.parent}",
+                verbose,
+            )
 
         if "combine_sessions" in self.config and get_num_sessions(self.recordings) > 1:
             self.create_bad_channel_labels_union()
@@ -166,47 +160,6 @@ class BadChannelDetectionStep(BasePipelineStep):
                         "Set overwrite=True to replace existing outputs, "
                         "or choose a different output_path."
                     )
-
-    def load_bad_channels(
-        self, session_name, shank_id=None, combine_sessions=False, required=False
-    ):
-        """Load session or union bad-channel IDs in their original dtype.
-
-        combine_sessions selects the union for the shank. Missing files return
-        None unless required is True, in which case FileNotFoundError is raised.
-        """
-        if combine_sessions:
-            session_name = "session_unions"
-
-        channel_ids_path = (
-            self._get_output_path(session_name, shank_id) / "bad_channel_ids.csv"
-        )
-
-        if not channel_ids_path.exists():
-            if required:
-                raise FileNotFoundError(
-                    f"Bad-channel CSV not found: {channel_ids_path}"
-                )
-            return None
-
-        bad_channels = pd.read_csv(channel_ids_path, dtype={"channel_id": str})
-
-        bad_channel_ids = bad_channels["channel_id"].to_numpy()
-
-        if not bad_channels.empty:
-            # Bad channels can be str or int dtype
-            bad_channels_type = bad_channels["channel_id_dtype"].iloc[0]
-            bad_channel_ids = bad_channel_ids.astype(bad_channels_type)
-
-        return bad_channel_ids
-
-    def get_bad_channel_ids_filepath(self, shank_path: Path) -> Path:
-        """Return the bad-channel IDs CSV path for a shank output directory."""
-        return shank_path / "bad_channel_ids.csv"
-
-    def get_bad_channel_labels_filepath(self, shank_path: Path) -> Path:
-        """Return the all-channel labels CSV path for a shank output directory."""
-        return shank_path / "bad_channel_labels.csv"
 
     def needs_gpu(self) -> bool:
         """Report whether the configured detection method requires a GPU."""
@@ -260,10 +213,12 @@ class BadChannelDetectionStep(BasePipelineStep):
 
             output_path.mkdir(parents=True, exist_ok=True)
 
-            pd.DataFrame(
-                sorted(bad_channel_ids.items()),
-                columns=["channel_id", "channel_id_dtype"],
-            ).to_csv(output_path / "bad_channel_ids.csv", index=False)
+            sorted_ids = sorted(bad_channel_ids.items())
+            save_bad_channel_ids(
+                output_path,
+                [channel_id for channel_id, _ in sorted_ids],
+                [dtype for _, dtype in sorted_ids],
+            )
             with (output_path / "sessions.yaml").open("w", encoding="utf-8") as file:
                 yaml.safe_dump(
                     {"sessions": session_names, "date": generation_date},

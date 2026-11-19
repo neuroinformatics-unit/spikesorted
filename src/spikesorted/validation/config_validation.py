@@ -16,7 +16,6 @@ class OutputConfig(TypedDict, total=False):
     """Output folder layout; omitted structure uses NeuroBlueprint."""
 
     structure: Literal["neuroblueprint", "by_session", "by_step"]
-    save_preprocessed_recording: bool
 
 
 @with_config(ConfigDict(extra="forbid", strict=True))

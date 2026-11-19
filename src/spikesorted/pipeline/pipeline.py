@@ -31,6 +31,7 @@ class Pipeline:
         overwrite: bool = False,
         n_jobs: int = 1,
         verbose: bool = True,
+        save_preprocessed_copy: bool = True,
     ) -> None:
         """Store recordings, configuration path, output root, and execution options."""
         _PipelineArguments.model_validate(
@@ -43,6 +44,7 @@ class Pipeline:
                 "overwrite": overwrite,
                 "n_jobs": n_jobs,
                 "verbose": verbose,
+                "save_preprocessed_copy": save_preprocessed_copy,
             }
         )
         self.recordings = recordings
@@ -53,9 +55,10 @@ class Pipeline:
         self.overwrite = overwrite
         self.n_jobs = n_jobs
         self.verbose = verbose
+        self.save_preprocessed_copy = save_preprocessed_copy
 
-    def run(self) -> list[RecordingInput] | None:
-        """Run the selected steps, returning recordings after preprocessing."""
+    def run(self) -> None:
+        """Run the selected steps and write their outputs."""
         si.set_global_job_kwargs(n_jobs=self.n_jobs)
         configs = load_pipeline_config(self.config_path)
 
@@ -115,11 +118,12 @@ class Pipeline:
             "preprocessing",
         ]:
             preprocessing = PreprocessingStep(
+                save_preprocessed_copy=self.save_preprocessed_copy,
                 recordings=self.recordings,
                 config_path=self.config_path,
                 output_path=self.output_path,
                 overwrite=self.overwrite,
             )
-            return preprocessing.run(self.verbose)
+            preprocessing.run(self.verbose)
 
         return None

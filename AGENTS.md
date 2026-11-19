@@ -14,6 +14,9 @@
 
 ## Preserve user formatting
 
+- Use `step` rather than `operation` when naming pipeline or preprocessing steps,
+  including variable names, comments, and docstrings.
+
 - When moving or extracting existing code, preserve the user's formatting and
   style, including blank lines, line breaks, and explicit if/else blocks.
   Do not rewrite these into your preferred style or automatically reformat
