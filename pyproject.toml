@@ -16,6 +16,14 @@ dependencies = [
     "pandas",
     "matplotlib",
     "submitit",
+    # SpykingCircus2 and Lupin are implemented in SpikeInterface.
+    "numba",
+    "hdbscan",
+    "scikit-learn",
+    "torch",
+    "kilosort",
+    "mountainsort5",
+    # Kilosort 2.5/3 require separate MATLAB/CUDA installations, not pip packages.
 ]
 
 license = "BSD-3-Clause"

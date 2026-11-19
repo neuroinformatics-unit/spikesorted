@@ -12,6 +12,7 @@ PIPELINE_STEP_NAMES = (
     "raw_data_quality_metrics",
     "artifact_detection",
     "preprocessing",
+    "sorting",
 )
 
 
@@ -29,6 +30,7 @@ class _PipelineArguments(BaseModel):
             "raw_data_quality_metrics",
             "artifact_detection",
             "preprocessing",
+            "sorting",
         ]
         | None
     )
@@ -38,6 +40,7 @@ class _PipelineArguments(BaseModel):
             "raw_data_quality_metrics",
             "artifact_detection",
             "preprocessing",
+            "sorting",
         ]
         | None
     )

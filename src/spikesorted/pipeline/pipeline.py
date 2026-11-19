@@ -9,8 +9,9 @@ import spikeinterface as si
 
 from spikesorted.steps.artifact_detection import ArtifactDetectionStep
 from spikesorted.steps.bad_channel_detection import BadChannelDetectionStep
-from spikesorted.steps.preprocessing import PreprocessingStep
-from spikesorted.steps.raw_data_quality_metrics import RawDataQualityMetricsStep
+from spikesorted.steps.preprocessing_step import PreprocessingStep
+from spikesorted.steps.raw_data_quality_metrics_step import RawDataQualityMetricsStep
+from spikesorted.steps.sorting import SortingStep
 from spikesorted.utils.recordings_structure import check_and_normalize_recordings
 from spikesorted.utils.utils import load_pipeline_config
 from spikesorted.validation.pipeline_validation import _PipelineArguments
@@ -59,9 +60,10 @@ class Pipeline:
         self.save_preprocessed_copy = save_preprocessed_copy
 
     def run(self) -> None:
-        """Run the selected steps and write their outputs."""
+        """Run selected steps; sorting-only inputs must already be preprocessed."""
         si.set_global_job_kwargs(n_jobs=self.n_jobs)
         configs = load_pipeline_config(self.config_path)
+        recordings = self.recordings
 
         if "bad_channel_detection" in configs and self.start_at_step in [
             None,
@@ -125,6 +127,28 @@ class Pipeline:
                 output_path=self.output_path,
                 overwrite=self.overwrite,
             )
-            preprocessing.run(self.verbose)
+            recordings = preprocessing.run(self.verbose)
+
+        if self.stop_after_step == "preprocessing":
+            return
+
+        if self.start_at_step in [
+            None,
+            "bad_channel_detection",
+            "raw_data_quality_metrics",
+            "artifact_detection",
+            "preprocessing",
+            "sorting",
+        ]:
+            sorting = SortingStep(
+                recordings=recordings,
+                config_path=self.config_path,
+                output_path=self.output_path,
+                overwrite=self.overwrite,
+            )
+            sorting.run(self.verbose)
+
+        if self.stop_after_step == "sorting":
+            return
 
         return None

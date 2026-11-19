@@ -27,6 +27,8 @@ def run_pipeline_with_slurm(
     slurm_opts: dict | None = None,
     coordinator_slurm_opts: dict | None = None,
     save_preprocessed_copy: bool = True,
+    start_at_step: str | None = None,
+    stop_after_step: str | None = None,
 ):
     """Submit a coordinator job and return immediately with its job handle.
 
@@ -34,6 +36,7 @@ def run_pipeline_with_slurm(
     slurm_opts configure workers; coordinator_slurm_opts configure the coordinator.
     Its time limit must cover worker queueing and execution across all stages.
     Call job.result() explicitly to wait and retrieve errors in the caller.
+    Sorting-only runs accept preprocessed recordings or saved-recording paths.
     """
     return submit_slurm(
         _run_pipeline_with_slurm,
@@ -44,6 +47,8 @@ def run_pipeline_with_slurm(
             "num_cores": num_cores,
             "verbose": verbose,
             "slurm_opts": slurm_opts,
+            "start_at_step": start_at_step,
+            "stop_after_step": stop_after_step,
         },
         output_path=output_path,
         slurm_opts=coordinator_slurm_opts,
@@ -59,15 +64,15 @@ def _run_pipeline_with_slurm(
     verbose: bool = True,
     slurm_opts: dict | None = None,
     save_preprocessed_copy: bool = True,
+    start_at_step: str | None = None,
+    stop_after_step: str | None = None,
 ):
     """Run independent session/shank pipelines as an array and await results.
-
-    Each job retains the project root and its session/shank identity.
-    slurm_opts are passed to Submitit's executor.update_parameters().
-    Combined sessions synchronize after detection and preprocessing.
     """
 
-    def run_pipeline_in_slurm_batch(inputs, start_at_step=None, stop_after_step=None):
+    def run_pipeline_in_slurm_batch(
+        inputs, start_at_step=start_at_step, stop_after_step=stop_after_step
+    ):
         calls = []
         for recording in inputs:
             pipeline = Pipeline(
@@ -89,7 +94,11 @@ def _run_pipeline_with_slurm(
     configs = load_pipeline_config(config_path)
     split_recordings = split_recordings_by_shank(recordings)
 
-    if "combine_sessions" not in configs or "bad_channel_detection" not in configs:
+    if (
+        "combine_sessions" not in configs
+        or "bad_channel_detection" not in configs
+        or start_at_step not in (None, "bad_channel_detection")
+    ):
         return run_pipeline_in_slurm_batch(split_recordings)
     else:
         # First we run bad channel detection across separate nodes before
@@ -102,6 +111,9 @@ def _run_pipeline_with_slurm(
             config_path=config_path,
             output_path=output_path,
         ).create_bad_channel_labels_union()
+
+    if stop_after_step == "bad_channel_detection":
+        return
 
     return run_pipeline_in_slurm_batch(
         split_recordings, start_at_step="raw_data_quality_metrics"
