@@ -11,6 +11,7 @@ PIPELINE_STEP_NAMES = (
     "bad_channel_detection",
     "raw_data_quality_metrics",
     "artifact_detection",
+    "preprocessing",
 )
 
 
@@ -24,19 +25,34 @@ class _PipelineArguments(BaseModel):
     output_path: str | Path
     start_at_step: (
         Literal[
-            "bad_channel_detection", "raw_data_quality_metrics", "artifact_detection"
+            "bad_channel_detection",
+            "raw_data_quality_metrics",
+            "artifact_detection",
+            "preprocessing",
         ]
         | None
     )
     stop_after_step: (
         Literal[
-            "bad_channel_detection", "raw_data_quality_metrics", "artifact_detection"
+            "bad_channel_detection",
+            "raw_data_quality_metrics",
+            "artifact_detection",
+            "preprocessing",
         ]
         | None
     )
     overwrite: bool
     n_jobs: int
     verbose: bool
+    save_preprocessed_copy: bool
+
+    @field_validator("output_path")
+    @classmethod
+    def validate_output_path(cls, value: str | Path) -> str | Path:
+        """Require an absolute output path, preserving the supplied value."""
+        if not Path(value).is_absolute():
+            raise ValueError("output_path must be an absolute path.")
+        return value
 
     @field_validator("n_jobs")
     @classmethod

@@ -1,6 +1,3 @@
-"""Run bad-channel detection, raw-data metrics and artifact detection locally."""
-
-import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -11,6 +8,8 @@ from spikesorted.utils.testing_utils import get_test_data
 def main():
 
     repo_path = Path(__file__).resolve().parents[1]
+
+    # Replace this with a SpikeInterface loader for your own recording.
     recording = get_test_data(repo_path)
     run_name = f"{datetime.now():%Y-%m-%d_%H-%M-%S_%f}_{Path(__file__).stem}"
     output_path = repo_path / "examples" / "outputs" / run_name
@@ -19,12 +18,11 @@ def main():
         recordings=recording,
         config_path=repo_path / "examples/full_pipeline_test_config.yaml",
         output_path=output_path,
-        stop_after_step="artifact_detection",
+        stop_after_step="preprocessing",
         overwrite=False,
+        save_preprocessed_copy=True,  # False saves only metadata and plots.
         n_jobs=1,
     ).run()
-
-    print(f"Results saved to: {output_path}", file=sys.stderr, flush=True)
 
 
 if __name__ == "__main__":

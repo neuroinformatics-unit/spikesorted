@@ -8,8 +8,9 @@ from typing import ClassVar
 
 from spikeinterface.qualitycontrol import raw_data_quality_metrics
 
-from spikesorted.steps.bad_channel_detection import BadChannelDetectionStep
+from spikesorted.steps.bad_channel_detection.utils import load_and_check_bad_channel_ids
 from spikesorted.steps.base import BasePipelineStep
+from spikesorted.utils.utils import message_user
 
 
 @dataclass(frozen=True)
@@ -22,11 +23,6 @@ class RawDataQualityMetricsStep(BasePipelineStep):
         """Remove bad channels and save SI's metric summaries and plots."""
         self.perform_checks()
 
-        bad_channel_detection = BadChannelDetectionStep(
-            recordings=self.recordings,
-            config_path=self.config_path,
-            output_path=self.output_path,
-        )
         kwargs = self.config["raw_data_quality_metrics"]
 
         for (
@@ -35,17 +31,18 @@ class RawDataQualityMetricsStep(BasePipelineStep):
             shank_recording,
             shank_path,
         ) in self._get_recordings_and_paths():
-            if verbose:
-                shank_id_message = f", shank {shank_id}" if shank_id is not None else ""
-                print(
-                    f"Running raw-data quality metrics for session {session_name}"
-                    + shank_id_message,
-                    file=sys.stderr,
-                    flush=True,
-                )
+            shank_id_message = f", shank {shank_id}" if shank_id is not None else ""
+            message_user(
+                f"Running raw-data quality metrics for session {session_name}"
+                + shank_id_message,
+                verbose,
+            )
 
-            bad_channel_ids = bad_channel_detection.load_bad_channels(
-                session_name, shank_id
+            bad_channel_ids = load_and_check_bad_channel_ids(
+                self.output_path,
+                self.config,
+                session_name,
+                shank_id,
             )
             if bad_channel_ids is None:
                 warnings.warn(
@@ -62,12 +59,10 @@ class RawDataQualityMetricsStep(BasePipelineStep):
                     shank_recording, folder=shank_path, verbose=verbose, **kwargs
                 )
 
-            if verbose:
-                print(
-                    f"Raw-data quality metrics saved to: {shank_path}",
-                    file=sys.stderr,
-                    flush=True,
-                )
+            message_user(
+                f"Raw-data quality metrics saved to: {shank_path}",
+                verbose,
+            )
 
     def perform_checks(self) -> None:
         """Check recordings and protect existing raw-data metrics outputs."""

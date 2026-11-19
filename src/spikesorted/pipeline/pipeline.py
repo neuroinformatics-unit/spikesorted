@@ -9,7 +9,9 @@ import spikeinterface as si
 
 from spikesorted.steps.artifact_detection import ArtifactDetectionStep
 from spikesorted.steps.bad_channel_detection import BadChannelDetectionStep
+from spikesorted.steps.preprocessing import PreprocessingStep
 from spikesorted.steps.raw_data_quality_metrics import RawDataQualityMetricsStep
+from spikesorted.utils.recordings_structure import check_and_normalize_recordings
 from spikesorted.utils.utils import load_pipeline_config
 from spikesorted.validation.pipeline_validation import _PipelineArguments
 
@@ -30,6 +32,7 @@ class Pipeline:
         overwrite: bool = False,
         n_jobs: int = 1,
         verbose: bool = True,
+        save_preprocessed_copy: bool = True,
     ) -> None:
         """Store recordings, configuration path, output root, and execution options."""
         _PipelineArguments.model_validate(
@@ -42,9 +45,10 @@ class Pipeline:
                 "overwrite": overwrite,
                 "n_jobs": n_jobs,
                 "verbose": verbose,
+                "save_preprocessed_copy": save_preprocessed_copy,
             }
         )
-        self.recordings = recordings
+        self.recordings = check_and_normalize_recordings(recordings)
         self.config_path = config_path
         self.output_path = output_path
         self.start_at_step = start_at_step
@@ -52,9 +56,10 @@ class Pipeline:
         self.overwrite = overwrite
         self.n_jobs = n_jobs
         self.verbose = verbose
+        self.save_preprocessed_copy = save_preprocessed_copy
 
     def run(self) -> None:
-        """Run from start_at_step, stopping after stop_after_step executes."""
+        """Run the selected steps and write their outputs."""
         si.set_global_job_kwargs(n_jobs=self.n_jobs)
         configs = load_pipeline_config(self.config_path)
 
@@ -105,3 +110,21 @@ class Pipeline:
 
         if self.stop_after_step == "artifact_detection":
             return
+
+        if "preprocessing" in configs and self.start_at_step in [
+            None,
+            "bad_channel_detection",
+            "raw_data_quality_metrics",
+            "artifact_detection",
+            "preprocessing",
+        ]:
+            preprocessing = PreprocessingStep(
+                save_preprocessed_copy=self.save_preprocessed_copy,
+                recordings=self.recordings,
+                config_path=self.config_path,
+                output_path=self.output_path,
+                overwrite=self.overwrite,
+            )
+            preprocessing.run(self.verbose)
+
+        return None

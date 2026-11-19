@@ -35,20 +35,17 @@ def get_num_sessions(recordings: RecordingInput | list[RecordingInput]) -> int:
         return 1
 
 
-def get_recordings(
+def check_and_normalize_recordings(
     recordings: RecordingInput | list[RecordingInput],
-) -> list[tuple[str, str | int | None, BaseRecording]]:
-    """Flatten RecordingInput into named session/shank recordings.
-
-    The function handles every possible RecordingInput type and outputs a
-    list of tuples containing (session_name, shank_id, spikeinterface_recording).
-    """
+) -> list[tuple[SessionRecording, str]]:
+    """Normalize sessions and require unique explicit or generated session names."""
     if isinstance(recordings, list):
         sessions = recordings
     else:
         sessions = [recordings]
 
-    named_recordings: list[tuple[str, str | int | None, BaseRecording]] = []
+    named_sessions: list[tuple[SessionRecording, str]] = []
+    session_names = set()
 
     for session_idx, session_recording in enumerate(sessions):
         # Handle the (recording, session_name) case
@@ -57,6 +54,23 @@ def get_recordings(
         else:
             session_name = f"ses-{session_idx + 1:03d}"
 
+        if session_name in session_names:
+            raise ValueError(
+                f"Session names must be unique, however {session_name!r} appears more than once."
+            )
+        session_names.add(session_name)
+        named_sessions.append((session_recording, session_name))
+
+    return named_sessions
+
+
+def get_recordings(
+    recordings: list[tuple[SessionRecording, str]],
+) -> list[tuple[str, str | int | None, BaseRecording]]:
+    """Flatten normalized sessions into named shank recordings, loading paths."""
+    named_recordings: list[tuple[str, str | int | None, BaseRecording]] = []
+
+    for session_recording, session_name in recordings:
         # Handle multiple shanks. When only one shank is used, `shank_id`
         # is None and data is not stored in a folder called "shank_<id>".
         for shank_id, recording in iter_over_shanks(session_recording):

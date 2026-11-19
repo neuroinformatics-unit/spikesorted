@@ -1,5 +1,3 @@
-"""Run from a SLURM login node with spikesorted installed in the active environment."""
-
 from datetime import datetime
 from pathlib import Path
 
@@ -10,12 +8,8 @@ from spikesorted.utils.testing_utils import get_test_data
 def main():
     repo_path = Path(__file__).resolve().parents[1]
 
-    # Recording, config and output paths must be accessible on the compute nodes.
-    # Add more recordings to submit multiple sessions in one array.
     recordings = [get_test_data(repo_path)]
 
-    # This fixture already contains one shank. For multiple shanks, each session
-    # can instead be a dictionary: {"0": shank_0_recording, "1": shank_1_recording}.
     run_name = f"{datetime.now():%Y-%m-%d_%H-%M-%S_%f}_{Path(__file__).stem}"
     output_path = repo_path / "examples" / "outputs" / run_name
 
@@ -39,7 +33,8 @@ def main():
     )
     print(f"Coordinator job submitted: {job.job_id}")
     print(f"Results and SLURM logs: {output_path}")
-    # job.result()  # Uncomment only if you want this caller to wait.
+    # Uncomment to wait for completion and propagate worker errors.
+    # job.result()
 
 
 if __name__ == "__main__":

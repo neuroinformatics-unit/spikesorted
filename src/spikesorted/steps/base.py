@@ -9,7 +9,8 @@ from typing import TYPE_CHECKING, ClassVar
 from spikeinterface import load
 from spikeinterface.core import BaseRecording
 
-from spikesorted.utils.recordings_structure import get_recordings
+from spikesorted.utils.output_paths import get_step_output_path
+from spikesorted.utils.recordings_structure import get_recordings, check_and_normalize_recordings
 from spikesorted.utils.utils import load_pipeline_config
 from spikesorted.validation.steps_validation import _BaseStepArguments
 
@@ -61,6 +62,7 @@ class BasePipelineStep:
                 "overwrite": self.overwrite,
             }
         )
+        object.__setattr__(self, "recordings", check_and_normalize_recordings(self.recordings))
         loaded_config = load_pipeline_config(self.config_path)
         object.__setattr__(self, "_config", loaded_config)
 
@@ -79,8 +81,8 @@ class BasePipelineStep:
                     f"{recording.get_num_segments()} segments."
                 )
 
-    def run(self, verbose: bool = True) -> None:
-        """Perform checks, execute the step, and save its outputs."""
+    def run(self, verbose: bool = True) -> list[RecordingInput] | None:
+        """Perform checks and execute the step, saving or returning its outputs."""
         raise NotImplementedError
 
     def needs_gpu(self) -> bool:
@@ -117,14 +119,9 @@ class BasePipelineStep:
         shank_id: str | int | None = None,
     ) -> Path:
         """Return this step's output directory using the configured layout."""
-        structure = self.config.get("output", {}).get("structure", "neuroblueprint")
-        shank = () if shank_id is None else (f"shank_{shank_id}",)
-        layouts = {
-            "neuroblueprint": (session_name, "ephys", *shank, self._step_name),
-            "by_session": (session_name, self._step_name, *shank),
-            "by_step": (self._step_name, session_name, *shank),
-        }
-        return Path(self.output_path).joinpath(*layouts[structure])
+        return get_step_output_path(
+            self.output_path, self.config, self._step_name, session_name, shank_id
+        )
 
     def _get_recordings_and_paths(
         self,

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 import yaml
@@ -15,3 +16,9 @@ def load_pipeline_config(config_path: str | Path) -> PipelineConfig:
         loaded_config = yaml.safe_load(file)
 
     return validate_config(loaded_config)
+
+
+def message_user(message: str, verbose: bool) -> None:
+    """Print a progress message to stderr when verbose output is enabled."""
+    if verbose:
+        print(message, file=sys.stderr, flush=True)

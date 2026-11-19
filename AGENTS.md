@@ -14,6 +14,9 @@
 
 ## Preserve user formatting
 
+- Use `step` rather than `operation` when naming pipeline or preprocessing steps,
+  including variable names, comments, and docstrings.
+
 - When moving or extracting existing code, preserve the user's formatting and
   style, including blank lines, line breaks, and explicit if/else blocks.
   Do not rewrite these into your preferred style or automatically reformat
@@ -28,6 +31,10 @@
   This is a future task; do not perform the restructuring until requested.
 
 ## Keep scope explicit
+
+- `output_path` is validated as absolute at pipeline and step construction.
+  Code using it and derived step paths may assume they are absolute; do not
+  call `.resolve()` merely to make these paths absolute.
 
 - Only add behaviour specifically requested by the user. Do not add execution
   policies, defaults, configuration handling, or refactoring on your own.

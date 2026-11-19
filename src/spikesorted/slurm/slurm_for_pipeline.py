@@ -26,6 +26,7 @@ def run_pipeline_with_slurm(
     verbose: bool = True,
     slurm_opts: dict | None = None,
     coordinator_slurm_opts: dict | None = None,
+    save_preprocessed_copy: bool = True,
 ):
     """Submit a coordinator job and return immediately with its job handle.
 
@@ -39,6 +40,7 @@ def run_pipeline_with_slurm(
         args=(recordings, config_path, output_path),
         kwargs={
             "overwrite": overwrite,
+            "save_preprocessed_copy": save_preprocessed_copy,
             "num_cores": num_cores,
             "verbose": verbose,
             "slurm_opts": slurm_opts,
@@ -56,6 +58,7 @@ def _run_pipeline_with_slurm(
     num_cores: int = 1,
     verbose: bool = True,
     slurm_opts: dict | None = None,
+    save_preprocessed_copy: bool = True,
 ):
     """Run independent session/shank pipelines as an array and await results.
 
@@ -72,6 +75,7 @@ def _run_pipeline_with_slurm(
                 config_path=config_path,
                 output_path=output_path,
                 overwrite=overwrite,
+                save_preprocessed_copy=save_preprocessed_copy,
                 n_jobs=num_cores,
                 verbose=verbose,
                 start_at_step=start_at_step,
@@ -99,6 +103,6 @@ def _run_pipeline_with_slurm(
             output_path=output_path,
         ).create_bad_channel_labels_union()
 
-    run_pipeline_in_slurm_batch(
+    return run_pipeline_in_slurm_batch(
         split_recordings, start_at_step="raw_data_quality_metrics"
     )
