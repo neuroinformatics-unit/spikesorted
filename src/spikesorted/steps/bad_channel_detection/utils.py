@@ -8,7 +8,9 @@ from spikesorted.utils.output_paths import get_step_output_path
 from spikesorted.utils.utils import message_user
 
 
-def bad_channel_id_loader(
+# TODO: move this stuff into self._check_dependecy() function for each
+# step, see https://github.com/neuroinformatics-unit/spikesorted/issues/24
+def load_and_check_bad_channel_ids(
     output_path,
     config,
     session_name,

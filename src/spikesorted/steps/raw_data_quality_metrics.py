@@ -8,7 +8,7 @@ from typing import ClassVar
 
 from spikeinterface.qualitycontrol import raw_data_quality_metrics
 
-from spikesorted.steps.bad_channel_detection.utils import bad_channel_id_loader
+from spikesorted.steps.bad_channel_detection.utils import load_and_check_bad_channel_ids
 from spikesorted.steps.base import BasePipelineStep
 from spikesorted.utils.utils import message_user
 
@@ -38,7 +38,7 @@ class RawDataQualityMetricsStep(BasePipelineStep):
                 verbose,
             )
 
-            bad_channel_ids = bad_channel_id_loader(
+            bad_channel_ids = load_and_check_bad_channel_ids(
                 self.output_path,
                 self.config,
                 session_name,

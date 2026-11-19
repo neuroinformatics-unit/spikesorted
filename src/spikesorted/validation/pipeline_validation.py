@@ -46,6 +46,14 @@ class _PipelineArguments(BaseModel):
     verbose: bool
     save_preprocessed_copy: bool
 
+    @field_validator("output_path")
+    @classmethod
+    def validate_output_path(cls, value: str | Path) -> str | Path:
+        """Require an absolute output path, preserving the supplied value."""
+        if not Path(value).is_absolute():
+            raise ValueError("output_path must be an absolute path.")
+        return value
+
     @field_validator("n_jobs")
     @classmethod
     def validate_n_jobs(cls, value: int) -> int:

@@ -10,7 +10,7 @@ from spikesorted.utils.output_paths import get_step_output_path
 from spikesorted.utils.utils import message_user
 
 
-def artefact_period_loader(
+def load_and_check_artefact_periods(
     output_path, config, session_name, shank_id, recording, verbose=False
 ) -> np.ndarray:
     """Validate saved artefact times and return SpikeInterface sample periods."""
@@ -30,6 +30,7 @@ def artefact_period_loader(
         f"Loading artefact periods from: {periods_path}",
         verbose,
     )
+
     # check_artifact_period_times
     periods = pd.read_csv(periods_path)
     if not periods.empty:

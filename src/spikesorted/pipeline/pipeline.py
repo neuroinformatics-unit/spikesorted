@@ -11,6 +11,7 @@ from spikesorted.steps.artifact_detection import ArtifactDetectionStep
 from spikesorted.steps.bad_channel_detection import BadChannelDetectionStep
 from spikesorted.steps.preprocessing import PreprocessingStep
 from spikesorted.steps.raw_data_quality_metrics import RawDataQualityMetricsStep
+from spikesorted.utils.recordings_structure import check_and_normalize_recordings
 from spikesorted.utils.utils import load_pipeline_config
 from spikesorted.validation.pipeline_validation import _PipelineArguments
 
@@ -47,7 +48,7 @@ class Pipeline:
                 "save_preprocessed_copy": save_preprocessed_copy,
             }
         )
-        self.recordings = recordings
+        self.recordings = check_and_normalize_recordings(recordings)
         self.config_path = config_path
         self.output_path = output_path
         self.start_at_step = start_at_step

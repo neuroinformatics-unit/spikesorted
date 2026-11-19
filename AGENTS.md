@@ -32,6 +32,10 @@
 
 ## Keep scope explicit
 
+- `output_path` is validated as absolute at pipeline and step construction.
+  Code using it and derived step paths may assume they are absolute; do not
+  call `.resolve()` merely to make these paths absolute.
+
 - Only add behaviour specifically requested by the user. Do not add execution
   policies, defaults, configuration handling, or refactoring on your own.
 - Make the smallest necessary change and preserve the user's design decisions.

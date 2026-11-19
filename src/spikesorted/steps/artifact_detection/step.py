@@ -9,7 +9,7 @@ from typing import ClassVar
 import spikeinterface.preprocessing as spre
 
 from spikesorted.plotting.artifact_detection import save_artifact_plots
-from spikesorted.steps.bad_channel_detection.utils import bad_channel_id_loader
+from spikesorted.steps.bad_channel_detection.utils import load_and_check_bad_channel_ids
 from spikesorted.steps.base import BasePipelineStep
 from spikesorted.utils.utils import message_user
 
@@ -46,7 +46,7 @@ class ArtifactDetectionStep(BasePipelineStep):
 
             # Remove bad channels if they exist
             # TODO: to be moved to check_requirements()
-            bad_channel_ids = bad_channel_id_loader(
+            bad_channel_ids = load_and_check_bad_channel_ids(
                 self.output_path,
                 self.config,
                 session_name,

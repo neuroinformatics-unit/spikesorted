@@ -8,17 +8,6 @@ import numpy as np
 import spikeinterface.widgets as sw
 
 
-def save_artifact_plots(recording, periods, output_path):
-    """Save the artefact figure when detected periods are present."""
-    figure = plot_artifact_periods(recording, periods)
-    if figure is not None:
-        plots_path = output_path / "artifact_detection_plots"
-        plots_path.mkdir(parents=True, exist_ok=True)
-
-        figure.savefig(plots_path / "artifact_periods.png", dpi=150)
-        plt.close(figure)
-
-
 def plot_artifact_periods(recording, periods):
     """Plot up to six evenly spaced events with a shared time-window width."""
     num_artifacts = len(periods)
@@ -93,3 +82,16 @@ def plot_artifact_periods(recording, periods):
         axis.set_title(f"Artifact at {artefact_times[0]:.3f} s")
 
     return figure
+
+
+def save_artifact_plots(recording, periods, output_path):
+    """Save the artefact figure when detected periods are present."""
+    figure = plot_artifact_periods(recording, periods)
+
+    if figure is not None:
+        plots_path = output_path / "artifact_detection_plots"
+        plots_path.mkdir(parents=True, exist_ok=True)
+
+        figure.savefig(plots_path / "artifact_periods.png", dpi=150)
+        plt.close(figure)
+

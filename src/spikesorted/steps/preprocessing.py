@@ -7,7 +7,6 @@ import shutil
 import sys
 from contextlib import redirect_stdout
 from dataclasses import dataclass
-from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar
 
 import spikeinterface.preprocessing as spre
@@ -16,11 +15,10 @@ from spikesorted.plotting.preprocessing import plot_preprocessing
 from spikesorted.step_configs import (
     SPATIAL_OPERATIONS,
     TEMPORAL_FILTERS,
-    get_bad_channel_step,
 )
-from spikesorted.steps.artifact_detection.utils import artefact_period_loader
+from spikesorted.steps.artifact_detection.utils import load_and_check_artefact_periods
 from spikesorted.steps.bad_channel_detection.utils import (
-    bad_channel_id_loader,
+    load_and_check_bad_channel_ids,
     get_bad_channel_ids_filepath,
 )
 from spikesorted.steps.base import BasePipelineStep
@@ -39,24 +37,108 @@ class PreprocessingStep(BasePipelineStep):
 
     _step_name: ClassVar[str] = "preprocessing"
 
+    def run(self, verbose: bool = True) -> list[RecordingInput]:
+        """Save outputs and return named recordings, retaining their shank IDs."""
+        self.perform_checks()
+
+        processed_sessions = []
+
+        for (
+            session_name,
+            shank_id,
+            recording,
+            step_path,
+        ) in self._get_recordings_and_paths():
+            shank_message = f", shank {shank_id}" if shank_id is not None else ""
+            message_user(
+                f"Preprocessing session {session_name}{shank_message}",
+                verbose,
+            )
+
+            spikeinterface_kwargs = copy.deepcopy(self.config["preprocessing"])
+
+            pipeline = self._convert_kwargs_to_spikeinterface_pipeline(
+                spikeinterface_kwargs, session_name, shank_id, recording, verbose
+            )
+
+            with redirect_stdout(sys.stderr):
+                preprocessed_rec = spre.apply_preprocessing_pipeline(
+                    recording, pipeline, apply_precomputed_kwargs=True
+                )
+
+            plot_preprocessing(
+                recording,
+                preprocessed_rec,
+                step_path / "preprocessing_plots",
+            )
+
+            if self.save_preprocessed_copy:
+                preprocessed_rec = preprocessed_rec.save(
+                    folder=step_path / "recording", verbose=verbose
+                )
+            else:
+                preprocessed_rec.dump_to_json(
+                    step_path / "metadata.json", include_properties=True
+                )
+
+            # Store each session as one recording or a dictionary of shank recordings.
+            if shank_id is None:
+                processed_sessions.append((preprocessed_rec, session_name))
+            else:
+                if processed_sessions and processed_sessions[-1][1] == session_name:
+                    processed_sessions[-1][0][shank_id] = preprocessed_rec
+                else:
+                    processed_sessions.append(
+                        ({shank_id: preprocessed_rec}, session_name)
+                    )
+
+        return processed_sessions
+
+    def _convert_kwargs_to_spikeinterface_pipeline(
+        self, spikeinterface_kwargs, session_name, shank_id, recording, verbose
+    ):
+        """Load step inputs and convert kwargs to SpikeInterface's ordered list."""
+        pipeline = []
+        for step, kwargs in spikeinterface_kwargs.items():
+            if step in ("remove_bad_channels", "interpolate_bad_channels"):
+                bad_channel_ids = load_and_check_bad_channel_ids(
+                    self.output_path,
+                    self.config,
+                    session_name,
+                    shank_id,
+                    required=True,
+                    verbose=verbose,
+                )
+                if len(bad_channel_ids) == 0:
+                    continue
+                else:
+                    kwargs["bad_channel_ids"] = bad_channel_ids
+
+                # Convert to SpikeInterface pipeline name
+                if step == "remove_bad_channels":
+                    step = "detect_and_remove_bad_channels"
+
+            elif step == "silence_periods":
+                kwargs["periods"] = load_and_check_artefact_periods(
+                    self.output_path,
+                    self.config,
+                    session_name,
+                    shank_id,
+                    recording,
+                    verbose=verbose,
+                )
+            pipeline.append({"name": step, "params": kwargs})
+
+        return pipeline
+
+    # ----------------------------------------------------------------------------------
+    # Checks
+    # ----------------------------------------------------------------------------------
+
     def perform_checks(self) -> None:
         """Check preprocessing inputs and operation order.
-
-        - Require one segment per session/shank recording.
-        - Reject existing preprocessing output unless overwrite is enabled.
-        - Prepare output folders, replacing existing ones when overwrite is enabled.
-        - Reject simultaneous bad-channel removal and interpolation.
-        - Require removal before filtering and referencing.
-        - Require interpolation after temporal filtering and before referencing
-          or spatial filtering.
-        - Require phase shifting before referencing or spatial filtering.
-        - Require silencing after temporal filtering.
-        - Require explicit bad-channel removal when a union exists.
-
-        Union/config consistency, required detection files and artefact times
-        are checked by the loaders
-        when the preprocessing inputs are loaded.
         """
+        # Check mutually exclusive bad channel handling steps
         if {"remove_bad_channels", "interpolate_bad_channels"} <= self.config[
             "preprocessing"
         ].keys():
@@ -64,16 +146,12 @@ class PreprocessingStep(BasePipelineStep):
                 "Cannot configure both bad-channel removal and interpolation."
             )
 
-        super().perform_checks()
+        # Check preprocessing steps are in a sensible order
         self._check_operation_order()
 
-        # Check bad channel detection
-
-        #     handle_bad_channels = (
-        #         "remove_bad_channels" in preprocessing
-        #         or "interpolate_bad_channels" in preprocessing
-        #     )
+        # Check overwrite settings and
         for _, shank_id, _, step_path in self._get_recordings_and_paths():
+
             if step_path.exists() and not self.overwrite:
                 raise FileExistsError(
                     f"Preprocessing output already exists: {step_path}"
@@ -89,18 +167,22 @@ class PreprocessingStep(BasePipelineStep):
             )
             if (
                 union_path.is_file()
-                and "remove_bad_channels" not in self.config["preprocessing"]
+                and not {
+                    "remove_bad_channels",
+                    "interpolate_bad_channels",
+                } & self.config["preprocessing"].keys()
             ):
                 raise ValueError(
                     f"Bad-channel union exists at {union_path}, but preprocessing "
-                    "does not include remove_bad_channels. Add explicit "
-                    "remove_bad_channels; interpolation alone does not satisfy "
-                    "the union requirement."
+                    "does not include remove_bad_channels or interpolate_bad_channels. "
+                    "Add either step to handle the union bad channels."
                 )
+
+        # Check overwrite settings, and delete existing outputs
+        super().perform_checks()
 
         for _, _, _, step_path in self._get_recordings_and_paths():
             if step_path.exists():
-                step_path.resolve().relative_to(Path(self.output_path).resolve())
                 shutil.rmtree(step_path)
 
             step_path.mkdir(parents=True)
@@ -136,7 +218,7 @@ class PreprocessingStep(BasePipelineStep):
                 operation, user_referencing_steps
             ):
                 raise ValueError(
-                    f"{operation} must precede referncing steps and spatial filtering."
+                    f"{operation} must precede reference steps and spatial filtering."
                 )
 
     def _is_before(self, lhs: str, rhs: list[str]) -> bool:
@@ -147,115 +229,3 @@ class PreprocessingStep(BasePipelineStep):
         user_operations = list(self.config["preprocessing"])
         lhs_index = user_operations.index(lhs)
         return all(lhs_index < user_operations.index(operation) for operation in rhs)
-
-    def run(self, verbose: bool = True) -> list[RecordingInput]:
-        """Save outputs and return named recordings, retaining their shank IDs."""
-        self.perform_checks()
-
-        processed_sessions = {}
-
-        for (
-            session_name,
-            shank_id,
-            recording,
-            step_path,
-        ) in self._get_recordings_and_paths():
-            shank_message = f", shank {shank_id}" if shank_id is not None else ""
-            message_user(
-                f"Preprocessing session {session_name}{shank_message}",
-                verbose,
-            )
-
-            spikeinterface_kwargs = copy.deepcopy(self.config["preprocessing"])
-
-            self._load_artefact_periods_into_kwargs(
-                spikeinterface_kwargs, session_name, shank_id, recording, verbose
-            )
-            self._load_bad_channels_into_kwargs(
-                spikeinterface_kwargs, session_name, shank_id, verbose
-            )
-
-            pipeline = self._rename_steps_for_spikeinterface(spikeinterface_kwargs)
-
-            with redirect_stdout(sys.stderr):
-                processed = spre.apply_preprocessing_pipeline(
-                    recording, pipeline, apply_precomputed_kwargs=True
-                )
-
-            plot_preprocessing(
-                recording,
-                processed,
-                step_path / "preprocessing_plots",
-            )
-
-            if self.save_preprocessed_copy:
-                processed = processed.save(
-                    folder=step_path / "recording", verbose=verbose
-                )
-            else:
-                processed.dump_to_json(
-                    step_path / "metadata.json", include_properties=True
-                )
-
-            processed_sessions.setdefault(session_name, {})[shank_id] = processed
-
-        recordings = []
-        for session_name, shanks in processed_sessions.items():
-            if None in shanks:
-                recordings.append((shanks[None], session_name))
-            else:
-                recordings.append((shanks, session_name))
-
-        return recordings
-
-    def _load_bad_channels_into_kwargs(
-        self, spikeinterface_kwargs, session_name, shank_id, verbose
-    ):
-        """Load bad-channel IDs into kwargs, skipping an empty bad-channel step."""
-        handle_bad_channel_step = get_bad_channel_step(spikeinterface_kwargs)
-        if handle_bad_channel_step is not None:
-            # remove or interpolate
-            bad_channel_ids = bad_channel_id_loader(
-                self.output_path,
-                self.config,
-                session_name,
-                shank_id,
-                required=True,
-                verbose=verbose,
-            )
-            if len(bad_channel_ids) == 0:
-                del spikeinterface_kwargs[handle_bad_channel_step]
-            else:
-                spikeinterface_kwargs[handle_bad_channel_step]["bad_channel_ids"] = (
-                    bad_channel_ids
-                )
-
-    def _load_artefact_periods_into_kwargs(
-        self, spikeinterface_kwargs, session_name, shank_id, recording, verbose
-    ):
-        """Load validated artefact periods into the configured silencing step."""
-        if "silence_periods" in spikeinterface_kwargs:
-            spikeinterface_kwargs["silence_periods"]["periods"] = (
-                artefact_period_loader(
-                    self.output_path,
-                    self.config,
-                    session_name,
-                    shank_id,
-                    recording,
-                    verbose=verbose,
-                )
-            )
-
-    def _rename_steps_for_spikeinterface(self, spikeinterface_kwargs):
-        """Translate the removal name and convert kwargs to SI's ordered list."""
-        names = {
-            "remove_bad_channels": "detect_and_remove_bad_channels",
-        }
-        pipeline = []
-        for step, kwargs in spikeinterface_kwargs.items():
-            if step in names:
-                step = names[step]
-
-            pipeline.append({"name": step, "params": kwargs})
-
-        return pipeline

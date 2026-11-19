@@ -4,7 +4,7 @@ from inspect import Parameter, signature
 from pathlib import Path
 from typing import Any, cast
 
-from pydantic import BaseModel, ConfigDict, Field, create_model
+from pydantic import BaseModel, ConfigDict, Field, create_model, field_validator
 from spikeinterface.preprocessing import detect_bad_channels
 from spikeinterface.qualitycontrol import raw_data_quality_metrics
 
@@ -20,6 +20,14 @@ class _BaseStepArguments(BaseModel):
     config_path: str | Path
     output_path: str | Path
     overwrite: bool
+
+    @field_validator("output_path")
+    @classmethod
+    def validate_output_path(cls, value: str | Path) -> str | Path:
+        """Require an absolute output path, preserving the supplied value."""
+        if not Path(value).is_absolute():
+            raise ValueError("output_path must be an absolute path.")
+        return value
 
 
 BadChannelDetectionConfig = create_model(

@@ -10,7 +10,7 @@ from spikeinterface import load
 from spikeinterface.core import BaseRecording
 
 from spikesorted.utils.output_paths import get_step_output_path
-from spikesorted.utils.recordings_structure import get_recordings
+from spikesorted.utils.recordings_structure import get_recordings, check_and_normalize_recordings
 from spikesorted.utils.utils import load_pipeline_config
 from spikesorted.validation.steps_validation import _BaseStepArguments
 
@@ -62,6 +62,7 @@ class BasePipelineStep:
                 "overwrite": self.overwrite,
             }
         )
+        object.__setattr__(self, "recordings", check_and_normalize_recordings(self.recordings))
         loaded_config = load_pipeline_config(self.config_path)
         object.__setattr__(self, "_config", loaded_config)
 
