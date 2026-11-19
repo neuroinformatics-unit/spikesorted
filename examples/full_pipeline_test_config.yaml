@@ -25,3 +25,7 @@ preprocessing:
     operator: median
   silence_periods:
     mode: zeros
+
+sorting:
+  sorter: kilosort2_5
+  params: {}

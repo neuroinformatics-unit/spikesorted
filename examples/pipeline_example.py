@@ -9,7 +9,8 @@ def main():
 
     repo_path = Path(__file__).resolve().parents[1]
 
-    # Replace this with a SpikeInterface loader for your own recording.
+    # Replace this with a SpikeInterface loader for a recording suitable for sorting.
+    # The bundled 0.5-second recording is only a preprocessing example.
     recording = get_test_data(repo_path)
     run_name = f"{datetime.now():%Y-%m-%d_%H-%M-%S_%f}_{Path(__file__).stem}"
     output_path = repo_path / "examples" / "outputs" / run_name
@@ -18,7 +19,7 @@ def main():
         recordings=recording,
         config_path=repo_path / "examples/full_pipeline_test_config.yaml",
         output_path=output_path,
-        stop_after_step="preprocessing",
+        stop_after_step="sorting",
         overwrite=False,
         save_preprocessed_copy=True,  # False saves only metadata and plots.
         n_jobs=1,
