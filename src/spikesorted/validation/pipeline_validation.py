@@ -13,6 +13,7 @@ PIPELINE_STEP_NAMES = (
     "artifact_detection",
     "preprocessing",
     "sorting",
+    "postprocessing",
 )
 
 
@@ -31,6 +32,7 @@ class _PipelineArguments(BaseModel):
             "artifact_detection",
             "preprocessing",
             "sorting",
+            "postprocessing",
         ]
         | None
     )
@@ -41,6 +43,7 @@ class _PipelineArguments(BaseModel):
             "artifact_detection",
             "preprocessing",
             "sorting",
+            "postprocessing",
         ]
         | None
     )

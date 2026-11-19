@@ -29,8 +29,10 @@ def plot_preprocessing(recording, processed, plots_path):
             "end": (start + duration - window, start + duration),
         }
 
+        plot_number = 0
         for name, time_range in time_ranges.items():
             for label, current in (("raw", recording), ("prepro", processed)):
+                plot_number += 1
 
                 widget = sw.plot_traces(
                     current,
@@ -43,6 +45,8 @@ def plot_preprocessing(recording, processed, plots_path):
                     # seconds for > 1 and ms for < 1
                     time_label = f"{window:g}s" if window >= 1 else f"{window * 1000:g}ms"
                     widget.figure.suptitle(label)
-                    widget.figure.savefig(plots_path / f"{name}_{time_label}_{label}.png")
+                    widget.figure.savefig(
+                        plots_path / f"{time_label}_{plot_number:02d}_{name}_{label}.png"
+                    )
                 finally:
                     plt.close(widget.figure)

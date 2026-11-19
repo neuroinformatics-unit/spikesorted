@@ -9,6 +9,7 @@ import spikeinterface as si
 
 from spikesorted.steps.artifact_detection import ArtifactDetectionStep
 from spikesorted.steps.bad_channel_detection import BadChannelDetectionStep
+from spikesorted.steps.postprocessing_step import PostprocessingStep
 from spikesorted.steps.preprocessing_step import PreprocessingStep
 from spikesorted.steps.raw_data_quality_metrics_step import RawDataQualityMetricsStep
 from spikesorted.steps.sorting import SortingStep
@@ -60,7 +61,7 @@ class Pipeline:
         self.save_preprocessed_copy = save_preprocessed_copy
 
     def run(self) -> None:
-        """Run selected steps; sorting-only inputs must already be preprocessed."""
+        """Run selected steps; sorting/postprocessing inputs must be preprocessed."""
         si.set_global_job_kwargs(n_jobs=self.n_jobs)
         configs = load_pipeline_config(self.config_path)
         recordings = self.recordings
@@ -150,5 +151,14 @@ class Pipeline:
 
         if self.stop_after_step == "sorting":
             return
+
+        if "postprocessing" in configs:
+            postprocessing = PostprocessingStep(
+                recordings=recordings,
+                config_path=self.config_path,
+                output_path=self.output_path,
+                overwrite=self.overwrite,
+            )
+            postprocessing.run(self.verbose)
 
         return None

@@ -27,5 +27,32 @@ preprocessing:
     mode: zeros
 
 sorting:
-  sorter: kilosort2_5
-  params: {}
+  sorter: mountainsort5
+  params:
+    scheme: "1"  # Avoid classifier training on the 0.5-second example.
+    filter: false  # The pipeline has already filtered the recording.
+
+postprocessing:
+  random_spikes:
+    max_spikes_per_unit: 2500
+  waveforms:
+    ms_before: 1.0
+    ms_after: 2.0
+  templates: {}
+  principal_components:
+    n_components: 5
+    mode: by_channel_local
+    whiten: true
+  noise_levels: {}
+  spike_amplitudes: {}
+  spike_locations: {}
+  unit_locations: {}
+  template_similarity: {}
+  correlograms: {}
+  isi_histograms: {}
+  template_metrics: {}
+  quality_metrics:
+    metric_names: all
+  compute_sparsity:
+    method: radius
+    radius_um: 100
