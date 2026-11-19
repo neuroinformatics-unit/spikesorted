@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from pathlib import Path
+from shlex import quote
 from typing import Any
 
 import submitit
@@ -16,7 +17,8 @@ def _get_executor(log_path: Path, slurm_opts: dict) -> submitit.AutoExecutor:
         Path to log the SLURM output to.
 
     slurm_opts
-        The slurm options to run.
+        The slurm options to run. If matlab_module_name is not None, load
+        that module before starting Python.
 
     Returns
     -------
@@ -25,6 +27,14 @@ def _get_executor(log_path: Path, slurm_opts: dict) -> submitit.AutoExecutor:
 
     """
     executor = submitit.AutoExecutor(folder=log_path, cluster="slurm")
+
+    slurm_opts = slurm_opts.copy()
+    matlab_module_name = slurm_opts.pop("matlab_module_name", None)
+    if matlab_module_name is not None:
+        slurm_opts["slurm_setup"] = [
+            *(slurm_opts.get("slurm_setup") or []),
+            f"module load {quote(matlab_module_name)}",
+        ]
 
     executor.update_parameters(**slurm_opts)
 

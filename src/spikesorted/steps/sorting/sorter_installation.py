@@ -4,7 +4,10 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Literal
+from urllib.request import urlretrieve
+from zipfile import ZipFile
 
 from spikeinterface.sorters import Kilosort2_5Sorter, Kilosort3Sorter
 
@@ -21,7 +24,7 @@ def install_kilosort(
 ) -> Path:
     """Download a pinned commit, build its MEX files, and register its path.
 
-    MATLAB and Git must be on PATH. MATLAB needs a configured CUDA/C++ compiler
+    MATLAB must be on PATH. MATLAB needs a configured CUDA/C++ compiler
     and the toolboxes required by Kilosort. Incomplete installations are retried
     in the same folder. Registration applies to this process and its subprocesses.
     """
@@ -34,28 +37,30 @@ def install_kilosort(
 
     matlab = shutil.which("matlab")
     if matlab is None:
-        raise FileNotFoundError("MATLAB is not installed or is not available on PATH.")
+        raise FileNotFoundError(
+            f"Cannot install {sorter_name}. "
+            "MATLAB is not installed or is not available on PATH."
+        )
 
     matlab_command = [matlab]
     if sys.platform == "win32":
         matlab_command.append("-wait")
-    # Confirm MATLAB can start before downloading the sorter.
-    subprocess.run([*matlab_command, "-batch", "disp(version)"], check=True)
 
     sorter_path = get_sorter_installation_path(sorter_name)
-    sorter_path.mkdir(parents=True, exist_ok=True)
-    subprocess.run(["git", "init", str(sorter_path)], check=True)
-    subprocess.run(
-        [
-            "git", "-C", str(sorter_path), "fetch", "--depth", "1", "--",
-            "https://github.com/MouseLand/Kilosort.git", commit,
-        ],
-        check=True,
-    )
-    subprocess.run(
-        ["git", "-C", str(sorter_path), "checkout", "--detach", "FETCH_HEAD"],
-        check=True,
-    )
+    with TemporaryDirectory() as download_folder:
+        download_path = Path(download_folder)
+        archive_path = download_path / "kilosort.zip"
+        urlretrieve(
+            f"https://github.com/MouseLand/Kilosort/archive/{commit}.zip",
+            archive_path,
+        )
+        with ZipFile(archive_path) as archive:
+            archive.extractall(download_path)
+        shutil.copytree(
+            download_path / f"Kilosort-{commit}",
+            sorter_path,
+            dirs_exist_ok=True,
+        )
 
     subprocess.run(
         [*matlab_command, "-batch", "mexGPUall"],
