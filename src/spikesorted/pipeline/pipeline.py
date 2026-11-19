@@ -132,7 +132,14 @@ class Pipeline:
         if self.stop_after_step == "preprocessing":
             return
 
-        if "sorting" in configs:
+        if self.start_at_step in [
+            None,
+            "bad_channel_detection",
+            "raw_data_quality_metrics",
+            "artifact_detection",
+            "preprocessing",
+            "sorting",
+        ]:
             sorting = SortingStep(
                 recordings=recordings,
                 config_path=self.config_path,
@@ -140,5 +147,8 @@ class Pipeline:
                 overwrite=self.overwrite,
             )
             sorting.run(self.verbose)
+
+        if self.stop_after_step == "sorting":
+            return
 
         return None
