@@ -7,7 +7,7 @@ import shutil
 import sys
 from contextlib import redirect_stdout
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 
 import spikeinterface.preprocessing as spre
 
@@ -23,10 +23,8 @@ from spikesorted.steps.bad_channel_detection.utils import (
 )
 from spikesorted.steps.base import BasePipelineStep
 from spikesorted.utils.output_paths import get_step_output_path
+from spikesorted.utils.recordings_structure import RecordingInput
 from spikesorted.utils.utils import message_user
-
-if TYPE_CHECKING:
-    from spikesorted.utils.recordings_structure import RecordingInput
 
 
 @dataclass(frozen=True)
@@ -38,7 +36,7 @@ class PreprocessingStep(BasePipelineStep):
     _step_name: ClassVar[str] = "preprocessing"
 
     def run(self, verbose: bool = True) -> list[RecordingInput]:
-        """Save outputs and return named recordings, retaining their shank IDs."""
+        """Return named sessions containing saved paths or in-memory recordings."""
         self.perform_checks()
 
         processed_sessions = []
@@ -76,20 +74,27 @@ class PreprocessingStep(BasePipelineStep):
                 preprocessed_rec = preprocessed_rec.save(
                     folder=step_path / "recording", verbose=verbose
                 )
-            else:
-                preprocessed_rec.dump_to_json(
-                    step_path / "metadata.json", include_properties=True
-                )
 
-            # Store each session as one recording or a dictionary of shank recordings.
+            preprocessed_rec.dump_to_json(
+                step_path / "metadata.json", include_properties=True
+            )
+
+            # Handover the path for the next step if recording
+            # is saved to disk, otherwise the recording in-memory
+            if self.save_preprocessed_copy:
+                processed_output = step_path / "recording"
+            else:
+                processed_output = preprocessed_rec
+
+            # Store each session as one recording/path or a dictionary of shanks.
             if shank_id is None:
-                processed_sessions.append((preprocessed_rec, session_name))
+                processed_sessions.append((processed_output, session_name))
             else:
                 if processed_sessions and processed_sessions[-1][1] == session_name:
-                    processed_sessions[-1][0][shank_id] = preprocessed_rec
+                    processed_sessions[-1][0][shank_id] = processed_output
                 else:
                     processed_sessions.append(
-                        ({shank_id: preprocessed_rec}, session_name)
+                        ({shank_id: processed_output}, session_name)
                     )
 
         return processed_sessions

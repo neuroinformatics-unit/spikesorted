@@ -1,5 +1,5 @@
 """Bad channel detection."""
 
-from .step import BadChannelDetectionStep
+from .bad_channel_detection_step import BadChannelDetectionStep
 
 __all__ = ["BadChannelDetectionStep"]

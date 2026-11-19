@@ -1,5 +1,5 @@
 """Artifact detection."""
 
-from .step import ArtifactDetectionStep
+from .artifact_detection_step import ArtifactDetectionStep
 
 __all__ = ["ArtifactDetectionStep"]

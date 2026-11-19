@@ -23,7 +23,7 @@ from spikeinterface import load
 from spikeinterface.core import BaseRecording
 
 Recording: TypeAlias = str | Path | BaseRecording
-SessionRecording: TypeAlias = Recording | dict[str | int, BaseRecording]
+SessionRecording: TypeAlias = Recording | dict[str | int, Recording]
 RecordingInput: TypeAlias = SessionRecording | tuple[SessionRecording, str]
 
 

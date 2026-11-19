@@ -46,6 +46,9 @@
 
 ## Repository layout
 
+- Use descriptive step module names such as `bad_channel_detection_step.py`;
+  never name a module `step.py` or `steps.py`.
+
 - Do not create or generate tests unless the user explicitly asks for them.
 
 - Use `src/spikesorted/` for Python source; keep `pyproject.toml`, `tests/`, and

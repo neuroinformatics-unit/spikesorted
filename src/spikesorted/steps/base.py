@@ -15,6 +15,8 @@ from spikesorted.utils.utils import load_pipeline_config
 from spikesorted.validation.steps_validation import _BaseStepArguments
 
 if TYPE_CHECKING:
+    from spikeinterface.core import BaseSorting
+
     from spikesorted.utils.recordings_structure import RecordingInput
     from spikesorted.validation.config_validation import PipelineConfig
 
@@ -81,7 +83,13 @@ class BasePipelineStep:
                     f"{recording.get_num_segments()} segments."
                 )
 
-    def run(self, verbose: bool = True) -> list[RecordingInput] | None:
+    def run(
+        self, verbose: bool = True
+    ) -> (
+        list[RecordingInput]
+        | list[tuple[str, str | int | None, BaseSorting]]
+        | None
+    ):
         """Perform checks and execute the step, saving or returning its outputs."""
         raise NotImplementedError
 
