@@ -17,8 +17,9 @@ def _get_executor(log_path: Path, slurm_opts: dict) -> submitit.AutoExecutor:
         Path to log the SLURM output to.
 
     slurm_opts
-        The slurm options to run. If matlab_module_name is not None, load
-        that module before starting Python.
+        The slurm options to run, including the required conda_env_name.
+        If matlab_module_name is not None, load that module after activating
+        the Conda environment. Conda must be available on PATH in the job.
 
     Returns
     -------
@@ -26,15 +27,21 @@ def _get_executor(log_path: Path, slurm_opts: dict) -> submitit.AutoExecutor:
         submitit executor object defining requested SLURM node parameters.
 
     """
-    executor = submitit.AutoExecutor(folder=log_path, cluster="slurm")
+    executor = submitit.AutoExecutor(
+        folder=log_path, cluster="slurm", slurm_python="python"
+    )
 
     slurm_opts = slurm_opts.copy()
+    conda_env_name = slurm_opts.pop("conda_env_name")
     matlab_module_name = slurm_opts.pop("matlab_module_name", None)
+    slurm_setup = list(slurm_opts.get("slurm_setup") or [])
+    slurm_setup.extend([
+        'eval "$(conda shell.bash hook)"',
+        f"conda activate {quote(conda_env_name)}",
+    ])
     if matlab_module_name is not None:
-        slurm_opts["slurm_setup"] = [
-            *(slurm_opts.get("slurm_setup") or []),
-            f"module load {quote(matlab_module_name)}",
-        ]
+        slurm_setup.append(f"module load {quote(matlab_module_name)}")
+    slurm_opts["slurm_setup"] = slurm_setup
 
     executor.update_parameters(**slurm_opts)
 

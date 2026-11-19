@@ -69,7 +69,9 @@ def install_kilosort(
     )
     if not _has_kilosort_mex_files(sorter_name, sorter_path):
         raise FileNotFoundError(f"Kilosort MEX build is incomplete at {sorter_path}.")
+
     _set_kilosort_path(sorter_name, sorter_path)
+
     return sorter_path
 
 
