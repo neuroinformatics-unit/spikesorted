@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../_static/documentation_options.js?v=67397aeb"></script>
+    <script src="../../../_static/documentation_options.js?v=c341fef2"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../../_static/design-tabs.js?v=fcb327ea"></script>
@@ -446,8 +446,9 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.steps.artifact_detection</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArtifactDetectionStep</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.steps.bad_channel_detection</span><span class="w"> </span><span class="kn">import</span> <span class="n">BadChannelDetectionStep</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.steps.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">PreprocessingStep</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.steps.raw_data_quality_metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">RawDataQualityMetricsStep</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.steps.preprocessing_step</span><span class="w"> </span><span class="kn">import</span> <span class="n">PreprocessingStep</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.steps.raw_data_quality_metrics_step</span><span class="w"> </span><span class="kn">import</span> <span class="n">RawDataQualityMetricsStep</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.steps.sorting</span><span class="w"> </span><span class="kn">import</span> <span class="n">SortingStep</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.utils.recordings_structure</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_and_normalize_recordings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.utils.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_pipeline_config</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spikesorted.validation.pipeline_validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">_PipelineArguments</span>
@@ -500,9 +501,10 @@
 <div class="viewcode-block" id="Pipeline.run">
 <a class="viewcode-back" href="../../../api_index.html#spikesorted.Pipeline.run">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Run the selected steps and write their outputs."""</span>
+<span class="w">        </span><span class="sd">"""Run selected steps; sorting-only inputs must already be preprocessed."""</span>
         <span class="n">si</span><span class="o">.</span><span class="n">set_global_job_kwargs</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">)</span>
         <span class="n">configs</span> <span class="o">=</span> <span class="n">load_pipeline_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="n">recordings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recordings</span>
 
         <span class="k">if</span> <span class="s2">"bad_channel_detection"</span> <span class="ow">in</span> <span class="n">configs</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_at_step</span> <span class="ow">in</span> <span class="p">[</span>
             <span class="kc">None</span><span class="p">,</span>
@@ -566,7 +568,19 @@
                 <span class="n">output_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span>
                 <span class="n">overwrite</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">overwrite</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="n">preprocessing</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+            <span class="n">recordings</span> <span class="o">=</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_after_step</span> <span class="o">==</span> <span class="s2">"preprocessing"</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="s2">"sorting"</span> <span class="ow">in</span> <span class="n">configs</span><span class="p">:</span>
+            <span class="n">sorting</span> <span class="o">=</span> <span class="n">SortingStep</span><span class="p">(</span>
+                <span class="n">recordings</span><span class="o">=</span><span class="n">recordings</span><span class="p">,</span>
+                <span class="n">config_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="p">,</span>
+                <span class="n">output_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span>
+                <span class="n">overwrite</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">overwrite</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">sorting</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
 </div>
