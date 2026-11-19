@@ -68,11 +68,6 @@ def _run_pipeline_with_slurm(
     stop_after_step: str | None = None,
 ):
     """Run independent session/shank pipelines as an array and await results.
-
-    Each job retains the project root and its session/shank identity.
-    slurm_opts are passed to Submitit's executor.update_parameters().
-    Bad-channel unions synchronize after detection. Each worker passes its
-    preprocessing outputs directly to sorting.
     """
 
     def run_pipeline_in_slurm_batch(
