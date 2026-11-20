@@ -9,6 +9,7 @@ import spikeinterface as si
 
 from spikesorted.steps.artifact_detection import ArtifactDetectionStep
 from spikesorted.steps.bad_channel_detection import BadChannelDetectionStep
+from spikesorted.steps.combine_sessions import CombineSessionsStep
 from spikesorted.steps.preprocessing_step import PreprocessingStep
 from spikesorted.steps.raw_data_quality_metrics_step import RawDataQualityMetricsStep
 from spikesorted.steps.sorting import SortingStep
@@ -33,7 +34,6 @@ class Pipeline:
         overwrite: bool = False,
         n_jobs: int = 1,
         verbose: bool = True,
-        save_preprocessed_copy: bool = True,
     ) -> None:
         """Store recordings, configuration path, output root, and execution options."""
         _PipelineArguments.model_validate(
@@ -46,7 +46,6 @@ class Pipeline:
                 "overwrite": overwrite,
                 "n_jobs": n_jobs,
                 "verbose": verbose,
-                "save_preprocessed_copy": save_preprocessed_copy,
             }
         )
         self.recordings = check_and_normalize_recordings(recordings)
@@ -57,10 +56,12 @@ class Pipeline:
         self.overwrite = overwrite
         self.n_jobs = n_jobs
         self.verbose = verbose
-        self.save_preprocessed_copy = save_preprocessed_copy
 
-    def run(self) -> None:
-        """Run selected steps; sorting-only inputs must already be preprocessed."""
+    def run(self) -> list[RecordingInput] | None:
+        """Run selected steps, returning recordings when stopping after preprocessing.
+
+        Sorting-only inputs must already be preprocessed.
+        """
         si.set_global_job_kwargs(n_jobs=self.n_jobs)
         configs = load_pipeline_config(self.config_path)
         recordings = self.recordings
@@ -121,7 +122,6 @@ class Pipeline:
             "preprocessing",
         ]:
             preprocessing = PreprocessingStep(
-                save_preprocessed_copy=self.save_preprocessed_copy,
                 recordings=self.recordings,
                 config_path=self.config_path,
                 output_path=self.output_path,
@@ -130,6 +130,25 @@ class Pipeline:
             recordings = preprocessing.run(self.verbose)
 
         if self.stop_after_step == "preprocessing":
+            return recordings
+
+        if "combine_sessions" in configs and self.start_at_step in [
+            None,
+            "bad_channel_detection",
+            "raw_data_quality_metrics",
+            "artifact_detection",
+            "preprocessing",
+            "combine_sessions",
+        ]:
+            combine_sessions_step = CombineSessionsStep(
+                recordings=recordings,
+                config_path=self.config_path,
+                output_path=self.output_path,
+                overwrite=self.overwrite,
+            )
+            recordings = combine_sessions_step.run(self.verbose)
+
+        if self.stop_after_step == "combine_sessions":
             return
 
         if self.start_at_step in [
@@ -138,6 +157,7 @@ class Pipeline:
             "raw_data_quality_metrics",
             "artifact_detection",
             "preprocessing",
+            "combine_sessions",
             "sorting",
         ]:
             sorting = SortingStep(
