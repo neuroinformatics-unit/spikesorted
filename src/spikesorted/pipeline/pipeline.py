@@ -57,8 +57,11 @@ class Pipeline:
         self.n_jobs = n_jobs
         self.verbose = verbose
 
-    def run(self) -> None:
-        """Run selected steps; sorting-only inputs must already be preprocessed."""
+    def run(self) -> list[RecordingInput] | None:
+        """Run selected steps, returning recordings when stopping after preprocessing.
+
+        Sorting-only inputs must already be preprocessed.
+        """
         si.set_global_job_kwargs(n_jobs=self.n_jobs)
         configs = load_pipeline_config(self.config_path)
         recordings = self.recordings
@@ -127,7 +130,7 @@ class Pipeline:
             recordings = preprocessing.run(self.verbose)
 
         if self.stop_after_step == "preprocessing":
-            return
+            return recordings
 
         if "combine_sessions" in configs and self.start_at_step in [
             None,
