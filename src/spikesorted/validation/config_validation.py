@@ -1,6 +1,6 @@
 """Validate pipeline configuration using SpikeInterface's declared parameters."""
 
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, NotRequired
 
 from pydantic import AfterValidator, ConfigDict, TypeAdapter, with_config
 from typing_extensions import TypedDict
@@ -19,6 +19,14 @@ class OutputConfig(TypedDict, total=False):
 
 
 @with_config(ConfigDict(extra="forbid", strict=True))
+class CombineSessionsConfig(TypedDict):
+    """Concatenate sessions, optionally saving the combined recording."""
+
+    method: Literal["concatenate"]
+    save_recording: NotRequired[bool]
+
+
+@with_config(ConfigDict(extra="forbid", strict=True))
 class PipelineConfig(TypedDict, total=False):
     """Optional pipeline sections; unimplemented sections accept any value."""
 
@@ -32,7 +40,7 @@ class PipelineConfig(TypedDict, total=False):
     artifact_detection: Any
     artifact_curation: Any
     preprocessing: Any
-    combine_sessions: Any
+    combine_sessions: CombineSessionsConfig
     sorting: Any
     postprocessing: Any
     curation: Any

@@ -18,8 +18,8 @@ from spikesorted.step_configs import (
 )
 from spikesorted.steps.artifact_detection.utils import load_and_check_artefact_periods
 from spikesorted.steps.bad_channel_detection.utils import (
-    load_and_check_bad_channel_ids,
     get_bad_channel_ids_filepath,
+    load_and_check_bad_channel_ids,
 )
 from spikesorted.steps.base import BasePipelineStep
 from spikesorted.utils.output_paths import get_step_output_path
@@ -30,8 +30,6 @@ from spikesorted.utils.utils import message_user
 @dataclass(frozen=True)
 class PreprocessingStep(BasePipelineStep):
     """Preprocess each session and shank using the configured operation order."""
-
-    save_preprocessed_copy: bool = True
 
     _step_name: ClassVar[str] = "preprocessing"
 
@@ -54,6 +52,7 @@ class PreprocessingStep(BasePipelineStep):
             )
 
             spikeinterface_kwargs = copy.deepcopy(self.config["preprocessing"])
+            save_recording = spikeinterface_kwargs.pop("save_recording", False)
 
             pipeline = self._convert_kwargs_to_spikeinterface_pipeline(
                 spikeinterface_kwargs, session_name, shank_id, recording, verbose
@@ -70,7 +69,7 @@ class PreprocessingStep(BasePipelineStep):
                 step_path / "preprocessing_plots",
             )
 
-            if self.save_preprocessed_copy:
+            if save_recording:
                 preprocessed_rec = preprocessed_rec.save(
                     folder=step_path / "recording", verbose=verbose
                 )
@@ -141,8 +140,7 @@ class PreprocessingStep(BasePipelineStep):
     # ----------------------------------------------------------------------------------
 
     def perform_checks(self) -> None:
-        """Check preprocessing inputs and operation order.
-        """
+        """Check preprocessing inputs and operation order."""
         # Check mutually exclusive bad channel handling steps
         if {"remove_bad_channels", "interpolate_bad_channels"} <= self.config[
             "preprocessing"
@@ -156,7 +154,6 @@ class PreprocessingStep(BasePipelineStep):
 
         # Check overwrite settings and
         for _, shank_id, _, step_path in self._get_recordings_and_paths():
-
             if step_path.exists() and not self.overwrite:
                 raise FileExistsError(
                     f"Preprocessing output already exists: {step_path}"
@@ -175,7 +172,8 @@ class PreprocessingStep(BasePipelineStep):
                 and not {
                     "remove_bad_channels",
                     "interpolate_bad_channels",
-                } & self.config["preprocessing"].keys()
+                }
+                & self.config["preprocessing"].keys()
             ):
                 raise ValueError(
                     f"Bad-channel union exists at {union_path}, but preprocessing "
