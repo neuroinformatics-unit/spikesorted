@@ -133,7 +133,7 @@ class Pipeline:
         if self.stop_after_step == "preprocessing":
             return
 
-        if self.start_at_step in [
+        if "sorting" in configs and self.start_at_step in [
             None,
             "bad_channel_detection",
             "raw_data_quality_metrics",
@@ -152,7 +152,15 @@ class Pipeline:
         if self.stop_after_step == "sorting":
             return
 
-        if "postprocessing" in configs:
+        if "postprocessing" in configs and self.start_at_step in [
+            None,
+            "bad_channel_detection",
+            "raw_data_quality_metrics",
+            "artifact_detection",
+            "preprocessing",
+            "sorting",
+            "postprocessing",
+        ]:
             postprocessing = PostprocessingStep(
                 recordings=recordings,
                 config_path=self.config_path,

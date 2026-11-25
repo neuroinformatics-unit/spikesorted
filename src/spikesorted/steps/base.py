@@ -72,7 +72,13 @@ class BasePipelineStep:
         return self._config
 
     def perform_checks(self) -> None:
-        """Check that every recording contains exactly one segment."""
+        """Check the step is configured and every recording has one segment."""
+        if self._step_name not in self.config:
+            raise ValueError(
+                f"The config has no '{self._step_name}' section, "
+                f"which is required to run the {self._step_name} step."
+            )
+
         for session_name, shank_id, recording, _ in self._get_recordings_and_paths():
             if recording.get_num_segments() != 1:
                 raise ValueError(

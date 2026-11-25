@@ -143,6 +143,9 @@ class PreprocessingStep(BasePipelineStep):
     def perform_checks(self) -> None:
         """Check preprocessing inputs and operation order.
         """
+        # Check the step is configured before reading its config
+        super().perform_checks()
+
         # Check mutually exclusive bad channel handling steps
         if {"remove_bad_channels", "interpolate_bad_channels"} <= self.config[
             "preprocessing"
@@ -182,9 +185,6 @@ class PreprocessingStep(BasePipelineStep):
                     "does not include remove_bad_channels or interpolate_bad_channels. "
                     "Add either step to handle the union bad channels."
                 )
-
-        # Check overwrite settings, and delete existing outputs
-        super().perform_checks()
 
         for _, _, _, step_path in self._get_recordings_and_paths():
             if step_path.exists():
