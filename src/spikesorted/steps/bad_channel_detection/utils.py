@@ -28,9 +28,8 @@ def load_and_check_bad_channel_ids(
     union_path = get_bad_channel_ids_filepath(
         get_step_output_path(
             output_path,
-            config,
             "bad_channel_detection",
-            "session_unions",
+            "bad_channel_unions",
             shank_id,
         )
     )
@@ -57,7 +56,6 @@ def load_and_check_bad_channel_ids(
         channel_ids_path = get_bad_channel_ids_filepath(
             get_step_output_path(
                 output_path,
-                config,
                 "bad_channel_detection",
                 session_name,
                 shank_id,

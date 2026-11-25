@@ -16,6 +16,7 @@ dependencies = [
     "pandas",
     "matplotlib",
     "submitit",
+    "snakemake",
     # SpykingCircus2 and Lupin are implemented in SpikeInterface.
     "numba",
     "hdbscan",
@@ -40,7 +41,8 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
-
+[project.scripts]
+spikesorted = "spikesorted.cli:main"
 
 [project.optional-dependencies]
 dev = [
@@ -104,6 +106,8 @@ ignore = [
   "tests/test_integration/",
   "docs/",
   "docs/source/",
+  "agents/",
+  "agents/**",
 ]
 
 

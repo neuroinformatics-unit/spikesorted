@@ -126,7 +126,6 @@ class PreprocessingStep(BasePipelineStep):
             elif step == "silence_periods":
                 kwargs["periods"] = load_and_check_artefact_periods(
                     self.output_path,
-                    self.config,
                     session_name,
                     shank_id,
                     recording,
@@ -164,9 +163,8 @@ class PreprocessingStep(BasePipelineStep):
             union_path = get_bad_channel_ids_filepath(
                 get_step_output_path(
                     self.output_path,
-                    self.config,
                     "bad_channel_detection",
-                    "session_unions",
+                    "bad_channel_unions",
                     shank_id,
                 )
             )

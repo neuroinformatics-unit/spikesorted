@@ -1,0 +1,111 @@
+"""The spikesorted workflow.
+
+Run through the ``spikesorted`` command, which writes the run config this
+workflow reads:
+
+- ``output_path``: the subject folder all outputs are written below.
+- ``config_path``: the user's pipeline config.
+- ``sessions``: session name to recording path.
+
+Each session's shanks are found when the workflow loads, from the recording's
+``group`` property. Rule inputs and outputs come from each step's
+``get_input_paths()`` and ``get_output_path()``, so Snakemake checks the same
+paths the steps use.
+"""
+
+import re
+
+from spikesorted.steps.bad_channel_detection import (
+    BadChannelDetectionStep,
+    BadChannelUnionStep,
+)
+from spikesorted.steps.input_data_step import InputDataStep
+from spikesorted.utils.utils import load_pipeline_config
+
+OUTPUT_PATH = config["output_path"]
+CONFIG_PATH = config["config_path"]
+PIPELINE_CONFIG = load_pipeline_config(CONFIG_PATH)
+
+RECORDING_PATHS = config["sessions"]
+SESSION_NAMES = tuple(sorted(RECORDING_PATHS))
+
+# Only reads recording headers. On a cluster this runs again in every job,
+# because each job re-reads the Snakefile.
+MANIFEST = []
+for session_name in SESSION_NAMES:
+    recording_path = RECORDING_PATHS[session_name]
+    for shank_id in InputDataStep.get_shank_ids(recording_path):
+        MANIFEST.append({"session": session_name, "shank": shank_id})
+
+SHANK_IDS = sorted({manifest_entry["shank"] for manifest_entry in MANIFEST})
+
+COMBINE_SESSIONS = "combine_sessions" in PIPELINE_CONFIG
+
+
+wildcard_constraints:
+    session="|".join(re.escape(session_name) for session_name in SESSION_NAMES),
+    shank="[^/]+",
+
+
+def as_pattern(path):
+    """Return a path as a forward-slash string for Snakemake.
+
+    Parameters
+    ----------
+    path
+        The path to convert.
+
+    Returns
+    -------
+    path_pattern
+        The path with forward slashes.
+    """
+    return path.as_posix()
+
+
+def get_targets():
+    """Return the final outputs for every session shank.
+
+    Returns
+    -------
+    target_paths
+        The output paths ``rule all`` requests.
+    """
+    target_paths = []
+
+    for manifest_entry in MANIFEST:
+        target_paths.append(
+            as_pattern(
+                InputDataStep.get_recording_json_path(
+                    OUTPUT_PATH, manifest_entry["session"], manifest_entry["shank"]
+                )
+            )
+        )
+
+    if "bad_channel_detection" in PIPELINE_CONFIG:
+        for manifest_entry in MANIFEST:
+            target_paths.append(
+                as_pattern(
+                    BadChannelDetectionStep.get_output_path(
+                        OUTPUT_PATH, manifest_entry["session"], manifest_entry["shank"]
+                    )
+                )
+            )
+
+        if COMBINE_SESSIONS:
+            for shank_id in SHANK_IDS:
+                target_paths.append(
+                    as_pattern(BadChannelUnionStep.get_output_path(OUTPUT_PATH, shank_id))
+                )
+
+    return target_paths
+
+
+rule all:
+    input:
+        get_targets(),
+    default_target: True
+
+
+include: "input_data.smk"
+include: "bad_channel_detection.smk"
