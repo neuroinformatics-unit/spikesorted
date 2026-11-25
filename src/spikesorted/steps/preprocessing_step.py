@@ -7,7 +7,7 @@ import shutil
 import sys
 from contextlib import redirect_stdout
 from dataclasses import dataclass
-from typing import ClassVar
+from typing import ClassVar, cast
 
 import spikeinterface.preprocessing as spre
 
@@ -18,12 +18,12 @@ from spikesorted.step_configs import (
 )
 from spikesorted.steps.artifact_detection.utils import load_and_check_artefact_periods
 from spikesorted.steps.bad_channel_detection.utils import (
-    load_and_check_bad_channel_ids,
     get_bad_channel_ids_filepath,
+    load_and_check_bad_channel_ids,
 )
 from spikesorted.steps.base import BasePipelineStep
 from spikesorted.utils.output_paths import get_step_output_path
-from spikesorted.utils.recordings_structure import RecordingInput
+from spikesorted.utils.recordings_structure import Recording, SessionRecording
 from spikesorted.utils.utils import message_user
 
 
@@ -35,11 +35,11 @@ class PreprocessingStep(BasePipelineStep):
 
     _step_name: ClassVar[str] = "preprocessing"
 
-    def run(self, verbose: bool = True) -> list[RecordingInput]:
+    def run(self, verbose: bool = True) -> list[tuple[SessionRecording, str]]:
         """Return named sessions containing saved paths or in-memory recordings."""
         self.perform_checks()
 
-        processed_sessions = []
+        processed_sessions: list[tuple[SessionRecording, str]] = []
 
         for (
             session_name,
@@ -91,7 +91,10 @@ class PreprocessingStep(BasePipelineStep):
                 processed_sessions.append((processed_output, session_name))
             else:
                 if processed_sessions and processed_sessions[-1][1] == session_name:
-                    processed_sessions[-1][0][shank_id] = processed_output
+                    shank_recordings = cast(
+                        "dict[str | int, Recording]", processed_sessions[-1][0]
+                    )
+                    shank_recordings[shank_id] = processed_output
                 else:
                     processed_sessions.append(
                         ({shank_id: processed_output}, session_name)
@@ -141,8 +144,7 @@ class PreprocessingStep(BasePipelineStep):
     # ----------------------------------------------------------------------------------
 
     def perform_checks(self) -> None:
-        """Check preprocessing inputs and operation order.
-        """
+        """Check preprocessing inputs and operation order."""
         # Check the step is configured before reading its config
         super().perform_checks()
 
@@ -159,7 +161,6 @@ class PreprocessingStep(BasePipelineStep):
 
         # Check overwrite settings and
         for _, shank_id, _, step_path in self._get_recordings_and_paths():
-
             if step_path.exists() and not self.overwrite:
                 raise FileExistsError(
                     f"Preprocessing output already exists: {step_path}"
@@ -178,7 +179,8 @@ class PreprocessingStep(BasePipelineStep):
                 and not {
                     "remove_bad_channels",
                     "interpolate_bad_channels",
-                } & self.config["preprocessing"].keys()
+                }
+                & self.config["preprocessing"].keys()
             ):
                 raise ValueError(
                     f"Bad-channel union exists at {union_path}, but preprocessing "

@@ -23,7 +23,6 @@ class SortingStep(BasePipelineStep):
         self.perform_checks()
 
         for _, _, recording, step_path in self._get_recordings_and_paths():
-
             with redirect_stdout(sys.stderr):
                 run_sorter(
                     sorter_name=self.config["sorting"]["sorter"],

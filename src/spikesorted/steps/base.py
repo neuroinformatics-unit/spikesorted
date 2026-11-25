@@ -4,18 +4,21 @@ import sys
 from contextlib import redirect_stdout
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, ClassVar, cast
 
 from spikeinterface import load
 from spikeinterface.core import BaseRecording
 
 from spikesorted.utils.output_paths import get_step_output_path
-from spikesorted.utils.recordings_structure import get_recordings, check_and_normalize_recordings
+from spikesorted.utils.recordings_structure import (
+    check_and_normalize_recordings,
+    get_recordings,
+)
 from spikesorted.utils.utils import load_pipeline_config
 from spikesorted.validation.steps_validation import _BaseStepArguments
 
 if TYPE_CHECKING:
-    from spikesorted.utils.recordings_structure import RecordingInput
+    from spikesorted.utils.recordings_structure import RecordingInput, SessionRecording
     from spikesorted.validation.config_validation import PipelineConfig
 
 
@@ -62,7 +65,9 @@ class BasePipelineStep:
                 "overwrite": self.overwrite,
             }
         )
-        object.__setattr__(self, "recordings", check_and_normalize_recordings(self.recordings))
+        object.__setattr__(
+            self, "recordings", check_and_normalize_recordings(self.recordings)
+        )
         loaded_config = load_pipeline_config(self.config_path)
         object.__setattr__(self, "_config", loaded_config)
 
@@ -87,7 +92,7 @@ class BasePipelineStep:
                     f"{recording.get_num_segments()} segments."
                 )
 
-    def run(self, verbose: bool = True) -> list[RecordingInput] | None:
+    def run(self, verbose: bool = True) -> list[tuple[SessionRecording, str]] | None:
         """Perform checks and execute the step, saving or returning its outputs."""
         raise NotImplementedError
 
@@ -140,5 +145,7 @@ class BasePipelineStep:
                 recording,
                 self._get_output_path(session_name, shank_id),
             )
-            for session_name, shank_id, recording in get_recordings(self.recordings)
+            for session_name, shank_id, recording in get_recordings(
+                cast("list[tuple[SessionRecording, str]]", self.recordings)
+            )
         ]

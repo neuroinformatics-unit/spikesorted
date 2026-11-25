@@ -67,8 +67,7 @@ def _run_pipeline_with_slurm(
     start_at_step: str | None = None,
     stop_after_step: str | None = None,
 ):
-    """Run independent session/shank pipelines as an array and await results.
-    """
+    """Run independent session/shank pipelines as an array and await results."""
 
     def run_pipeline_in_slurm_batch(
         inputs, start_at_step=start_at_step, stop_after_step=stop_after_step

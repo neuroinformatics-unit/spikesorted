@@ -1,4 +1,4 @@
-"""Postprocess saved sortings with their matching preprocessed recordings."""
+"""Postprocess saved sorting results with their matching preprocessed recordings."""
 
 import copy
 import shutil
@@ -33,7 +33,6 @@ class PostprocessingStep(BasePipelineStep):
             recording,
             step_path,
         ) in self._get_recordings_and_paths():
-
             sorting_path = get_step_output_path(
                 self.output_path, self.config, "sorting", session_name, shank_id
             )
@@ -46,7 +45,6 @@ class PostprocessingStep(BasePipelineStep):
                 quality_metrics_kwargs["metric_names"] = get_quality_metric_list()
 
             with redirect_stdout(sys.stderr):
-
                 sorting = read_sorter_folder(sorting_path, register_recording=False)
 
                 analyzer = create_sorting_analyzer(

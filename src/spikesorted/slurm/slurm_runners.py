@@ -40,10 +40,12 @@ def _get_executor(log_path: Path, slurm_opts: dict) -> submitit.AutoExecutor:
         )
     matlab_module_name = slurm_opts.pop("matlab_module_name", None)
     slurm_setup = list(slurm_opts.get("slurm_setup") or [])
-    slurm_setup.extend([
-        'eval "$(conda shell.bash hook)"',
-        f"conda activate {quote(conda_env_name)}",
-    ])
+    slurm_setup.extend(
+        [
+            'eval "$(conda shell.bash hook)"',
+            f"conda activate {quote(conda_env_name)}",
+        ]
+    )
     if matlab_module_name is not None:
         slurm_setup.append(f"module load {quote(matlab_module_name)}")
     slurm_opts["slurm_setup"] = slurm_setup

@@ -60,7 +60,7 @@ class Pipeline:
         self.verbose = verbose
         self.save_preprocessed_copy = save_preprocessed_copy
 
-    def run(self) -> None:
+    def run(self) -> None:  # noqa: C901 - Keep the pipeline step sequence explicit.
         """Run selected steps; sorting/postprocessing inputs must be preprocessed."""
         si.set_global_job_kwargs(n_jobs=self.n_jobs)
         configs = load_pipeline_config(self.config_path)

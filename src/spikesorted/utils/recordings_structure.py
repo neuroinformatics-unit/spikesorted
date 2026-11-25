@@ -56,7 +56,8 @@ def check_and_normalize_recordings(
 
         if session_name in session_names:
             raise ValueError(
-                f"Session names must be unique, however {session_name!r} appears more than once."
+                f"Session names must be unique, however {session_name!r} "
+                "appears more than once."
             )
         session_names.add(session_name)
         named_sessions.append((session_recording, session_name))

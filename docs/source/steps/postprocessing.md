@@ -22,7 +22,7 @@ The postprocessing step:
 
 The runnable pipeline example includes postprocessing. To run only this step,
 set `start_at_step="postprocessing"` and supply the preprocessed recordings and
-the output path containing the saved sortings. Existing postprocessing outputs
+the output path containing the saved sorting results. Existing postprocessing outputs
 require `overwrite=True` to replace them. Metrics can be undefined (NaN) for
 very short recordings or units with too few spikes.
 
