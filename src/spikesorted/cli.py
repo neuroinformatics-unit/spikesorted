@@ -110,6 +110,10 @@ def main(argv: list[str] | None = None) -> int:
         str(output_path),
         "--cores",
         "1",
+        # The default file backend names a metadata file after each output's
+        # full path, which goes over the Windows path-length limit.
+        "--persistence-backend",
+        "db",
     ]
     if cli_arguments.dry_run:
         snakemake_command.append("--dry-run")
