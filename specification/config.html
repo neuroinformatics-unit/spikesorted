@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=c341fef2"></script>
+    <script src="../_static/documentation_options.js?v=a1b47e79"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
@@ -486,6 +486,7 @@
 <span class="w">    </span><span class="nt">proportion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
 
 <span class="nt">preprocessing</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">save_recording</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="w">  </span><span class="nt">highpass_filter</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">freq_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">300.0</span>
 <span class="w">  </span><span class="nt">phase_shift</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
@@ -496,6 +497,7 @@
 
 <span class="nt">combine_sessions</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">concatenate</span>
+<span class="w">  </span><span class="nt">save_recording</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 
 <span class="nt">sorting</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">sorter</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kilosort2_5</span>
@@ -578,6 +580,19 @@ See <a class="reference internal" href="on-disk-structure.html"><span class="std
 </section>
 <section id="step-parameters">
 <h2>Step parameters<a class="headerlink" href="#step-parameters" title="Link to this heading">#</a></h2>
+<section id="recording-saves-and-session-combination">
+<h3>Recording saves and session combination<a class="headerlink" href="#recording-saves-and-session-combination" title="Link to this heading">#</a></h3>
+<p>Set <code class="docutils literal notranslate"><span class="pre">preprocessing.save_recording</span></code> and <code class="docutils literal notranslate"><span class="pre">combine_sessions.save_recording</span></code>
+independently. Both default to <code class="docutils literal notranslate"><span class="pre">false</span></code>. Set the first to <code class="docutils literal notranslate"><span class="pre">false</span></code> and the second
+to <code class="docutils literal notranslate"><span class="pre">true</span></code> to write recording data only after concatenation. With <code class="docutils literal notranslate"><span class="pre">false</span></code>, the
+step saves recording metadata and plots without writing the trace data.
+These settings replace the Python <code class="docutils literal notranslate"><span class="pre">save_preprocessed_copy</span></code> argument.</p>
+<p><code class="docutils literal notranslate"><span class="pre">combine_sessions.method:</span> <span class="pre">concatenate</span></code> concatenates sessions in their supplied
+order, separately for each shank. It uses the preprocessing outputs when that
+step runs. Outputs use the session name <code class="docutils literal notranslate"><span class="pre">combined_sessions</span></code> in the selected
+folder layout. Each join has a one-second trace image, clipped to
+the adjacent session lengths, with the boundary marked.</p>
+</section>
 <section id="bad-channel-detection">
 <h3>Bad channel detection<a class="headerlink" href="#bad-channel-detection" title="Link to this heading">#</a></h3>
 <p>All supported parameters and their descriptions can be found in the
@@ -670,6 +685,7 @@ The defaults are designed for Neuropixels 1.0 probes.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#config-structure">Config structure</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#output-layout">Output layout</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-parameters">Step parameters</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#recording-saves-and-session-combination">Recording saves and session combination</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bad-channel-detection">Bad channel detection</a></li>
 </ul>
 </li>

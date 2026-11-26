@@ -24,6 +24,7 @@ artifact_detection:
     proportion: 0.2
 
 preprocessing:
+  save_recording: false
   highpass_filter:
     freq_min: 300.0
   phase_shift: {}
@@ -34,6 +35,7 @@ preprocessing:
 
 combine_sessions:
   method: concatenate
+  save_recording: true
 
 sorting:
   sorter: kilosort2_5
@@ -84,6 +86,20 @@ Pass the subject directory, for example `results/sub-001`, as `output_path`.
 See [Structure on disk](on-disk-structure.md) for folder trees and session-union paths.
 
 ## Step parameters
+
+### Recording saves and session combination
+
+Set `preprocessing.save_recording` and `combine_sessions.save_recording`
+independently. Both default to `false`. Set the first to `false` and the second
+to `true` to write recording data only after concatenation. With `false`, the
+step saves recording metadata and plots without writing the trace data.
+These settings replace the Python `save_preprocessed_copy` argument.
+
+`combine_sessions.method: concatenate` concatenates sessions in their supplied
+order, separately for each shank. It uses the preprocessing outputs when that
+step runs. Outputs use the session name `combined_sessions` in the selected
+folder layout. Each join has a one-second trace image, clipped to
+the adjacent session lengths, with the boundary marked.
 
 ### Bad channel detection
 
