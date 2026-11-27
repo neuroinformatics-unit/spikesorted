@@ -1,6 +1,3 @@
-output:
-  structure: neuroblueprint
-
 bad_channel_detection:
   method: coherence+psd
 
@@ -15,7 +12,7 @@ artifact_detection:
   saturation: {}
 
 preprocessing:
-  save_recording: true
+  save_preprocessed_copy: true
   remove_bad_channels: {}
   phase_shift: {}
   bandpass_filter:

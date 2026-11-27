@@ -1,24 +1,23 @@
-"""Bad-channel detection step (not implemented yet)."""
+"""Bad-channel detection step for one session shank."""
+
+from __future__ import annotations
 
 import sys
 import warnings
 from contextlib import redirect_stdout
-from dataclasses import dataclass
-from datetime import date
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import ClassVar
-
-import pandas as pd
+from typing import TYPE_CHECKING, ClassVar
 
 # Preload SciPy signal so its one-time import allocations are process baseline,
 # rather than part of the first bad-channel detection chunk.
 import scipy.signal  # noqa: F401
 import spikeinterface.preprocessing as spre
-import yaml
+from spikeinterface import load
 
-from spikesorted.steps.base import BasePipelineStep
-from spikesorted.utils.recordings_structure import get_num_sessions
-from spikesorted.utils.utils import message_user
+from spikesorted.steps.input_data_step import InputDataStep
+from spikesorted.utils.output_paths import get_step_output_path
+from spikesorted.utils.utils import load_pipeline_config, message_user
 
 from .utils import (
     get_bad_channel_ids_filepath,
@@ -26,39 +25,39 @@ from .utils import (
     save_bad_channel_labels,
 )
 
+if TYPE_CHECKING:
+    from spikesorted.validation.config_validation import PipelineConfig
+
 
 @dataclass(frozen=True)
-class BadChannelDetectionStep(BasePipelineStep):
-    """Detect bad channels for each recording session and shank.
+class BadChannelDetectionStep:
+    """Detect bad channels for one session and shank.
 
     The ``run()`` method wraps SpikeInterface's ``detect_bad_channels()``.
 
     Parameters
     ----------
-    recordings : RecordingInput or list of RecordingInput
-        A recording, a dictionary mapping shank IDs to recordings, or a
-        tuple of (recording or shank dictionary, session name). Supply a
-        list of these objects to process multiple sessions.
+    session_name
+        Name of the session to process.
 
-    config_path : str or pathlib.Path
+    shank_id
+        ID of the shank to process.
+
+    config_path
         Path to the YAML pipeline configuration file containing the
         ``bad_channel_detection`` settings.
 
-    output_path : str or pathlib.Path
-        Root output directory under which the step saves outputs for
-        each session and shank.
-
-    overwrite : bool, optional
-        Whether to overwrite existing output CSV files. Default is False.
+    output_path
+        The subject folder. The input recording is read from the session
+        shank's ``input_data`` folder, and outputs are written beside it.
 
     See Also
     --------
-    BasePipelineStep
     spikeinterface.preprocessing.detect_bad_channels
 
     Notes
     -----
-    The following CSV files are saved for each session and shank:
+    The following CSV files are saved for the session shank:
 
     ``bad_channel_ids.csv``
         One row per detected bad channel, with ``channel_id``
@@ -71,191 +70,183 @@ class BadChannelDetectionStep(BasePipelineStep):
 
     Both files include column headers and omit the DataFrame index.
 
+    Examples
+    --------
+    >>> BadChannelDetectionStep(
+    ...     session_name="ses-001",
+    ...     shank_id="0",
+    ...     config_path="config.yaml",
+    ...     output_path="/derivatives/sub-001",
+    ... ).run()
     """
 
+    session_name: str
+    shank_id: str
+    config_path: str | Path
+    output_path: str | Path
+
     _step_name: ClassVar[str] = "bad_channel_detection"
+
+    _highpass_freq_min: ClassVar[float] = 300
+
+    _config: PipelineConfig = field(init=False, repr=False, compare=False)
+
+    def __post_init__(self) -> None:
+        """Load and validate the pipeline config once."""
+        object.__setattr__(self, "_config", load_pipeline_config(self.config_path))
+
+    @property
+    def config(self) -> PipelineConfig:
+        """Return the dictionary loaded at construction, without rereading disk."""
+        return self._config
+
+    @classmethod
+    def get_input_paths(
+        cls, output_path: str | Path, session_name: str, shank_id: str
+    ) -> list[Path]:
+        """Return the input data files this step reads for a session shank.
+
+        Parameters
+        ----------
+        output_path
+            The subject folder.
+        session_name
+            Name of the session.
+        shank_id
+            Shank ID.
+
+        Returns
+        -------
+        input_paths
+            The session shank's ``recording.json`` and ``recording_info.yaml``.
+        """
+        return [
+            InputDataStep.get_recording_json_path(output_path, session_name, shank_id),
+            InputDataStep.get_recording_info_path(output_path, session_name, shank_id),
+        ]
+
+    @classmethod
+    def get_output_path(
+        cls, output_path: str | Path, session_name: str, shank_id: str
+    ) -> Path:
+        """Return the folder this step writes for a session shank.
+
+        Parameters
+        ----------
+        output_path
+            The subject folder.
+        session_name
+            Name of the session.
+        shank_id
+            Shank ID.
+
+        Returns
+        -------
+        step_path
+            The session shank's bad-channel detection folder.
+        """
+        return get_step_output_path(output_path, cls._step_name, session_name, shank_id)
 
     def run(self, verbose: bool = True) -> None:
         """Check inputs, high-pass at 300 Hz, and run IBL bad-channel detection.
 
-        Save channel IDs, labels, detection metrics, and associated plots.
+        Save channel IDs and labels.
+
+        Parameters
+        ----------
+        verbose
+            Whether to print progress messages.
         """
         self.perform_checks()
 
-        kwargs = self.config["bad_channel_detection"]
+        detection_kwargs = self.config["bad_channel_detection"]
 
-        for (
-            session_name,
-            shank_id,
-            shank_recording,
+        shank_path = self.get_output_path(
+            self.output_path, self.session_name, self.shank_id
+        )
+        shank_id_message = f", shank {self.shank_id}" if self.shank_id else ""
+        message_user(
+            f"Running bad channel detection for session {self.session_name}"
+            + shank_id_message,
+            verbose,
+        )
+
+        bad_channel_ids_path = get_bad_channel_ids_filepath(shank_path)
+
+        shank_path.mkdir(parents=True, exist_ok=True)
+
+        with redirect_stdout(sys.stderr):
+            shank_recording = load(self._get_recording_json_path())
+
+            filtered_recording = spre.highpass_filter(
+                shank_recording, freq_min=self._highpass_freq_min
+            )
+
+            bad_channel_ids, channel_labels = spre.detect_bad_channels(
+                filtered_recording, **detection_kwargs
+            )
+
+        channel_id_dtype = shank_recording.get_channel_ids().dtype.str
+        save_bad_channel_ids(shank_path, bad_channel_ids, channel_id_dtype)
+        save_bad_channel_labels(
             shank_path,
-        ) in self._get_recordings_and_paths():
-            shank_id_message = f", shank {shank_id}" if shank_id else ""
-            message_user(
-                f"Running bad channel detection for session {session_name}"
-                + shank_id_message,
-                verbose,
-            )
+            shank_recording.get_channel_ids(),
+            channel_labels,
+            channel_id_dtype,
+        )
 
-            bad_ids_path = get_bad_channel_ids_filepath(shank_path)
-
-            shank_path.mkdir(parents=True, exist_ok=True)
-
-            with redirect_stdout(sys.stderr):
-                filtered_recording = spre.highpass_filter(
-                    shank_recording, freq_min=self._highpass_freq_min
-                )
-
-                bad_channel_ids, channel_labels = spre.detect_bad_channels(
-                    filtered_recording, **kwargs
-                )
-
-            channel_id_dtype = shank_recording.get_channel_ids().dtype.str
-            save_bad_channel_ids(shank_path, bad_channel_ids, channel_id_dtype)
-            save_bad_channel_labels(
-                shank_path,
-                shank_recording.get_channel_ids(),
-                channel_labels,
-                channel_id_dtype,
-            )
-
-            message_user(
-                f"Bad channel IDS and labels saved to: {bad_ids_path.parent}",
-                verbose,
-            )
-
-        if "combine_sessions" in self.config and get_num_sessions(self.recordings) > 1:
-            self.create_bad_channel_labels_union()
+        message_user(
+            f"Bad channel IDS and labels saved to: {bad_channel_ids_path.parent}",
+            verbose,
+        )
 
     def perform_checks(self) -> None:
         """Check the bad-channel detection input:
 
+        - checks the input data files exist
         - checks required bad channel detection method is passed
-        - throw a warning for low-coutn channels
-        - raise if `overwrite=False` and output already exists.
+        - throw a warning for low-count channels
         """
-        super().perform_checks()
-
-        method = self.config["bad_channel_detection"].get("method")
-        if method is None:
-            raise ValueError("bad_channel_detection.method must be explicitly provided")
-
-        for _, _, recording, shank_path in self._get_recordings_and_paths():
-            num_channels = recording.get_num_channels()
-            if method == "coherence+psd" and num_channels <= 64:
-                warnings.warn(
-                    f"Recording for {shank_path} has {num_channels} channels "
-                    "(64 or fewer). IBL bad-channel detection was developed for "
-                    "Neuropixels probes; review its suitability and thresholds "
-                    "for low-channel-count recordings.",
-                    UserWarning,
-                    stacklevel=2,
+        for input_path in self.get_input_paths(
+            self.output_path, self.session_name, self.shank_id
+        ):
+            if not input_path.is_file():
+                raise FileNotFoundError(
+                    f"Input data file not found: {input_path}. "
+                    "Run the input data step for this session first."
                 )
 
-            if not self.overwrite:
-                if shank_path.exists():
-                    raise FileExistsError(
-                        "Bad-channel detection output folder already exists: "
-                        f"{shank_path}. "
-                        "Set overwrite=True to replace existing outputs, "
-                        "or choose a different output_path."
-                    )
+        detection_method = self.config["bad_channel_detection"].get("method")
+        if detection_method is None:
+            raise ValueError("bad_channel_detection.method must be explicitly provided")
+
+        with redirect_stdout(sys.stderr):
+            recording = load(self._get_recording_json_path())
+
+        num_channels = recording.get_num_channels()
+        if detection_method == "coherence+psd" and num_channels <= 64:
+            warnings.warn(
+                f"Recording for session {self.session_name}, shank "
+                f"{self.shank_id} has {num_channels} channels "
+                "(64 or fewer). IBL bad-channel detection was developed for "
+                "Neuropixels probes; review its suitability and thresholds "
+                "for low-channel-count recordings.",
+                UserWarning,
+                stacklevel=2,
+            )
 
     def needs_gpu(self) -> bool:
         """Report whether the configured detection method requires a GPU."""
         return False
 
-    def create_bad_channel_labels_union(self):
-        """Create a CSV which contains the union of all bad channel IDs across sessions.
+    def _get_recording_json_path(self) -> Path:
+        """Return the input recording for this session shank.
 
-        When working with multiple sessions, and concatenating or unit-matching, the
-        same set of channels must be included on all used recordings. This function
-        uses the individual sessions bad channel detection outputs on disk to create
-        a union of all bad channel labels.
-
-        Outputs use "session_unions" as the session name in the configured layout.
-        A sessions.yaml beside each CSV records the contributing session names and date.
-
-        This step will throw an error if the set of sessions / shanks on disk
-        does not exactly match those in `recordings`, as this may indicate the
-        project has gotten out of sync.
+        Returns
+        -------
+        recording_json_path
+            Path of the session shank's ``recording.json``.
         """
-        recordings_by_shank = {}
-        for session_name, shank_id, recording, path in self._get_recordings_and_paths():
-            recordings_by_shank.setdefault(shank_id, []).append(
-                (session_name, recording, path)
-            )
-
-        self._confirm_all_and_only_specified_bad_channel_files_exist(
-            recordings_by_shank
+        return InputDataStep.get_recording_json_path(
+            self.output_path, self.session_name, self.shank_id
         )
-
-        # For each session / shank, load the bad channel ids and save their
-        # union in the shared output folder
-        generation_date = date.today().isoformat()
-
-        for shank_id, recordings_and_paths in recordings_by_shank.items():
-            bad_channel_ids = {}
-            session_names = []
-
-            for session_name, _, path in recordings_and_paths:
-                session_names.append(session_name)
-                labels = pd.read_csv(
-                    path / "bad_channel_ids.csv",
-                    dtype={"channel_id": str},
-                    keep_default_na=False,
-                )
-                bad_channel_ids.update(
-                    zip(labels["channel_id"], labels["channel_id_dtype"], strict=False)
-                )
-
-            output_path = self._get_output_path("session_unions", shank_id)
-
-            output_path.mkdir(parents=True, exist_ok=True)
-
-            sorted_ids = sorted(bad_channel_ids.items())
-            save_bad_channel_ids(
-                output_path,
-                [channel_id for channel_id, _ in sorted_ids],
-                [dtype for _, dtype in sorted_ids],
-            )
-            with (output_path / "sessions.yaml").open("w", encoding="utf-8") as file:
-                yaml.safe_dump(
-                    {"sessions": session_names, "date": generation_date},
-                    file,
-                    sort_keys=False,
-                )
-
-    def _confirm_all_and_only_specified_bad_channel_files_exist(
-        self, recordings_by_shank
-    ):
-        """Require the discovered CSVs to match the supplied sessions/shanks exactly."""
-        expected_files = sorted(
-            path / "bad_channel_ids.csv"
-            for recordings_and_paths in recordings_by_shank.values()
-            for _, _, path in recordings_and_paths
-        )
-
-        root = Path(self.output_path)
-        existing_files = set()
-        union_files = set()
-        for shank_id in (None, "*"):
-            pattern = self._get_output_path("*", shank_id).relative_to(root)
-            existing_files.update(root.glob(str(pattern / "bad_channel_ids.csv")))
-            union_pattern = self._get_output_path(
-                "session_unions", shank_id
-            ).relative_to(root)
-            union_files.update(root.glob(str(union_pattern / "bad_channel_ids.csv")))
-        existing_files = sorted(existing_files - union_files)
-
-        if expected_files != existing_files:
-            missing = sorted(set(expected_files) - set(existing_files))
-            unexpected = sorted(set(existing_files) - set(expected_files))
-            raise ValueError(
-                "Cannot create the bad-channel union: files in the project path "
-                "do not match the supplied recordings.\n"
-                f"Missing files: {missing}\n"
-                f"Unexpected files: {unexpected}\n"
-                "Remove folders for sessions or shanks that are not part of this run, "
-                "and generate any missing bad-channel files before trying again."
-            )

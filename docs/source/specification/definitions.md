@@ -136,7 +136,7 @@ Outputs from the {ref}`detect bad channels step <pipeline-steps-detect-bad-chann
 #### `BAD_CHANNEL_IDS`
 The channel IDs identified as bad by the detect-bad-channels step.
 
-**TODO:** Document cross-session bad-channel ID unions for concatenation and unit matching, including per-shank behavior, the `session_unions` directory, and `sessions.yaml` alongside each union CSV listing the contributing session names and generation date.
+**TODO:** Document cross-session bad-channel ID unions for concatenation and unit matching, including per-shank behavior, the `bad-channels-union` directory, and `sessions.yaml` alongside each union CSV listing the contributing session names and generation date.
 
 (outputs-bad-channel-labels)=
 #### `BAD_CHANNEL_LABELS`

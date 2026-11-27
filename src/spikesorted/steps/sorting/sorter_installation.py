@@ -9,7 +9,11 @@ from typing import Literal
 from urllib.request import urlretrieve
 from zipfile import ZipFile
 
-from spikeinterface.sorters import Kilosort2_5Sorter, Kilosort3Sorter
+from spikeinterface.sorters import (
+    Kilosort2_5Sorter,
+    Kilosort3Sorter,
+    installed_sorters,
+)
 
 
 def get_sorter_installation_path(
@@ -85,6 +89,52 @@ def ensure_kilosort_installed(
     else:
         install_kilosort(sorter_name)
     return True
+
+
+def ensure_sorter_installed(sorter_name: str) -> None:
+    """Check the configured sorter is installed, installing MATLAB Kilosort if not.
+
+    Run by the ``spikesorted`` command before any job starts, on the machine
+    the command is launched from. ``kilosort2_5`` and ``kilosort3`` are
+    downloaded and built when missing. Any other sorter must already be
+    installed in the environment.
+
+    Parameters
+    ----------
+    sorter_name
+        Name of the sorter in the config's ``sorting`` section.
+    """
+    if sorter_name == "kilosort2_5":
+        ensure_kilosort_installed("kilosort2_5")
+    elif sorter_name == "kilosort3":
+        ensure_kilosort_installed("kilosort3")
+    elif sorter_name not in installed_sorters():
+        raise RuntimeError(
+            f"The sorter {sorter_name!r} is not installed. Install it in this "
+            "environment before running the pipeline."
+        )
+
+
+def register_installed_kilosort(
+    sorter_name: Literal["kilosort2_5", "kilosort3"],
+) -> None:
+    """Register an already-built Kilosort installation with SpikeInterface.
+
+    Used by the sorting step, which runs in its own process and so registers
+    the path itself. It does not install the sorter.
+
+    Parameters
+    ----------
+    sorter_name
+        The MATLAB Kilosort version to register.
+    """
+    sorter_path = get_sorter_installation_path(sorter_name)
+    if not (sorter_path.is_dir() and _has_kilosort_mex_files(sorter_name, sorter_path)):
+        raise FileNotFoundError(
+            f"{sorter_name} is not installed at {sorter_path}. Run the pipeline "
+            "with the `spikesorted` command, which installs it before starting."
+        )
+    _set_kilosort_path(sorter_name, sorter_path)
 
 
 def _has_kilosort_mex_files(sorter_name, sorter_path) -> bool:

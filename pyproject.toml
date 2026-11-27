@@ -16,6 +16,8 @@ dependencies = [
     "pandas",
     "matplotlib",
     "submitit",
+    # --persistence-backend was added in 9.17.0 and its parsing fixed in 9.17.1.
+    "snakemake>=9.17.1",
     # SpykingCircus2 and Lupin are implemented in SpikeInterface.
     "numba",
     "hdbscan",
@@ -40,7 +42,8 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
-
+[project.scripts]
+spikesorted = "spikesorted.cli:main"
 
 [project.optional-dependencies]
 dev = [
@@ -104,6 +107,8 @@ ignore = [
   "tests/test_integration/",
   "docs/",
   "docs/source/",
+  "agents/",
+  "agents/**",
 ]
 
 

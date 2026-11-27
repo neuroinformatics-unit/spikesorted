@@ -5,17 +5,13 @@
 - Do not create standalone documentation, notes, plans, reports, or summary files
   unless the user explicitly requests them. This includes files such as
   `DEPLOYMENT.md`, `IMPLEMENTATION.md`, and `SUMMARY.md`.
-- Put necessary documentation updates in existing relevant documentation, or
-  concise comments beside the code or configuration they explain.
+- Put necessary documentation updates in existing relevant documentation.
 - Report work completed, verification results, and next steps in the chat rather
   than adding repository files for them.
 - When documentation pages are explicitly requested, follow the existing docs
   structure and keep additions within the requested scope.
 
 ## Preserve user formatting
-
-- Use `step` rather than `operation` when naming pipeline or preprocessing steps,
-  including variable names, comments, and docstrings.
 
 - When moving or extracting existing code, preserve the user's formatting and
   style, including blank lines, line breaks, and explicit if/else blocks.
@@ -34,7 +30,8 @@
 
 - `output_path` is validated as absolute at pipeline and step construction.
   Code using it and derived step paths may assume they are absolute; do not
-  call `.resolve()` merely to make these paths absolute.
+  call `.resolve()` merely to make these paths absolute. `.resolve()` also
+  replaces symlinks with their targets, which we don't want.
 
 - Only add behaviour specifically requested by the user. Do not add execution
   policies, defaults, configuration handling, or refactoring on your own.
@@ -46,10 +43,17 @@
 
 ## Repository layout
 
-- Use descriptive step module names such as `bad_channel_detection_step.py`;
-  never name a module `step.py` or `steps.py`.
-
 - Do not create or generate tests unless the user explicitly asks for them.
 
 - Use `src/spikesorted/` for Python source; keep `pyproject.toml`, `tests/`, and
   `docs/` at repository root. Run development commands from repository root.
+
+## Skills and checks
+
+- Before starting a task, check `agents/skills/` for a matching `SKILL.md` and
+  follow it (for example, `docstrings`, `comments` and `naming`).
+- Repository-specific lint checks are in `agents/lint/custom_hooks.py` and run
+  as the `custom-hooks` pre-commit hook
+  (`pre-commit run custom-hooks --all-files`).
+- After editing files, run `pre-commit run --files <changed files>` and fix
+  what it reports before finishing the task.

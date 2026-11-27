@@ -73,7 +73,7 @@ def get_recordings(
 
     for session_recording, session_name in recordings:
         # Handle multiple shanks. When only one shank is used, `shank_id`
-        # is None and data is not stored in a folder called "shank_<id>".
+        # is None and data is not stored in a folder called "shank-<id>".
         for shank_id, recording in iter_over_shanks(session_recording):
             if isinstance(recording, (str, Path)):
                 with redirect_stdout(sys.stderr):

@@ -5,9 +5,6 @@ This specification defines the structure and valid contents of the [Config file]
 An example including every step, with a subset of available arguments for each, is shown below:
 
 ```yaml
-output:
-  structure: neuroblueprint
-
 raw_data_quality_metrics:
   chunk_size_s: 1.0
   num_chunks: 30
@@ -24,7 +21,6 @@ artifact_detection:
     proportion: 0.2
 
 preprocessing:
-  save_recording: false
   highpass_filter:
     freq_min: 300.0
   phase_shift: {}
@@ -32,10 +28,11 @@ preprocessing:
   highpass_spatial_filter: {}
   silence_periods:
     mode: zeros
+  save_preprocessed_copy: false
 
 combine_sessions:
   method: concatenate
-  save_recording: true
+  save_preprocessed_copy: true
 
 sorting:
   sorter: kilosort2_5
@@ -76,30 +73,47 @@ It is best practice to include all applicable steps, especially raw data quality
 metrics and bad channel detection.
 ```
 
+## Saving the preprocessed recording
+
+`save_preprocessed_copy` sets whether a step saves a binary copy of the
+preprocessed recording. It can be set in the `preprocessing` section, the
+`combine_sessions` section, or neither. It is `false` when left out, and it is
+not a preprocessing step.
+
+| Section | When `true` |
+| --- | --- |
+| `preprocessing` | Each session's preprocessed recording is saved in `preprocessing/recording/`. |
+| `combine_sessions` | The combined recording is saved in `combine_sessions/recording/`. |
+
+It cannot be `true` in both sections, which raises a configuration error.
+
+A step that does not save a copy writes only `metadata.json`, which points at
+the previous step's saved copy or at the raw data. The preprocessing is then
+recomputed when a later step loads it.
+
+```{note}
+If no step saves a copy, the raw data must stay available at the path it was
+loaded from. If it may be moved or deleted, set `save_preprocessed_copy: true`
+in one of the sections to write the preprocessed recording to disk.
+```
+
 ## Output layout
 
-The optional `output` section controls folder organisation; it is not a pipeline step.
-Set `output.structure` to `neuroblueprint` (the default), `by_session`, or `by_step`.
-Omitting `output` or `structure` selects `neuroblueprint`.
-
-Pass the subject directory, for example `results/sub-001`, as `output_path`.
+The output folder layout is fixed and is not set in the config.
+Pass the subject folder, for example `derivatives/sub-001`, as `output_path`.
 See [Structure on disk](on-disk-structure.md) for folder trees and session-union paths.
 
 ## Step parameters
 
-### Recording saves and session combination
+### Session combination
 
-Set `preprocessing.save_recording` and `combine_sessions.save_recording`
-independently. Both default to `false`. Set the first to `false` and the second
-to `true` to write recording data only after concatenation. With `false`, the
-step saves recording metadata and plots without writing the trace data.
-These settings replace the Python `save_preprocessed_copy` argument.
+`combine_sessions.method: concatenate` concatenates sessions in session-name
+order, separately for each shank. It uses each session's preprocessing output.
+Outputs use the session name `combined-sessions`. Each join has a one-second
+trace image, clipped to the adjacent session lengths, with the boundary marked.
 
-`combine_sessions.method: concatenate` concatenates sessions in their supplied
-order, separately for each shank. It uses the preprocessing outputs when that
-step runs. Outputs use the session name `combined_sessions` in the selected
-folder layout. Each join has a one-second trace image, clipped to
-the adjacent session lengths, with the boundary marked.
+Whether a binary copy is saved is set by `save_preprocessed_copy`; see
+[Saving the preprocessed recording](#saving-the-preprocessed-recording).
 
 ### Bad channel detection
 

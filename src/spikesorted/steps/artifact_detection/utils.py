@@ -11,13 +11,12 @@ from spikesorted.utils.utils import message_user
 
 
 def load_and_check_artefact_periods(
-    output_path, config, session_name, shank_id, recording, verbose=False
+    output_path, session_name, shank_id, recording, verbose=False
 ) -> np.ndarray:
     """Validate saved artefact times and return SpikeInterface sample periods."""
     periods_path = get_artifact_periods_filepath(
         get_step_output_path(
             output_path,
-            config,
             "artifact_detection",
             session_name,
             shank_id,

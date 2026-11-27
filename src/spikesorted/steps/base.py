@@ -129,9 +129,9 @@ class BasePipelineStep:
         session_name: str,
         shank_id: str | int | None = None,
     ) -> Path:
-        """Return this step's output directory using the configured layout."""
+        """Return this step's output directory in the fixed output layout."""
         return get_step_output_path(
-            self.output_path, self.config, self._step_name, session_name, shank_id
+            self.output_path, self._step_name, session_name, shank_id
         )
 
     def _get_recordings_and_paths(
