@@ -53,6 +53,9 @@ def validate_config(config: object) -> PipelineConfig:
     if "preprocessing" not in validated_config:
         raise ValueError("The config must include a preprocessing section.")
 
+    if "sorting" not in validated_config:
+        raise ValueError("The config must include a sorting section.")
+
     # combine_sessions.save_preprocessed_copy is checked by CombineSessionsConfig.
     save_preprocessed_copy = validated_config["preprocessing"].get(
         "save_preprocessed_copy", False

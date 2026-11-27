@@ -86,7 +86,7 @@ class CombineSessionsStep:
 
     _step_name: ClassVar[str] = "combine_sessions"
 
-    _combined_session_name: ClassVar[str] = "combined-sessions"
+    combined_session_name: ClassVar[str] = "combined-sessions"
 
     _config: PipelineConfig = field(init=False, repr=False, compare=False)
 
@@ -146,7 +146,7 @@ class CombineSessionsStep:
             The shank's combine sessions folder.
         """
         return get_step_output_path(
-            output_path, cls._step_name, cls._combined_session_name, shank_id
+            output_path, cls._step_name, cls.combined_session_name, shank_id
         )
 
     def run(self, verbose: bool = True) -> None:

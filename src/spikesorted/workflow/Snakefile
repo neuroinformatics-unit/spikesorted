@@ -31,6 +31,7 @@ from spikesorted.steps.combine_sessions_step import CombineSessionsStep
 from spikesorted.steps.input_data_step import InputDataStep
 from spikesorted.steps.preprocessing_step import PreprocessingStep
 from spikesorted.steps.raw_data_quality_metrics_step import RawDataQualityMetricsStep
+from spikesorted.steps.sorting import SortingStep
 from spikesorted.utils.utils import load_pipeline_config
 
 # Snakemake runs jobs in worker threads, where an interactive backend such as
@@ -179,6 +180,25 @@ def get_targets():
                 as_pattern(CombineSessionsStep.get_output_path(OUTPUT_PATH, shank_id))
             )
 
+    if COMBINE_SESSIONS:
+        for shank_id in SHANK_IDS:
+            target_paths.append(
+                as_pattern(
+                    SortingStep.get_output_path(
+                        OUTPUT_PATH, CombineSessionsStep.combined_session_name, shank_id
+                    )
+                )
+            )
+    else:
+        for manifest_entry in MANIFEST:
+            target_paths.append(
+                as_pattern(
+                    SortingStep.get_output_path(
+                        OUTPUT_PATH, manifest_entry["session"], manifest_entry["shank"]
+                    )
+                )
+            )
+
     return target_paths
 
 
@@ -194,3 +214,4 @@ include: "raw_data_quality_metrics.smk"
 include: "artifact_detection.smk"
 include: "preprocessing.smk"
 include: "combine_sessions.smk"
+include: "sorting.smk"

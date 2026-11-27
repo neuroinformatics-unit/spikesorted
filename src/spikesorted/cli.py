@@ -9,6 +9,7 @@ from pathlib import Path
 
 import yaml
 
+from spikesorted.steps.sorting.sorter_installation import ensure_sorter_installed
 from spikesorted.utils.utils import load_pipeline_config
 
 SNAKEFILE_PATH = Path(__file__).parent / "workflow" / "Snakefile"
@@ -73,7 +74,11 @@ def main(argv: list[str] | None = None) -> int:
     output_path = cli_arguments.output.absolute()
 
     # Validate the config before writing anything.
-    load_pipeline_config(config_path)
+    pipeline_config = load_pipeline_config(config_path)
+
+    # Check or install the sorter on this machine, before any job runs.
+    if not cli_arguments.dry_run:
+        ensure_sorter_installed(pipeline_config["sorting"]["sorter"])
 
     session_names = []
     recording_paths = {}
@@ -140,8 +145,8 @@ def _parse_session_argument(
         The session name and the absolute recording path.
     """
     if "=" in session_argument:
-        session_name, recording_path = session_argument.split("=", 1)
-        return session_name, Path(recording_path).absolute()
+        session_name, named_recording_path = session_argument.split("=", 1)
+        return session_name, Path(named_recording_path).absolute()
 
     recording_path = Path(session_argument).absolute()
 
