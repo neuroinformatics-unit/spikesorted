@@ -24,7 +24,7 @@ class BadChannelUnionStep:
     needs the same set of channels in every session. It reads each session's
     ``bad_channel_ids.csv`` for the shank and writes their union.
 
-    Outputs use "bad_channel_unions" as the session name. A ``sessions.yaml`` beside
+    Outputs use "bad-channels-union" as the session name. A ``sessions.yaml`` beside
     the CSV records the contributing session names and date.
 
     Parameters
@@ -51,7 +51,7 @@ class BadChannelUnionStep:
 
     _step_name: ClassVar[str] = "bad_channel_detection"
 
-    _union_session_name: ClassVar[str] = "bad_channel_unions"
+    _union_session_name: ClassVar[str] = "bad-channels-union"
 
     @classmethod
     def get_input_paths(
@@ -60,7 +60,7 @@ class BadChannelUnionStep:
         session_names: tuple[str, ...],
         shank_id: str,
     ) -> list[Path]:
-        """Return each session's bad-channel detection folder for a shank.
+        """Return each session's bad-channel detection CSV for a shank.
 
         Parameters
         ----------
@@ -73,17 +73,19 @@ class BadChannelUnionStep:
 
         Returns
         -------
-        session_step_paths
-            One bad-channel detection folder per session.
+        session_bad_channel_ids_paths
+            One bad-channel detection CSV per session.
         """
-        session_step_paths = []
+        session_bad_channel_ids_paths = []
         for session_name in session_names:
-            session_step_paths.append(
-                BadChannelDetectionStep.get_output_path(
-                    output_path, session_name, shank_id
+            session_bad_channel_ids_paths.append(
+                get_bad_channel_ids_filepath(
+                    BadChannelDetectionStep.get_output_path(
+                        output_path, session_name, shank_id
+                    )
                 )
             )
-        return session_step_paths
+        return session_bad_channel_ids_paths
 
     @classmethod
     def get_output_path(cls, output_path: str | Path, shank_id: str) -> Path:
@@ -107,25 +109,14 @@ class BadChannelUnionStep:
 
     def run(self) -> None:
         """Read each session's bad channel IDs and save their union."""
-        session_step_paths = self.get_input_paths(
+        session_bad_channel_ids_paths = self.get_input_paths(
             self.output_path, self.session_names, self.shank_id
         )
 
-        for session_step_path in session_step_paths:
-            session_bad_channel_ids_path = get_bad_channel_ids_filepath(
-                session_step_path
-            )
-            if not session_bad_channel_ids_path.is_file():
-                raise FileNotFoundError(
-                    f"Cannot create the bad-channel union: "
-                    f"{session_bad_channel_ids_path} does not exist. "
-                    "Run bad channel detection for every session first."
-                )
-
-        bad_channel_ids = {}
-        for session_step_path in session_step_paths:
+        bad_channel_ids: dict[str, str] = {}
+        for session_bad_channel_ids_path in session_bad_channel_ids_paths:
             session_bad_channel_ids = pd.read_csv(
-                get_bad_channel_ids_filepath(session_step_path),
+                session_bad_channel_ids_path,
                 dtype={"channel_id": str},
                 keep_default_na=False,
             )

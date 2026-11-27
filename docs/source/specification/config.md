@@ -28,9 +28,11 @@ preprocessing:
   highpass_spatial_filter: {}
   silence_periods:
     mode: zeros
+  save_preprocessed_copy: false
 
 combine_sessions:
   method: concatenate
+  save_preprocessed_copy: true
 
 sorting:
   sorter: kilosort2_5
@@ -69,6 +71,30 @@ Only optional steps can be skipped.
 ```{note}
 It is best practice to include all applicable steps, especially raw data quality
 metrics and bad channel detection.
+```
+
+## Saving the preprocessed recording
+
+`save_preprocessed_copy` sets whether a step saves a binary copy of the
+preprocessed recording. It can be set in the `preprocessing` section, the
+`combine_sessions` section, or neither. It is `false` when left out, and it is
+not a preprocessing step.
+
+| Section | When `true` |
+| --- | --- |
+| `preprocessing` | Each session's preprocessed recording is saved in `preprocessing/recording/`. |
+| `combine_sessions` | The combined recording is saved in `combine_sessions/recording/`. |
+
+It cannot be `true` in both sections, which raises a configuration error.
+
+A step that does not save a copy writes only `metadata.json`, which points at
+the previous step's saved copy or at the raw data. The preprocessing is then
+recomputed when a later step loads it.
+
+```{note}
+If no step saves a copy, the raw data must stay available at the path it was
+loaded from. If it may be moved or deleted, set `save_preprocessed_copy: true`
+in one of the sections to write the preprocessed recording to disk.
 ```
 
 ## Output layout

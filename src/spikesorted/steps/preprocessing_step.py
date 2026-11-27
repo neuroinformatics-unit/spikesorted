@@ -1,106 +1,269 @@
-"""Preprocess recordings using SpikeInterface's ordered pipeline."""
+"""Preprocess one session shank using SpikeInterface's ordered pipeline."""
 
 from __future__ import annotations
 
 import copy
-import shutil
 import sys
 from contextlib import redirect_stdout
-from dataclasses import dataclass
-from typing import ClassVar
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import TYPE_CHECKING, ClassVar
 
 import spikeinterface.preprocessing as spre
+from spikeinterface import load
 
 from spikesorted.plotting.preprocessing import plot_preprocessing
 from spikesorted.step_configs import (
     SPATIAL_OPERATIONS,
     TEMPORAL_FILTERS,
 )
+from spikesorted.steps.artifact_detection import ArtifactDetectionStep
 from spikesorted.steps.artifact_detection.utils import load_and_check_artefact_periods
-from spikesorted.steps.bad_channel_detection.utils import (
-    load_and_check_bad_channel_ids,
-    get_bad_channel_ids_filepath,
+from spikesorted.steps.bad_channel_detection import (
+    BadChannelDetectionStep,
+    BadChannelUnionStep,
 )
-from spikesorted.steps.base import BasePipelineStep
+from spikesorted.steps.bad_channel_detection.utils import (
+    get_bad_channel_ids_filepath,
+    load_and_check_bad_channel_ids,
+)
+from spikesorted.steps.input_data_step import InputDataStep
 from spikesorted.utils.output_paths import get_step_output_path
-from spikesorted.utils.recordings_structure import RecordingInput
-from spikesorted.utils.utils import message_user
+from spikesorted.utils.utils import load_pipeline_config, message_user
+
+if TYPE_CHECKING:
+    from spikesorted.validation.config_validation import PipelineConfig
 
 
 @dataclass(frozen=True)
-class PreprocessingStep(BasePipelineStep):
-    """Preprocess each session and shank using the configured operation order."""
+class PreprocessingStep:
+    """Preprocess one session and shank using the configured step order.
 
-    save_preprocessed_copy: bool = True
+    The ``run()`` method wraps SpikeInterface's
+    ``apply_preprocessing_pipeline()``, applying the steps of the config's
+    ``preprocessing`` section in the order they are written.
+
+    Parameters
+    ----------
+    session_name
+        Name of the session to process.
+
+    shank_id
+        ID of the shank to process.
+
+    config_path
+        Path to the YAML pipeline configuration file containing the
+        ``preprocessing`` settings.
+
+    output_path
+        The subject folder. The input recording is read from the session
+        shank's ``input_data`` folder, and outputs are written beside it.
+
+    See Also
+    --------
+    spikeinterface.preprocessing.apply_preprocessing_pipeline
+
+    Notes
+    -----
+    The following are saved for the session shank:
+
+    ``preprocessing_plots/``
+        Traces before and after preprocessing, at the start, middle and end
+        of the recording.
+
+    ``recording/``
+        The preprocessed data, saved when ``save_preprocessed_copy`` in the
+        config's ``preprocessing`` section is true.
+
+    ``metadata.json``
+        A SpikeInterface JSON dump that later steps load the preprocessed
+        recording from. When ``recording/`` is saved it points at that.
+        Otherwise it points at the raw data and the preprocessing is
+        recomputed on loading, so the raw data must stay where it is.
+
+    Examples
+    --------
+    >>> PreprocessingStep(
+    ...     session_name="ses-001",
+    ...     shank_id="0",
+    ...     config_path="config.yaml",
+    ...     output_path="/derivatives/sub-001",
+    ... ).run()
+    """
+
+    session_name: str
+    shank_id: str
+    config_path: str | Path
+    output_path: str | Path
 
     _step_name: ClassVar[str] = "preprocessing"
 
-    def run(self, verbose: bool = True) -> list[RecordingInput]:
-        """Return named sessions containing saved paths or in-memory recordings."""
+    _config: PipelineConfig = field(init=False, repr=False, compare=False)
+
+    def __post_init__(self) -> None:
+        """Load and validate the pipeline config once."""
+        object.__setattr__(self, "_config", load_pipeline_config(self.config_path))
+
+    @property
+    def config(self) -> PipelineConfig:
+        """Return the dictionary loaded at construction, without rereading disk."""
+        return self._config
+
+    @classmethod
+    def get_input_paths(
+        cls,
+        output_path: str | Path,
+        config: PipelineConfig,
+        session_name: str,
+        shank_id: str,
+    ) -> list[Path]:
+        """Return the paths this step waits for, for a session shank.
+
+        Parameters
+        ----------
+        output_path
+            The subject folder.
+        config
+            The loaded pipeline config.
+        session_name
+            Name of the session.
+        shank_id
+            Shank ID.
+
+        Returns
+        -------
+        input_paths
+            The CSV holding the bad channels when the ``preprocessing`` section
+            includes ``remove_bad_channels`` or ``interpolate_bad_channels``:
+            the shank's union CSV and session metadata with
+            ``combine_sessions``, otherwise the session shank's bad-channel
+            detection CSV. The session shank's artifact detection folder when
+            it includes ``silence_periods``. With neither, the session shank's
+            ``recording.json`` and ``recording_info.yaml``.
+        """
+        preprocessing_steps = config["preprocessing"]
+
+        input_paths = []
+
+        if (
+            "remove_bad_channels" in preprocessing_steps
+            or "interpolate_bad_channels" in preprocessing_steps
+        ):
+            if "combine_sessions" in config:
+                union_path = BadChannelUnionStep.get_output_path(output_path, shank_id)
+                input_paths.append(get_bad_channel_ids_filepath(union_path))
+                input_paths.append(union_path / "sessions.yaml")
+            else:
+                input_paths.append(
+                    get_bad_channel_ids_filepath(
+                        BadChannelDetectionStep.get_output_path(
+                            output_path, session_name, shank_id
+                        )
+                    )
+                )
+
+        if "silence_periods" in preprocessing_steps:
+            input_paths.append(
+                ArtifactDetectionStep.get_output_path(
+                    output_path, session_name, shank_id
+                )
+            )
+
+        if len(input_paths) == 0:
+            input_paths.append(
+                InputDataStep.get_recording_json_path(
+                    output_path, session_name, shank_id
+                )
+            )
+            input_paths.append(
+                InputDataStep.get_recording_info_path(
+                    output_path, session_name, shank_id
+                )
+            )
+
+        return input_paths
+
+    @classmethod
+    def get_output_path(
+        cls, output_path: str | Path, session_name: str, shank_id: str
+    ) -> Path:
+        """Return the folder this step writes for a session shank.
+
+        Parameters
+        ----------
+        output_path
+            The subject folder.
+        session_name
+            Name of the session.
+        shank_id
+            Shank ID.
+
+        Returns
+        -------
+        step_path
+            The session shank's preprocessing folder.
+        """
+        return get_step_output_path(output_path, cls._step_name, session_name, shank_id)
+
+    def run(self, verbose: bool = True) -> None:
+        """Preprocess the recording and save its plots, metadata and optional copy.
+
+        Parameters
+        ----------
+        verbose
+            Whether to print progress messages.
+        """
         self.perform_checks()
 
-        processed_sessions = []
+        step_path = self.get_output_path(
+            self.output_path, self.session_name, self.shank_id
+        )
+        shank_message = f", shank {self.shank_id}" if self.shank_id else ""
+        message_user(
+            f"Preprocessing session {self.session_name}{shank_message}",
+            verbose,
+        )
 
-        for (
-            session_name,
-            shank_id,
+        step_path.mkdir(parents=True, exist_ok=True)
+
+        with redirect_stdout(sys.stderr):
+            recording = load(
+                InputDataStep.get_recording_json_path(
+                    self.output_path, self.session_name, self.shank_id
+                )
+            )
+
+        spikeinterface_kwargs = copy.deepcopy(self.config["preprocessing"])
+        save_preprocessed_copy = spikeinterface_kwargs.pop(
+            "save_preprocessed_copy", False
+        )
+
+        pipeline = self._convert_kwargs_to_spikeinterface_pipeline(
+            spikeinterface_kwargs, recording, verbose
+        )
+
+        with redirect_stdout(sys.stderr):
+            preprocessed_rec = spre.apply_preprocessing_pipeline(
+                recording, pipeline, apply_precomputed_kwargs=True
+            )
+
+        plot_preprocessing(
             recording,
-            step_path,
-        ) in self._get_recordings_and_paths():
-            shank_message = f", shank {shank_id}" if shank_id is not None else ""
-            message_user(
-                f"Preprocessing session {session_name}{shank_message}",
-                verbose,
+            preprocessed_rec,
+            step_path / "preprocessing_plots",
+        )
+
+        if save_preprocessed_copy:
+            preprocessed_rec = preprocessed_rec.save(
+                folder=step_path / "recording", verbose=verbose
             )
 
-            spikeinterface_kwargs = copy.deepcopy(self.config["preprocessing"])
-
-            pipeline = self._convert_kwargs_to_spikeinterface_pipeline(
-                spikeinterface_kwargs, session_name, shank_id, recording, verbose
-            )
-
-            with redirect_stdout(sys.stderr):
-                preprocessed_rec = spre.apply_preprocessing_pipeline(
-                    recording, pipeline, apply_precomputed_kwargs=True
-                )
-
-            plot_preprocessing(
-                recording,
-                preprocessed_rec,
-                step_path / "preprocessing_plots",
-            )
-
-            if self.save_preprocessed_copy:
-                preprocessed_rec = preprocessed_rec.save(
-                    folder=step_path / "recording", verbose=verbose
-                )
-
-            preprocessed_rec.dump_to_json(
-                step_path / "metadata.json", include_properties=True
-            )
-
-            # Handover the path for the next step if recording
-            # is saved to disk, otherwise the recording in-memory
-            if self.save_preprocessed_copy:
-                processed_output = step_path / "recording"
-            else:
-                processed_output = preprocessed_rec
-
-            # Store each session as one recording/path or a dictionary of shanks.
-            if shank_id is None:
-                processed_sessions.append((processed_output, session_name))
-            else:
-                if processed_sessions and processed_sessions[-1][1] == session_name:
-                    processed_sessions[-1][0][shank_id] = processed_output
-                else:
-                    processed_sessions.append(
-                        ({shank_id: processed_output}, session_name)
-                    )
-
-        return processed_sessions
+        preprocessed_rec.dump_to_json(
+            step_path / "metadata.json", include_properties=True
+        )
 
     def _convert_kwargs_to_spikeinterface_pipeline(
-        self, spikeinterface_kwargs, session_name, shank_id, recording, verbose
+        self, spikeinterface_kwargs, recording, verbose
     ):
         """Load step inputs and convert kwargs to SpikeInterface's ordered list."""
         pipeline = []
@@ -109,8 +272,8 @@ class PreprocessingStep(BasePipelineStep):
                 bad_channel_ids = load_and_check_bad_channel_ids(
                     self.output_path,
                     self.config,
-                    session_name,
-                    shank_id,
+                    self.session_name,
+                    self.shank_id,
                     required=True,
                     verbose=verbose,
                 )
@@ -126,8 +289,8 @@ class PreprocessingStep(BasePipelineStep):
             elif step == "silence_periods":
                 kwargs["periods"] = load_and_check_artefact_periods(
                     self.output_path,
-                    session_name,
-                    shank_id,
+                    self.session_name,
+                    self.shank_id,
                     recording,
                     verbose=verbose,
                 )
@@ -140,8 +303,7 @@ class PreprocessingStep(BasePipelineStep):
     # ----------------------------------------------------------------------------------
 
     def perform_checks(self) -> None:
-        """Check preprocessing inputs and operation order.
-        """
+        """Check preprocessing inputs and operation order."""
         # Check mutually exclusive bad channel handling steps
         if {"remove_bad_channels", "interpolate_bad_channels"} <= self.config[
             "preprocessing"
@@ -153,42 +315,21 @@ class PreprocessingStep(BasePipelineStep):
         # Check preprocessing steps are in a sensible order
         self._check_operation_order()
 
-        # Check overwrite settings and
-        for _, shank_id, _, step_path in self._get_recordings_and_paths():
-
-            if step_path.exists() and not self.overwrite:
-                raise FileExistsError(
-                    f"Preprocessing output already exists: {step_path}"
-                )
-            union_path = get_bad_channel_ids_filepath(
-                get_step_output_path(
-                    self.output_path,
-                    "bad_channel_detection",
-                    "bad_channel_unions",
-                    shank_id,
-                )
+        if (
+            "bad_channel_detection" in self.config
+            and "combine_sessions" in self.config
+            and not {
+                "remove_bad_channels",
+                "interpolate_bad_channels",
+            }
+            & self.config["preprocessing"].keys()
+        ):
+            raise ValueError(
+                "The config combines sessions with bad-channel detection, but "
+                "preprocessing "
+                "does not include remove_bad_channels or interpolate_bad_channels. "
+                "Add either step to handle the union bad channels."
             )
-            if (
-                union_path.is_file()
-                and not {
-                    "remove_bad_channels",
-                    "interpolate_bad_channels",
-                } & self.config["preprocessing"].keys()
-            ):
-                raise ValueError(
-                    f"Bad-channel union exists at {union_path}, but preprocessing "
-                    "does not include remove_bad_channels or interpolate_bad_channels. "
-                    "Add either step to handle the union bad channels."
-                )
-
-        # Check overwrite settings, and delete existing outputs
-        super().perform_checks()
-
-        for _, _, _, step_path in self._get_recordings_and_paths():
-            if step_path.exists():
-                shutil.rmtree(step_path)
-
-            step_path.mkdir(parents=True)
 
     def _check_operation_order(self) -> None:
         """Check the configured order without rearranging any operations."""
@@ -232,3 +373,7 @@ class PreprocessingStep(BasePipelineStep):
         user_operations = list(self.config["preprocessing"])
         lhs_index = user_operations.index(lhs)
         return all(lhs_index < user_operations.index(operation) for operation in rhs)
+
+    def needs_gpu(self) -> bool:
+        """Report whether preprocessing requires a GPU."""
+        return False

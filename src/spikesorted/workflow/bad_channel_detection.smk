@@ -23,7 +23,7 @@ def get_bad_channel_detection_input_paths(wildcards):
 
 
 def get_bad_channel_union_input_paths(wildcards):
-    """Return every session's bad-channel detection folder for a union job.
+    """Return every session's bad-channel detection CSV for a union job.
 
     Parameters
     ----------
@@ -33,7 +33,7 @@ def get_bad_channel_union_input_paths(wildcards):
     Returns
     -------
     input_paths
-        One bad-channel detection folder per session, for the job's shank.
+        One bad-channel detection CSV per session, for the job's shank.
     """
     input_paths = []
     for input_path in BadChannelUnionStep.get_input_paths(
@@ -49,8 +49,15 @@ if "bad_channel_detection" in PIPELINE_CONFIG:
         input:
             get_bad_channel_detection_input_paths,
         output:
-            directory(
-                as_pattern(
+            bad_channel_ids=as_pattern(
+                get_bad_channel_ids_filepath(
+                    BadChannelDetectionStep.get_output_path(
+                        OUTPUT_PATH, "{session}", "{shank}"
+                    )
+                )
+            ),
+            bad_channel_labels=as_pattern(
+                get_bad_channel_labels_filepath(
                     BadChannelDetectionStep.get_output_path(
                         OUTPUT_PATH, "{session}", "{shank}"
                     )
@@ -73,13 +80,17 @@ if "bad_channel_detection" in PIPELINE_CONFIG:
             input:
                 get_bad_channel_union_input_paths,
             output:
-                directory(
-                    as_pattern(
-                        BadChannelUnionStep.get_output_path(
-                            OUTPUT_PATH, "{shank}"
-                        )
+                bad_channel_ids=as_pattern(
+                    get_bad_channel_ids_filepath(
+                        BadChannelUnionStep.get_output_path(OUTPUT_PATH, "{shank}")
                     )
                 ),
+                sessions=as_pattern(
+                    BadChannelUnionStep.get_output_path(OUTPUT_PATH, "{shank}")
+                    / "sessions.yaml"
+                ),
+            params:
+                session_names=SESSION_NAMES,
             run:
                 BadChannelUnionStep(
                     session_names=SESSION_NAMES,

@@ -66,9 +66,9 @@ including planned outputs for later steps.
 ## Bad-channel unions
 
 When bad channels are combined across sessions, union outputs use
-`bad_channel_unions` in place of a session name. Each shank's union folder contains
+`bad-channels-union` in place of a session name. Each shank's union folder contains
 `bad_channel_ids.csv` and `sessions.yaml` recording its contributing sessions,
-at `bad_channel_unions/ephys/shank-<id>/bad_channel_detection/` below `output_path`.
+at `bad-channels-union/ephys/shank-<id>/bad_channel_detection/` below `output_path`.
 
 Local runs and SLURM coordinators use the same layout.
 

@@ -20,8 +20,7 @@ def load_and_check_bad_channel_ids(
 ):
     """Load session or union bad-channel IDs in their original dtype.
 
-    combine_sessions requires and selects the union for the shank. A union
-    without combine_sessions raises ValueError. Missing session files return
+    combine_sessions selects the union for the shank. Missing files return
     None unless required is True, in which case FileNotFoundError is raised.
     """
     combine_sessions = "combine_sessions" in config
@@ -29,30 +28,15 @@ def load_and_check_bad_channel_ids(
         get_step_output_path(
             output_path,
             "bad_channel_detection",
-            "bad_channel_unions",
+            "bad-channels-union",
             shank_id,
         )
     )
     # TODO: move this stuff into self._check_dependecy() function for each
     # step, see https://github.com/neuroinformatics-unit/spikesorted/issues/24
     if combine_sessions:
-        if not union_path.is_file():
-            raise FileNotFoundError(
-                "The config includes 'combine_sessions' but no bad channels "
-                f"union file can be found for shank {shank_id!r} at the "
-                f"expected path: {union_path}. Please re-run bad channel "
-                "detection with 'combine_sessions' present."
-            )
         channel_ids_path = union_path
     else:
-        if union_path.is_file():
-            raise ValueError(
-                f"A bad channels union file exists for shank {shank_id!r} "
-                "but this config does not include 'combine_sessions'. "
-                "It appears the pipeline has got out of alignment. Please "
-                "re-run bad channel detection with the current config "
-                "selecting `overwrite=True`."
-            )
         channel_ids_path = get_bad_channel_ids_filepath(
             get_step_output_path(
                 output_path,

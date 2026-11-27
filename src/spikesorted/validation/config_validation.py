@@ -40,4 +40,30 @@ def validate_config(config: object) -> PipelineConfig:
     Raw-data metric sampling options also require finite, valid ranges.
     Recording-dependent constraints remain SI's responsibility.
     """
-    return _pipeline_config_adapter.validate_python(config)
+    validated_config = _pipeline_config_adapter.validate_python(config)
+
+    if "preprocessing" not in validated_config:
+        raise ValueError("The config must include a preprocessing section.")
+
+    for section_name in ("preprocessing", "combine_sessions"):
+        if section_name in validated_config:
+            save_preprocessed_copy = validated_config[section_name].get(
+                "save_preprocessed_copy", False
+            )
+            if not isinstance(save_preprocessed_copy, bool):
+                raise ValueError(
+                    f"{section_name}.save_preprocessed_copy must be true or false, "
+                    f"not {save_preprocessed_copy!r}."
+                )
+
+    if (
+        "preprocessing" in validated_config
+        and "combine_sessions" in validated_config
+        and validated_config["preprocessing"].get("save_preprocessed_copy", False)
+        and validated_config["combine_sessions"].get("save_preprocessed_copy", False)
+    ):
+        raise ValueError(
+            "save_preprocessed_copy cannot be true for both preprocessing and "
+            "combine_sessions. Set it to true in only one of them."
+        )
+    return validated_config

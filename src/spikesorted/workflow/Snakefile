@@ -15,12 +15,27 @@ paths the steps use.
 
 import re
 
+import matplotlib
+import yaml
+
+from spikesorted.steps.artifact_detection import ArtifactDetectionStep
 from spikesorted.steps.bad_channel_detection import (
     BadChannelDetectionStep,
     BadChannelUnionStep,
 )
+from spikesorted.steps.bad_channel_detection.utils import (
+    get_bad_channel_ids_filepath,
+    get_bad_channel_labels_filepath,
+)
+from spikesorted.steps.combine_sessions_step import CombineSessionsStep
 from spikesorted.steps.input_data_step import InputDataStep
+from spikesorted.steps.preprocessing_step import PreprocessingStep
+from spikesorted.steps.raw_data_quality_metrics_step import RawDataQualityMetricsStep
 from spikesorted.utils.utils import load_pipeline_config
+
+# Snakemake runs jobs in worker threads, where an interactive backend such as
+# Tk fails when a step saves a plot.
+matplotlib.use("Agg")
 
 OUTPUT_PATH = config["output_path"]
 CONFIG_PATH = config["config_path"]
@@ -63,6 +78,31 @@ def as_pattern(path):
     return path.as_posix()
 
 
+def check_bad_channel_union_sessions(shank_id):
+    """Check a shank's bad-channel union was made from the requested sessions.
+
+    Does nothing unless the config has both ``bad_channel_detection`` and
+    ``combine_sessions``.
+
+    Parameters
+    ----------
+    shank_id
+        Shank ID.
+    """
+    if "bad_channel_detection" in PIPELINE_CONFIG and COMBINE_SESSIONS:
+        sessions_path = (
+            BadChannelUnionStep.get_output_path(OUTPUT_PATH, shank_id)
+            / "sessions.yaml"
+        )
+        with sessions_path.open(encoding="utf-8") as file:
+            union_sessions = yaml.safe_load(file)["sessions"]
+        if sorted(union_sessions) != list(SESSION_NAMES):
+            raise ValueError(
+                f"Bad-channel union sessions {union_sessions} do not match "
+                f"the requested sessions {list(SESSION_NAMES)}."
+            )
+
+
 def get_targets():
     """Return the final outputs for every session shank.
 
@@ -86,8 +126,10 @@ def get_targets():
         for manifest_entry in MANIFEST:
             target_paths.append(
                 as_pattern(
-                    BadChannelDetectionStep.get_output_path(
-                        OUTPUT_PATH, manifest_entry["session"], manifest_entry["shank"]
+                    get_bad_channel_ids_filepath(
+                        BadChannelDetectionStep.get_output_path(
+                            OUTPUT_PATH, manifest_entry["session"], manifest_entry["shank"]
+                        )
                     )
                 )
             )
@@ -95,8 +137,47 @@ def get_targets():
         if COMBINE_SESSIONS:
             for shank_id in SHANK_IDS:
                 target_paths.append(
-                    as_pattern(BadChannelUnionStep.get_output_path(OUTPUT_PATH, shank_id))
+                    as_pattern(
+                        get_bad_channel_ids_filepath(
+                            BadChannelUnionStep.get_output_path(OUTPUT_PATH, shank_id)
+                        )
+                    )
                 )
+
+    if "raw_data_quality_metrics" in PIPELINE_CONFIG:
+        for manifest_entry in MANIFEST:
+            target_paths.append(
+                as_pattern(
+                    RawDataQualityMetricsStep.get_output_path(
+                        OUTPUT_PATH, manifest_entry["session"], manifest_entry["shank"]
+                    )
+                )
+            )
+
+    if "artifact_detection" in PIPELINE_CONFIG:
+        for manifest_entry in MANIFEST:
+            target_paths.append(
+                as_pattern(
+                    ArtifactDetectionStep.get_output_path(
+                        OUTPUT_PATH, manifest_entry["session"], manifest_entry["shank"]
+                    )
+                )
+            )
+
+    for manifest_entry in MANIFEST:
+        target_paths.append(
+            as_pattern(
+                PreprocessingStep.get_output_path(
+                    OUTPUT_PATH, manifest_entry["session"], manifest_entry["shank"]
+                )
+            )
+        )
+
+    if COMBINE_SESSIONS:
+        for shank_id in SHANK_IDS:
+            target_paths.append(
+                as_pattern(CombineSessionsStep.get_output_path(OUTPUT_PATH, shank_id))
+            )
 
     return target_paths
 
@@ -109,3 +190,7 @@ rule all:
 
 include: "input_data.smk"
 include: "bad_channel_detection.smk"
+include: "raw_data_quality_metrics.smk"
+include: "artifact_detection.smk"
+include: "preprocessing.smk"
+include: "combine_sessions.smk"

@@ -39,7 +39,7 @@ The union of all bad channels detected across included sessions. It defines a
 shared set of bad channels across the sessions being combined.
 
 The bad channel unions are saved under
-`bad_channel_unions/ephys/shank-<shank_id>/bad_channel_detection/`.
+`bad-channels-union/ephys/shank-<shank_id>/bad_channel_detection/`.
 
 | File | Contents |
 | --- | --- |
