@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=a1b47e79"></script>
+    <script src="../_static/documentation_options.js?v=05ccfa60"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
@@ -434,7 +434,28 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="postprocessing">
 <h1>Postprocessing<a class="headerlink" href="#postprocessing" title="Link to this heading">#</a></h1>
-<p>Coming soon…</p>
+<p>The preset configs and
+<code class="docutils literal notranslate"><span class="pre">examples/full_pipeline_test_config.yaml</span></code> now explicitly request random spikes,
+waveforms, templates, PCA, noise levels, spike amplitudes, spike and unit
+locations, template similarity, correlograms, ISI histograms, template metrics,
+and all quality metrics. Empty dictionaries use SpikeInterface defaults.</p>
+<p>The postprocessing step:</p>
+<ul class="simple">
+<li><p>Pairs each saved sorting with the supplied preprocessed recording. Supply the
+same recording used for sorting, retaining its session and shank names.</p></li>
+<li><p>Applies <code class="docutils literal notranslate"><span class="pre">compute_sparsity</span></code> settings when creating the disk-backed analyzer.</p></li>
+<li><p>Computes the configured extensions in dependency order, then quality metrics.
+Expands <code class="docutils literal notranslate"><span class="pre">metric_names:</span> <span class="pre">all</span></code> to the full list of supported quality metrics.</p></li>
+<li><p>Saves <code class="docutils literal notranslate"><span class="pre">sorting_analyzer/</span></code>, <code class="docutils literal notranslate"><span class="pre">quality_metrics.csv</span></code>, and extension parameters in
+each session/shank’s postprocessing directory.</p></li>
+</ul>
+<p>The runnable pipeline example includes postprocessing. To run only this step,
+set <code class="docutils literal notranslate"><span class="pre">start_at_step=&quot;postprocessing&quot;</span></code> and supply the preprocessed recordings and
+the output path containing the saved sorting results. Existing postprocessing outputs
+require <code class="docutils literal notranslate"><span class="pre">overwrite=True</span></code> to replace them. Metrics can be undefined (NaN) for
+very short recordings or units with too few spikes.</p>
+<p>TODO: expand this page with the individual extension settings. Define the
+postprocessing plots required by the specification and document their outputs.</p>
 </section>
 
 
