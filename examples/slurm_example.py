@@ -20,12 +20,15 @@ def main():
         overwrite=False,
         num_cores=1,
         slurm_opts={
+            "conda_env_name": "spikesorted",  # Change to your Conda environment.
+            "matlab_module_name": None,  # Set your cluster's MATLAB module if needed.
             "slurm_partition": "cpu",  # Change to your cluster's partition.
             "mem_gb": 4,
             "timeout_min": 10,
             "slurm_array_parallelism": 4,
         },
         coordinator_slurm_opts={
+            "conda_env_name": "spikesorted",
             "slurm_partition": "cpu",
             "mem_gb": 4,
             "timeout_min": 1440,  # Includes time waiting for workers to start.

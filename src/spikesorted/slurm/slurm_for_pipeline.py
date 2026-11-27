@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from spikesorted.pipeline.pipeline import Pipeline
 from spikesorted.slurm.slurm_runners import run_slurm_batch, submit_slurm
@@ -54,7 +54,7 @@ def run_pipeline_with_slurm(
     )
 
 
-def _run_pipeline_with_slurm(
+def _run_pipeline_with_slurm(  # noqa: C901 - Keep the SLURM stage sequence explicit.
     recordings: RecordingInput | list[RecordingInput],
     config_path: str | Path,
     output_path: str | Path,
@@ -135,7 +135,7 @@ def _run_pipeline_with_slurm(
         )
 
         # Reassemble each session's shanks in the workers' input order.
-        sessions = {}
+        sessions: dict[str, Any] = {}
         for worker_recordings in worker_results:
             for session_recording, session_name in worker_recordings:
                 if isinstance(session_recording, dict):

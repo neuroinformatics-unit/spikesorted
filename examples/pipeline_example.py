@@ -18,7 +18,7 @@ def main():
         recordings=recording,
         config_path=repo_path / "examples/full_pipeline_test_config.yaml",
         output_path=output_path,
-        stop_after_step="preprocessing",
+        stop_after_step="postprocessing",
         overwrite=False,
         n_jobs=1,
     ).run()

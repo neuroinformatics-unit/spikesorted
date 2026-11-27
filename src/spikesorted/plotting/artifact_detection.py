@@ -94,4 +94,3 @@ def save_artifact_plots(recording, periods, output_path):
 
         figure.savefig(plots_path / "artifact_periods.png", dpi=150)
         plt.close(figure)
-

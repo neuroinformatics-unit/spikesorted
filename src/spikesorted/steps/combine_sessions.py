@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import shutil
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, ClassVar, cast
 
 import spikeinterface as si
 
@@ -14,7 +14,9 @@ from spikesorted.utils.recordings_structure import get_recordings
 from spikesorted.utils.utils import message_user
 
 if TYPE_CHECKING:
-    from spikesorted.utils.recordings_structure import RecordingInput
+    from spikeinterface.core import BaseRecording
+
+    from spikesorted.utils.recordings_structure import SessionRecording
 
 
 @dataclass(frozen=True)
@@ -23,12 +25,14 @@ class CombineSessionsStep(BasePipelineStep):
 
     _step_name: ClassVar[str] = "combine_sessions"
 
-    def run(self, verbose: bool = True) -> list[RecordingInput]:
+    def run(self, verbose: bool = True) -> list[tuple[SessionRecording, str]]:
         """Plot session boundaries and optionally save the combined recording."""
         self.perform_checks()
 
-        shanks = {}
-        for session_name, shank_id, recording in get_recordings(self.recordings):
+        shanks: dict[str | int | None, list[tuple[str, BaseRecording]]] = {}
+        for session_name, shank_id, recording in get_recordings(
+            cast("list[tuple[SessionRecording, str]]", self.recordings)
+        ):
             shanks.setdefault(shank_id, []).append((session_name, recording))
 
         combined_shanks = {}
@@ -68,7 +72,9 @@ class CombineSessionsStep(BasePipelineStep):
         """Check recording segments and existing combined-session outputs."""
         super().perform_checks()
 
-        for _, shank_id, _ in get_recordings(self.recordings):
+        for _, shank_id, _ in get_recordings(
+            cast("list[tuple[SessionRecording, str]]", self.recordings)
+        ):
             step_path = self._get_output_path("combined_sessions", shank_id)
             if step_path.exists():
                 if not self.overwrite:

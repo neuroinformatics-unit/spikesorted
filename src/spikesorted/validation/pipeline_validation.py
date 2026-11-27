@@ -14,6 +14,7 @@ PIPELINE_STEP_NAMES = (
     "preprocessing",
     "combine_sessions",
     "sorting",
+    "postprocessing",
 )
 
 
@@ -33,6 +34,7 @@ class _PipelineArguments(BaseModel):
             "preprocessing",
             "combine_sessions",
             "sorting",
+            "postprocessing",
         ]
         | None
     )
@@ -44,6 +46,7 @@ class _PipelineArguments(BaseModel):
             "preprocessing",
             "combine_sessions",
             "sorting",
+            "postprocessing",
         ]
         | None
     )

@@ -10,6 +10,7 @@ import spikeinterface as si
 from spikesorted.steps.artifact_detection import ArtifactDetectionStep
 from spikesorted.steps.bad_channel_detection import BadChannelDetectionStep
 from spikesorted.steps.combine_sessions import CombineSessionsStep
+from spikesorted.steps.postprocessing_step import PostprocessingStep
 from spikesorted.steps.preprocessing_step import PreprocessingStep
 from spikesorted.steps.raw_data_quality_metrics_step import RawDataQualityMetricsStep
 from spikesorted.steps.sorting import SortingStep
@@ -18,7 +19,10 @@ from spikesorted.utils.utils import load_pipeline_config
 from spikesorted.validation.pipeline_validation import _PipelineArguments
 
 if TYPE_CHECKING:
-    from spikesorted.utils.recordings_structure import RecordingInput
+    from spikesorted.utils.recordings_structure import (
+        RecordingInput,
+        SessionRecording,
+    )
 
 
 class Pipeline:
@@ -57,10 +61,10 @@ class Pipeline:
         self.n_jobs = n_jobs
         self.verbose = verbose
 
-    def run(self) -> list[RecordingInput] | None:
+    def run(self) -> list[tuple[SessionRecording, str]] | None:  # noqa: C901 - Keep the pipeline step sequence explicit.
         """Run selected steps, returning recordings when stopping after preprocessing.
 
-        Sorting-only inputs must already be preprocessed.
+        Sorting and postprocessing inputs must already be preprocessed.
         """
         si.set_global_job_kwargs(n_jobs=self.n_jobs)
         configs = load_pipeline_config(self.config_path)
@@ -79,7 +83,7 @@ class Pipeline:
             bad_channel_detection.run(self.verbose)
 
         if self.stop_after_step == "bad_channel_detection":
-            return
+            return None
 
         if "raw_data_quality_metrics" in configs and self.start_at_step in [
             None,
@@ -95,7 +99,7 @@ class Pipeline:
             raw_data_quality_metrics.run(self.verbose)
 
         if self.stop_after_step == "raw_data_quality_metrics":
-            return
+            return None
 
         if "artifact_detection" in configs and self.start_at_step in [
             None,
@@ -112,7 +116,7 @@ class Pipeline:
             artifact_detection.run(self.verbose)
 
         if self.stop_after_step == "artifact_detection":
-            return
+            return None
 
         if "preprocessing" in configs and self.start_at_step in [
             None,
@@ -149,9 +153,9 @@ class Pipeline:
             recordings = combine_sessions_step.run(self.verbose)
 
         if self.stop_after_step == "combine_sessions":
-            return
+            return None
 
-        if self.start_at_step in [
+        if "sorting" in configs and self.start_at_step in [
             None,
             "bad_channel_detection",
             "raw_data_quality_metrics",
@@ -169,6 +173,24 @@ class Pipeline:
             sorting.run(self.verbose)
 
         if self.stop_after_step == "sorting":
-            return
+            return None
+
+        if "postprocessing" in configs and self.start_at_step in [
+            None,
+            "bad_channel_detection",
+            "raw_data_quality_metrics",
+            "artifact_detection",
+            "preprocessing",
+            "combine_sessions",
+            "sorting",
+            "postprocessing",
+        ]:
+            postprocessing = PostprocessingStep(
+                recordings=recordings,
+                config_path=self.config_path,
+                output_path=self.output_path,
+                overwrite=self.overwrite,
+            )
+            postprocessing.run(self.verbose)
 
         return None
