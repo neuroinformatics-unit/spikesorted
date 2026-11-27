@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from spikesorted.pipeline.pipeline import Pipeline
 from spikesorted.slurm.slurm_runners import run_slurm_batch, submit_slurm
@@ -26,7 +26,6 @@ def run_pipeline_with_slurm(
     verbose: bool = True,
     slurm_opts: dict | None = None,
     coordinator_slurm_opts: dict | None = None,
-    save_preprocessed_copy: bool = True,
     start_at_step: str | None = None,
     stop_after_step: str | None = None,
 ):
@@ -43,7 +42,6 @@ def run_pipeline_with_slurm(
         args=(recordings, config_path, output_path),
         kwargs={
             "overwrite": overwrite,
-            "save_preprocessed_copy": save_preprocessed_copy,
             "num_cores": num_cores,
             "verbose": verbose,
             "slurm_opts": slurm_opts,
@@ -51,11 +49,12 @@ def run_pipeline_with_slurm(
             "stop_after_step": stop_after_step,
         },
         output_path=output_path,
+        num_cores=num_cores,
         slurm_opts=coordinator_slurm_opts,
     )
 
 
-def _run_pipeline_with_slurm(
+def _run_pipeline_with_slurm(  # noqa: C901 - Keep the SLURM stage sequence explicit.
     recordings: RecordingInput | list[RecordingInput],
     config_path: str | Path,
     output_path: str | Path,
@@ -63,11 +62,16 @@ def _run_pipeline_with_slurm(
     num_cores: int = 1,
     verbose: bool = True,
     slurm_opts: dict | None = None,
-    save_preprocessed_copy: bool = True,
     start_at_step: str | None = None,
     stop_after_step: str | None = None,
 ):
-    """Run independent session/shank pipelines as an array and await results."""
+    """Run independent session/shank pipelines as an array and await results.
+
+    Each job retains the project root and its session/shank identity.
+    slurm_opts are passed to Submitit's executor.update_parameters().
+    Workers stop after preprocessing when sessions will be combined.
+    Combination and subsequent steps run on this coordinator node.
+    """
 
     def run_pipeline_in_slurm_batch(
         inputs, start_at_step=start_at_step, stop_after_step=stop_after_step
@@ -79,7 +83,6 @@ def _run_pipeline_with_slurm(
                 config_path=config_path,
                 output_path=output_path,
                 overwrite=overwrite,
-                save_preprocessed_copy=save_preprocessed_copy,
                 n_jobs=num_cores,
                 verbose=verbose,
                 start_at_step=start_at_step,
@@ -93,13 +96,13 @@ def _run_pipeline_with_slurm(
     configs = load_pipeline_config(config_path)
     split_recordings = split_recordings_by_shank(recordings)
 
-    if (
-        "combine_sessions" not in configs
-        or "bad_channel_detection" not in configs
-        or start_at_step not in (None, "bad_channel_detection")
-    ):
+    if "combine_sessions" not in configs:
         return run_pipeline_in_slurm_batch(split_recordings)
-    else:
+
+    if "bad_channel_detection" in configs and start_at_step in (
+        None,
+        "bad_channel_detection",
+    ):
         # First we run bad channel detection across separate nodes before
         # creating the union of all bad channels for later combination
         run_pipeline_in_slurm_batch(
@@ -110,10 +113,48 @@ def _run_pipeline_with_slurm(
             config_path=config_path,
             output_path=output_path,
         ).create_bad_channel_labels_union()
+        start_at_step = "raw_data_quality_metrics"
 
     if stop_after_step == "bad_channel_detection":
         return
 
-    return run_pipeline_in_slurm_batch(
-        split_recordings, start_at_step="raw_data_quality_metrics"
-    )
+    if start_at_step not in ("combine_sessions", "sorting"):
+        if stop_after_step in (
+            "raw_data_quality_metrics",
+            "artifact_detection",
+            "preprocessing",
+        ):
+            return run_pipeline_in_slurm_batch(
+                split_recordings, start_at_step=start_at_step
+            )
+
+        worker_results = run_pipeline_in_slurm_batch(
+            split_recordings,
+            start_at_step=start_at_step,
+            stop_after_step="preprocessing",
+        )
+
+        # Reassemble each session's shanks in the workers' input order.
+        sessions: dict[str, Any] = {}
+        for worker_recordings in worker_results:
+            for session_recording, session_name in worker_recordings:
+                if isinstance(session_recording, dict):
+                    sessions.setdefault(session_name, {}).update(session_recording)
+                else:
+                    sessions[session_name] = session_recording
+        recordings = [
+            (session_recording, session_name)
+            for session_name, session_recording in sessions.items()
+        ]
+        start_at_step = "combine_sessions"
+
+    return Pipeline(
+        recordings=recordings,
+        config_path=config_path,
+        output_path=output_path,
+        overwrite=overwrite,
+        n_jobs=num_cores,
+        verbose=verbose,
+        start_at_step=start_at_step,
+        stop_after_step=stop_after_step,
+    ).run()

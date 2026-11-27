@@ -31,8 +31,6 @@ from spikesorted.utils.utils import message_user
 class PreprocessingStep(BasePipelineStep):
     """Preprocess each session and shank using the configured operation order."""
 
-    save_preprocessed_copy: bool = True
-
     _step_name: ClassVar[str] = "preprocessing"
 
     def run(self, verbose: bool = True) -> list[tuple[SessionRecording, str]]:
@@ -54,6 +52,7 @@ class PreprocessingStep(BasePipelineStep):
             )
 
             spikeinterface_kwargs = copy.deepcopy(self.config["preprocessing"])
+            save_recording = spikeinterface_kwargs.pop("save_recording", False)
 
             pipeline = self._convert_kwargs_to_spikeinterface_pipeline(
                 spikeinterface_kwargs, session_name, shank_id, recording, verbose
@@ -70,7 +69,7 @@ class PreprocessingStep(BasePipelineStep):
                 step_path / "preprocessing_plots",
             )
 
-            if self.save_preprocessed_copy:
+            if save_recording:
                 preprocessed_rec = preprocessed_rec.save(
                     folder=step_path / "recording", verbose=verbose
                 )
@@ -81,7 +80,7 @@ class PreprocessingStep(BasePipelineStep):
 
             # Handover the path for the next step if recording
             # is saved to disk, otherwise the recording in-memory
-            if self.save_preprocessed_copy:
+            if save_recording:
                 processed_output = step_path / "recording"
             else:
                 processed_output = preprocessed_rec

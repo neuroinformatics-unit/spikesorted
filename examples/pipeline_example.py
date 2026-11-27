@@ -20,7 +20,6 @@ def main():
         output_path=output_path,
         stop_after_step="postprocessing",
         overwrite=False,
-        save_preprocessed_copy=True,  # False saves only metadata and plots.
         n_jobs=1,
     ).run()
 

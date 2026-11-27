@@ -15,6 +15,7 @@ artifact_detection:
   saturation: {}
 
 preprocessing:
+  save_recording: true
   remove_bad_channels: {}
   phase_shift: {}
   bandpass_filter:

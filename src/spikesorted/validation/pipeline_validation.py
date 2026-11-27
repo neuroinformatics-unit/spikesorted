@@ -12,6 +12,7 @@ PIPELINE_STEP_NAMES = (
     "raw_data_quality_metrics",
     "artifact_detection",
     "preprocessing",
+    "combine_sessions",
     "sorting",
     "postprocessing",
 )
@@ -31,6 +32,7 @@ class _PipelineArguments(BaseModel):
             "raw_data_quality_metrics",
             "artifact_detection",
             "preprocessing",
+            "combine_sessions",
             "sorting",
             "postprocessing",
         ]
@@ -42,6 +44,7 @@ class _PipelineArguments(BaseModel):
             "raw_data_quality_metrics",
             "artifact_detection",
             "preprocessing",
+            "combine_sessions",
             "sorting",
             "postprocessing",
         ]
@@ -50,7 +53,6 @@ class _PipelineArguments(BaseModel):
     overwrite: bool
     n_jobs: int
     verbose: bool
-    save_preprocessed_copy: bool
 
     @field_validator("output_path")
     @classmethod
