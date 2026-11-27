@@ -8,8 +8,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar
 
-from spikeinterface import concatenate_recordings, load
+import spikeinterface as si
+from spikeinterface import load
 
+from spikesorted.plotting.combine_sessions import plot_concatenation_points
 from spikesorted.steps.preprocessing_step import PreprocessingStep
 from spikesorted.utils.output_paths import get_step_output_path
 from spikesorted.utils.utils import load_pipeline_config, message_user
@@ -24,8 +26,8 @@ class CombineSessionsStep:
 
     Use this to sort several sessions together. It loads each session's
     preprocessed recording for the shank and joins them end to end, in the
-    order of ``session_names``. Only the ``concatenate`` method of the
-    config's ``combine_sessions`` section is supported.
+    order of ``session_names``. ``concatenate`` is the only method the
+    config's ``combine_sessions`` section accepts.
 
     Outputs use "combined-sessions" as the session name.
 
@@ -51,6 +53,10 @@ class CombineSessionsStep:
     Notes
     -----
     The following are saved for the shank:
+
+    ``concatenation_plots/``
+        A one-second trace image across each join between sessions, with the
+        boundary marked.
 
     ``recording/``
         The combined preprocessed data, saved when ``save_preprocessed_copy``
@@ -144,54 +150,37 @@ class CombineSessionsStep:
         )
 
     def run(self, verbose: bool = True) -> None:
-        """Concatenate the sessions and save the metadata and optional copy.
+        """Plot session boundaries and optionally save the combined recording.
 
         Parameters
         ----------
         verbose
             Whether to print progress messages.
         """
-        combine_method = self.config["combine_sessions"]["method"]
-        if combine_method != "concatenate":
-            raise NotImplementedError(
-                f"combine_sessions method {combine_method!r} is not supported. "
-                "Use 'concatenate'."
-            )
-
         step_path = self.get_output_path(self.output_path, self.shank_id)
-        shank_message = f", shank {self.shank_id}" if self.shank_id else ""
-        message_user(
-            f"Combining sessions {list(self.session_names)}{shank_message}",
-            verbose,
-        )
 
         step_path.mkdir(parents=True, exist_ok=True)
 
-        session_recordings = []
+        shank_message = f", shank {self.shank_id}" if self.shank_id else ""
+        message_user(f"Concatenating sessions{shank_message}", verbose)
+
+        session_preprocessing_paths = self.get_input_paths(
+            self.output_path, self.session_names, self.shank_id
+        )
+        sessions = []
         with redirect_stdout(sys.stderr):
-            for session_preprocessing_path in self.get_input_paths(
-                self.output_path, self.session_names, self.shank_id
+            for session_name, session_preprocessing_path in zip(
+                self.session_names, session_preprocessing_paths, strict=True
             ):
-                session_recordings.append(
-                    load(session_preprocessing_path / "metadata.json")
+                sessions.append(
+                    (session_name, load(session_preprocessing_path / "metadata.json"))
                 )
 
-            combined_recording = concatenate_recordings(session_recordings)
+        # For now, concatenation is the only option and it is validated on load.
+        combined = si.concatenate_recordings([recording for _, recording in sessions])
+        plot_concatenation_points(combined, sessions, step_path / "concatenation_plots")
 
         if self.config["combine_sessions"].get("save_preprocessed_copy", False):
-            combined_recording = combined_recording.save(
-                folder=step_path / "recording", verbose=verbose
-            )
+            combined = combined.save(folder=step_path / "recording", verbose=verbose)
 
-        combined_recording.dump_to_json(
-            step_path / "metadata.json", include_properties=True
-        )
-
-        message_user(
-            f"Combined sessions saved to: {step_path}",
-            verbose,
-        )
-
-    def needs_gpu(self) -> bool:
-        """Report whether combining sessions requires a GPU."""
-        return False
+        combined.dump_to_json(step_path / "metadata.json", include_properties=True)

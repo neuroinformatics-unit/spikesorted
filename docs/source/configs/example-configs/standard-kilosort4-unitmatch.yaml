@@ -29,7 +29,18 @@ postprocessing:
     ms_before: 1.0
     ms_after: 2.0
   templates: {}
+  principal_components:
+    n_components: 5
+    mode: by_channel_local
+    whiten: true
   template_metrics: {}
+  noise_levels: {}
+  spike_amplitudes: {}
+  spike_locations: {}
+  unit_locations: {}
+  template_similarity: {}
+  correlograms: {}
+  isi_histograms: {}
   quality_metrics:
     metric_names: all
   compute_sparsity:

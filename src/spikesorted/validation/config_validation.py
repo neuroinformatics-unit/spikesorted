@@ -1,6 +1,6 @@
 """Validate pipeline configuration using SpikeInterface's declared parameters."""
 
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal, NotRequired
 
 from pydantic import AfterValidator, ConfigDict, TypeAdapter, with_config
 from typing_extensions import TypedDict
@@ -9,6 +9,14 @@ from spikesorted.validation.steps_validation import (
     _validate_bad_channel_config,
     _validate_raw_data_quality_metrics_config,
 )
+
+
+@with_config(ConfigDict(extra="forbid", strict=True))
+class CombineSessionsConfig(TypedDict):
+    """Concatenate sessions, optionally saving the combined recording."""
+
+    method: Literal["concatenate"]
+    save_preprocessed_copy: NotRequired[bool]
 
 
 @with_config(ConfigDict(extra="forbid", strict=True))
@@ -24,7 +32,7 @@ class PipelineConfig(TypedDict, total=False):
     artifact_detection: Any
     artifact_curation: Any
     preprocessing: Any
-    combine_sessions: Any
+    combine_sessions: CombineSessionsConfig
     sorting: Any
     postprocessing: Any
     curation: Any
@@ -45,16 +53,15 @@ def validate_config(config: object) -> PipelineConfig:
     if "preprocessing" not in validated_config:
         raise ValueError("The config must include a preprocessing section.")
 
-    for section_name in ("preprocessing", "combine_sessions"):
-        if section_name in validated_config:
-            save_preprocessed_copy = validated_config[section_name].get(
-                "save_preprocessed_copy", False
-            )
-            if not isinstance(save_preprocessed_copy, bool):
-                raise ValueError(
-                    f"{section_name}.save_preprocessed_copy must be true or false, "
-                    f"not {save_preprocessed_copy!r}."
-                )
+    # combine_sessions.save_preprocessed_copy is checked by CombineSessionsConfig.
+    save_preprocessed_copy = validated_config["preprocessing"].get(
+        "save_preprocessed_copy", False
+    )
+    if not isinstance(save_preprocessed_copy, bool):
+        raise ValueError(
+            "preprocessing.save_preprocessed_copy must be true or false, "
+            f"not {save_preprocessed_copy!r}."
+        )
 
     if (
         "preprocessing" in validated_config

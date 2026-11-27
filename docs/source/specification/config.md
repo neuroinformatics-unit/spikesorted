@@ -105,6 +105,16 @@ See [Structure on disk](on-disk-structure.md) for folder trees and session-union
 
 ## Step parameters
 
+### Session combination
+
+`combine_sessions.method: concatenate` concatenates sessions in session-name
+order, separately for each shank. It uses each session's preprocessing output.
+Outputs use the session name `combined-sessions`. Each join has a one-second
+trace image, clipped to the adjacent session lengths, with the boundary marked.
+
+Whether a binary copy is saved is set by `save_preprocessed_copy`; see
+[Saving the preprocessed recording](#saving-the-preprocessed-recording).
+
 ### Bad channel detection
 
 All supported parameters and their descriptions can be found in the
